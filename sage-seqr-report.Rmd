@@ -1,0 +1,33 @@
+---
+title: "sage-seqr-report"
+author: "Kelsey Montgomery"
+date: "10/1/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## RNA-Seq Normalization Pipeline using drake
+
+```{r scope}
+#ROSMAP
+table(metadata$diagnosis)
+table(metadata$sex)
+```
+
+
+```{r covariates.correlation, fig.width=9, fig.height=6}
+draw(covar_correlation$plot, heatmap_legend_side = 'left', padding  = unit(c(18,2,2,18), 'mm'))
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
