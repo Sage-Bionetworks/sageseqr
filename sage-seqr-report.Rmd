@@ -13,21 +13,38 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r scope}
 #ROSMAP
-table(metadata$diagnosis)
-table(metadata$sex)
+samples_inline <- glue::glue_collapse(removed_samples, sep = ", ", last = " and ")
 ```
 
+Samples `r samples_inline` were removed from the analysis due to missing metadata.
 
-```{r covariates.correlation, fig.width=9, fig.height=6}
+# Todo: verify if FDR <= 0.1
+```{r covariates_correlation, fig.width=9, fig.height=6}
 draw(covar_correlation$plot, heatmap_legend_side = 'left', padding  = unit(c(18,2,2,18), 'mm'))
 ```
 
-## Including Plots
+## Explore Metadata
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r metadata, fig.width = 10, fig.height = 14}
+# RIN
+p = list()
+p[[1]] = ggplot(clean_md, aes(x = diagnosis, y = RINcontinuous)) + geom_boxplot()
+p[[1]] = p[[1]] + ggtitle('RIN') + theme(legend.position = 'top')
+# AgeAtDeath
+p[[2]] = ggplot(clean_md, aes(x = diagnosis, y = age_death)) + geom_boxplot()
+p[[2]] = p[[2]] + ggtitle('AgeOfDeath') + theme(legend.position = 'top')
+# PMI
+p[[3]] = ggplot(clean_md, aes(x = diagnosis, y = pmi)) + geom_boxplot()
+p[[3]] = p[[3]] + ggtitle('PMI') + theme(legend.position = 'top')
+# Education
+p[[4]] = ggplot(clean_md, aes(x = diagnosis, y = educ)) + geom_boxplot()
+p[[4]] = p[[4]] + ggtitle('Education') + theme(legend.position = 'top')
+# Intronic bases
+p[[5]] = ggplot(clean_md, aes(x = diagnosis, y = PCT_INTRONIC_BASES)) + geom_boxplot()
+p[[5]] = p[[5]] + ggtitle('Fraction Intronic Bases') + theme(legend.position = 'top')
+# Ribosomal bases
+p[[6]] = ggplot(clean_md, aes(x = diagnosis, y = PCT_RIBOSOMAL_BASES)) + geom_boxplot()
+p[[6]] = p[[6]] + ggtitle('Fraction Ribosomal Bases') + theme(legend.position = 'top')
+multiplot(plotlist = p, cols = 2)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
