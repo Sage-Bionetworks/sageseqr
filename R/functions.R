@@ -30,9 +30,14 @@ get_data <- function(synID, version = NULL){
 #'@return A data frame with coerced variables.
 #'@examples
 clean_covariates <- function(md, factors, continuous){
-  md[,factors] <- lapply(md[,factors], factor)
-  md[,continuous] <- lapply(md[,continuous], as.numeric)
-  md
+  if(!missing(factors) & !missing(continuous)) {
+    md[,factors] <- lapply(md[,factors], factor)
+    md[,continuous] <- lapply(md[,continuous], as.numeric)
+    md
+  } else {
+    message("Factor and continuous variables are required.")
+  }
+
 }
 #'
 #'Explore metadata by variable.
