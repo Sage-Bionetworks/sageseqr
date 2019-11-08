@@ -25,12 +25,11 @@ get_data <- function(synID, version = NULL){
 #'@param factors A vector of factor variables
 #'@param continuous A vector of continuous variables
 #' Remove primary variable for now - A vector of primary variables
-#'@param sample_variable A character vector with the column name corresponding to sample identifiers
 #'
 #'@export
 #'@return A data frame with coerced variables.
 #'@examples
-clean_covariates <- function(md, factors, continuous, sample_variable){
+clean_covariates <- function(md, factors, continuous){
   md[,factors] <- lapply(md[,factors], factor)
   md[,continuous] <- lapply(md[,continuous], as.numeric)
   md
