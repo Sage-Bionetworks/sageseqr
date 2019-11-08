@@ -6,6 +6,7 @@ processing_plan <- drake_plan(
                               continuous = c("rincontinuous", "age_death", "pmi", "educ", "pct_pf_reads_aligned", "pct_coding_bases", "pct_intergenic_bases", "pct_intronic_bases", "pct_ribosomal_bases"),
                               sample_variable = c("sampleid")),
   covar_correlation = CovariateAnalysis::getAssociationStatistics(clean_md, PVAL = 0.05),
+  bioMart_query = get_biomart(count_matrix, organism = "hsa", host = "dec2016.archive.ensembl.org")
 
 )
 config <- drake_config(processing_plan)
