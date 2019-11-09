@@ -34,5 +34,13 @@ test_that("function accepts data frames", {
 })
 
 test_that("user cannot omit factor and continuous vector arguments", {
-  expect_null(clean_covariates(df_metadata))
+  expect_error(clean_covariates(df_metadata))
+})
+
+test_that("factor and continous variables are discrete.",{
+  expect_error(clean_covariates(df_metadata, factors = c("sex"), continous = c("sex")))
+})
+
+test_that("variables are in md", {
+  expect_error(clean_covariates(metadata, factors = c("sex"), continuous = c("diagnosis")))
 })
