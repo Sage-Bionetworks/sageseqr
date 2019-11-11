@@ -38,7 +38,7 @@ clean_covariates <- function(md, factors, continuous){
   } else if (!(factors %in% colnames(md) | !(continuous %in% colnames(md)))) {
     stop("Variables provided are not present in the metadata.")
   } else {
-    md[,factors] <- lapply(md[,factors], factor)
+    md[,factors] <- lapply(md[,factors, drop = FALSE], factor)
     md[,continuous] <- lapply(md[,continuous], as.numeric)
     md
   }
