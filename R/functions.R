@@ -39,7 +39,7 @@ clean_covariates <- function(md, factors, continuous){
     stop("Variables provided are not present in the metadata.")
   } else {
     md[,factors] <- lapply(md[,factors, drop = FALSE], factor)
-    md[,continuous] <- lapply(md[,continuous], as.numeric)
+    md[,continuous] <- lapply(md[,continuous, drop = FALSE], as.numeric)
     md
   }
 }
@@ -71,4 +71,3 @@ boxplot_vars <- function(md, include_vars, x_var){
 #'@param sample_variable
 #'
 #'
-
