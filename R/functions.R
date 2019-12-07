@@ -13,7 +13,9 @@
 #'
 #'}
 get_data <- function(synID, version = NULL){
-  df <- as_tibble(data.table::fread(synapser::synGet(synID, version = as.numeric(version))$path))
+  df <- as_tibble(data.table::fread(synapser::synGet(synID,
+                                                     version = as.numeric(version)
+                                                     )$path))
   df
 }
 #'Coerce objects to type factors
@@ -86,13 +88,84 @@ boxplot_vars <- function(md, include_vars, x_var){
     gather(key, value, -x_var) %>%
     ggplot(aes(x = x_var, y = value)) +
     geom_boxplot() +
-    theme(legend.position = 'top') +
+    theme(legend.position = "top") +
     facet_grid(key ~ !! x_var, scales = "free")
+}
+#'Get available Ensembl dataset
+#'
+#'Helper function to search relative Ensembl datasets by partial organism names.
+#'
+#'@param organism A character vector of the organism name. This argument takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".
+#'@param host An optional character vector specifying the release version. This specification is highly recommended for a reproducible workflow. (see \code{"biomaRt::listEnsemblArchives()"})
+biomart_obj <- function(organism, host){
+  message("Connecting to BioMart ...")
+  ensembl <- biomaRt::useMart("ENSEMBL_MART_ENSEMBL", host = host)
+  ds <- listDatasets(ensembl)[, "dataset"]
+  ds <- grep(paste0("^", organism), ds, value = TRUE)
+  if (length(ds) == 0){
+    stop(paste("Mart not found for:", organism))
+  } else if (length(ds) > 1) {
+    message("Found several marts")
+    sapply(ds, function(d) message(paste(which(ds == d), d, sep = ": ")))
+    n <- readline(paste0("Choose mart (1-", length(ds), ") : "))
+    ds <- ds[as.integer(n)]
+  }
+  ensembl <- biomaRt::useDataset(ds, mart = ensembl)
+  ensembl
+}
+#'Get Ensembl biomaRt object
+
+#'Get GC content, gene Ids, gene symbols, gene biotypes, gene lengths and other metadata from Ensembl BioMart.
+#'
+#'@param gene_ids Ensembl gene Ids. Transcript Ids must be converted to gene Ids.
+#'@param host An optional character vector specifying the release version. This specification is highly recommended for a reproducible workflow. (see \code{"biomaRt::listEnsemblArchives()"})
+#'@param organism A character vector of the organism name. This argument takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".
+get_biomart <- function(gene_ids, host, organism){
+    id_type <- "ensembl_gene_id"
+    ensembl <- biomart_obj(organism, host)
+    message(paste0("Downloading sequence",
+                   ifelse(length(gene_ids) > 1, "s", ""), " ..."))
+    if (length(gene_ids) > 100)
+      message("This may take a few minutes ...")
+    attrs <- c(id_type, "ensembl_exon_id", "chromosome_name", "exon_chrom_start", "exon_chrom_end")
+    coords <- biomaRt::getBM(filters = id_type, attributes = attrs, values = gene_ids, mart = ensembl)
+    gene_ids <- unique(coords[, id_type])
+    coords <- sapply(gene_ids, function(i) {
+      i.coords <- coords[coords[, 1] == i, 3:5]
+      g <- GenomicRanges::GRanges(i.coords[, 1], IRanges::IRanges(i.coords[, 2], i.coords[, 3]))
+      g
+    })
+    length <- plyr::ldply(coords[gene_ids], function(x) sum(IRanges::width(x)), .id = "ensembl_gene_id") %>%
+      dplyr::rename(gene_length = V1)
+
+    gc_content <- getBM(filters = id_type,
+                     attributes = c(id_type, "hgnc_symbol", "percentage_gene_gc_content",
+                                    "gene_biotype", "chromosome_name"), values = gene_ids,
+                     mart = ensembl)
+
+    biomart_results <- dplyr::full_join(gc_content, length)
+    biomart_results
 }
 #' Filter genes
 #'
-#'@param md A data frame with sample identifiers in a column
-#'@param count_matrix
-#'@param sample_variable
+#' Remove genes that have less than 1 counts per million (cpm) in at least 50% of samples per condition. If a biomaRt object
+#' is provided, gene lengths and gene GC content is required and genes with missing values are also removed.
 #'
+#'@param md A data frame with sample identifiers in a column.
+#'@param count_matrix A matrix with sample identifiers as columnnames and gene Ids as rownames.
 #'
+filter_genes <- function(md, count_matrix) {
+  genes_to_analyze <- md %>%
+    plyr::dlply(.(diagnosis), .fun = function(md, counts){
+      processed_counts = CovariateAnalysis::getGeneFilteredGeneExprMatrix(counts,
+                                                                          MIN_GENE_CPM = 1,
+                                                                          MIN_SAMPLE_PERCENT_WITH_MIN_GENE_CPM = 0.5)
+      processed_counts$filteredExprMatrix$gen
+    }, count_matrix)
+  genes_to_analyze <- unlist(genes_to_analyze) %>%
+    unique()
+  processed_counts <- CovariateAnalysis::getGeneFilteredGeneExprMatrix(counts[genes_to_analyze,],
+                                                                       MIN_GENE_CPM = 0,
+                                                                       MIN_SAMPLE_PERCENT_WITH_MIN_GENE_CPM = 0)
+  processed_counts
+}
