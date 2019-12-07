@@ -18,24 +18,57 @@ get_data <- function(synID, version = NULL){
                                                      )$path))
   df
 }
+#'Coerce objects to type factors
+#'
+#'@param md
+#'@param factors A vector of factor variables
+coerce_factors <- function(md, factors){
+  md[,factors] <- lapply(md[,factors, drop = FALSE], factor)
+  md
+}
+#'Coerce objects to type numeric
+#'
+#'@param md
+#'@param continuous A vector of continuous variables
+coerce_continuous <- function(md, continuous){
+  test_coercion <- lapply(continuous, function(x) class(type.convert(md[,x])))
+  if(all(test_coercion %in% c("integer", "numeric"))){
+    md[,continuous] <- lapply(md[,continuous, drop = FALSE], function(x) as.numeric(x))
+    md
+  } else {
+    mismatched <- continuous[which(!test_coercion %in% c("integer","numeric"))]
+    stop(glue::glue("Variable {mismatched} can not be coerced to numeric."))
+  }
+}
+#'
+#'
+#'
+#'
 #'
 #'Create covariate matrix from tidy metadata data frame.
 #'
-#'This function takes a tidy format. Coerces objects to correct type.
+#'This function takes a tidy format. Coerces vectors to correct type.
 #'
 #'@param md
 #'@param factors A vector of factor variables
 #'@param continuous A vector of continuous variables
-#' Remove primary variable for now - A vector of primary variables
-#'@param sample_variable A character vector with the column name corresponding to sample identifiers
 #'
 #'@export
 #'@return A data frame with coerced variables.
 #'@examples
-clean_covariates <- function(md, factors, continuous, sample_variable){
-  md[, factors] <- lapply(md[, factors], factor)
-  md[, continuous] <- lapply(md[, continuous], as.numeric)
-  md
+clean_covariates <- function(md, factors, continuous){
+  if (missing(factors) | missing(continuous)) {
+    stop("Factor and continuous variables are required.")
+  } else if (length(intersect(factors, continuous)) != 0) {
+    stop("Variables are present in both the continuous and factor arguments. Variables must be designated
+         numeric or factor, not both.")
+  } else if (!(factors %in% colnames(md) | !(continuous %in% colnames(md)))) {
+    stop("Variables provided are not present in the metadata.")
+  } else {
+    md <- coerce_factors(md, factors)
+    md <- coerce_continuous(md, continuous)
+    md
+  }
 }
 #'
 #'Explore metadata by variable.
@@ -136,8 +169,3 @@ filter_genes <- function(md, count_matrix) {
                                                                        MIN_SAMPLE_PERCENT_WITH_MIN_GENE_CPM = 0)
   processed_counts
 }
-
-
-
-
-
