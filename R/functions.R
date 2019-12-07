@@ -1,9 +1,11 @@
 #'Detect file type and download data
 #'
-#'This function takes synIds and version number to download any rectangular file type from Synapse.
+#'This function takes synIds and version number to download any
+#'rectangular file type from Synapse.
 #'
-#'@param synID A character vector with a Synapse Id.
-#'@param version Optional. A numeric vector with the Synapse file version number.
+#'@param synid A character vector with a Synapse Id.
+#'@param version Optional. A numeric vector with the Synapse file
+#'version number.
 #'@export
 #'@return A tibble.
 #'@examples
@@ -11,8 +13,8 @@
 #'file <- get_data(synID = "syn1234", version = 7)
 #'
 #'}
-get_data <- function(synID, version = NULL){
-  df <- as_tibble(data.table::fread(synapser::synGet(synID,
+get_data <- function(synid, version = NULL) {
+  df <- as_tibble(data.table::fread(synapser::synGet(synid,
                                                      version = as.numeric(version)
                                                      )$path))
   df
@@ -21,21 +23,21 @@ get_data <- function(synID, version = NULL){
 #'
 #'@param md
 #'@param factors A vector of factor variables
-coerce_factors <- function(md, factors){
-  md[,factors] <- lapply(md[,factors, drop = FALSE], factor)
+coerce_factors <- function(md, factors) {
+  md[, factors] <- lapply(md[, factors, drop = FALSE], factor)
   md
 }
 #'Coerce objects to type numeric
 #'
 #'@param md
 #'@param continuous A vector of continuous variables
-coerce_continuous <- function(md, continuous){
+coerce_continuous <- function(md, continuous) {
   test_coercion <- lapply(continuous, function(x) class(type.convert(md[,x])))
-  if(all(test_coercion %in% c("integer", "numeric"))){
-    md[,continuous] <- lapply(md[,continuous, drop = FALSE], function(x) as.numeric(x))
+  if (all(test_coercion %in% c("integer", "numeric"))) {
+    md[, continuous] <- lapply(md[, continuous, drop = FALSE], function(x) as.numeric(x))
     md
   } else {
-    mismatched <- continuous[which(!test_coercion %in% c("integer","numeric"))]
+    mismatched <- continuous[which(!test_coercion %in% c("integer", "numeric"))]
     stop(glue::glue("Variable {mismatched} can not be coerced to numeric."))
   }
 }
@@ -50,7 +52,7 @@ coerce_continuous <- function(md, continuous){
 #'@export
 #'@return A data frame with coerced variables.
 #'@examples
-clean_covariates <- function(md, factors, continuous){
+clean_covariates <- function(md, factors, continuous) {
   if (missing(factors) | missing(continuous)) {
     stop("Factor and continuous variables are required.")
   } else if (length(intersect(factors, continuous)) != 0) {
@@ -76,7 +78,7 @@ clean_covariates <- function(md, factors, continuous){
 #'@return
 #'@examples
 #' TO DO: test this
-boxplot_vars <- function(md, include_vars, x_var){
+boxplot_vars <- function(md, include_vars, x_var) {
   md %>%
     dplyr::select(., c(include_vars, x_var)) %>%
     gather(key, value, -x_var) %>%
@@ -91,12 +93,12 @@ boxplot_vars <- function(md, include_vars, x_var){
 #'
 #'@param organism A character vector of the organism name. This argument takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".
 #'@param host An optional character vector specifying the release version. This specification is highly recommended for a reproducible workflow. (see \code{"biomaRt::listEnsemblArchives()"})
-biomart_obj <- function(organism, host){
+biomart_obj <- function(organism, host) {
   message("Connecting to BioMart ...")
   ensembl <- biomaRt::useMart("ENSEMBL_MART_ENSEMBL", host = host)
   ds <- listDatasets(ensembl)[, "dataset"]
   ds <- grep(paste0("^", organism), ds, value = TRUE)
-  if (length(ds) == 0){
+  if (length(ds) == 0) {
     stop(paste("Mart not found for:", organism))
   } else if (length(ds) > 1) {
     message("Found several marts")
@@ -109,12 +111,17 @@ biomart_obj <- function(organism, host){
 }
 #'Get Ensembl biomaRt object
 
-#'Get GC content, gene Ids, gene symbols, gene biotypes, gene lengths and other metadata from Ensembl BioMart.
+#'Get GC content, gene Ids, gene symbols, gene biotypes, gene lengths
+#'and other metadata from Ensembl BioMart.
 #'
-#'@param gene_ids Ensembl gene Ids. Transcript Ids must be converted to gene Ids.
-#'@param host An optional character vector specifying the release version. This specification is highly recommended for a reproducible workflow. (see \code{"biomaRt::listEnsemblArchives()"})
-#'@param organism A character vector of the organism name. This argument takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".
-get_biomart <- function(gene_ids, host, organism){
+#'@param gene_ids Ensembl gene Ids. Transcript Ids must be converted to
+#'gene Ids.
+#'@param host An optional character vector specifying the release version.
+#'This specification is highly recommended for a reproducible workflow.
+#'(see \code{"biomaRt::listEnsemblArchives()"})
+#'@param organism A character vector of the organism name. This argument
+#'takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".
+get_biomart <- function(gene_ids, host, organism) {
     id_type <- "ensembl_gene_id"
     ensembl <- biomart_obj(organism, host)
     message(paste0("Downloading sequence",
@@ -142,22 +149,24 @@ get_biomart <- function(gene_ids, host, organism){
 }
 #' Filter genes
 #'
-#' Remove genes that have less than 1 counts per million (cpm) in at least 50% of samples per condition. If a biomaRt object
-#' is provided, gene lengths and gene GC content is required and genes with missing values are also removed.
+#' Remove genes that have less than 1 counts per million (cpm) in at least 50%
+#' of samples per condition. If a biomaRt object is provided, gene lengths and
+#' gene GC content is required and genes with missing values are also removed.
 #'
 #'@param md A data frame with sample identifiers in a column.
-#'@param count_matrix A matrix with sample identifiers as columnnames and gene Ids as rownames.
+#'@param count_matrix A matrix with sample identifiers as columnnames and gene
+#'Ids as rownames.
 filter_genes <- function(md, count_matrix) {
   genes_to_analyze <- md %>%
     plyr::dlply(.(diagnosis), .fun = function(md, counts){
-      processed_counts = CovariateAnalysis::getGeneFilteredGeneExprMatrix(counts,
+      processed_counts <- CovariateAnalysis::getGeneFilteredGeneExprMatrix(counts,
                                                                           MIN_GENE_CPM = 1,
                                                                           MIN_SAMPLE_PERCENT_WITH_MIN_GENE_CPM = 0.5)
       processed_counts$filteredExprMatrix$gen
     }, count_matrix)
   genes_to_analyze <- unlist(genes_to_analyze) %>%
     unique()
-  processed_counts <- CovariateAnalysis::getGeneFilteredGeneExprMatrix(counts[genes_to_analyze,],
+  processed_counts <- CovariateAnalysis::getGeneFilteredGeneExprMatrix(counts[genes_to_analyze, ],
                                                                        MIN_GENE_CPM = 0,
                                                                        MIN_SAMPLE_PERCENT_WITH_MIN_GENE_CPM = 0)
   processed_counts

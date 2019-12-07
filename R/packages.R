@@ -1,4 +1,4 @@
-library(CovariateAnalysis) # get the package from devtools::install_github('th1vairam/CovariateAnalysis@dev')
+library(CovariateAnalysis)
 library(data.table)
 library(plyr)
 library(tidyverse)
@@ -10,7 +10,4 @@ library(RColorBrewer)
 library(cqn)
 library(synapser)
 library(knitr)
-##library(doParallel) Need to figure out how to parrallelize drake workflows
 library(foreach)
-##cl = makeCluster(detectCores()-2)
-##registerDoParallel(cl)
