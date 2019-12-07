@@ -1,4 +1,3 @@
-#'
 #'Detect file type and download data
 #'
 #'This function takes synIds and version number to download any rectangular file type from Synapse.
@@ -40,11 +39,6 @@ coerce_continuous <- function(md, continuous){
     stop(glue::glue("Variable {mismatched} can not be coerced to numeric."))
   }
 }
-#'
-#'
-#'
-#'
-#'
 #'Create covariate matrix from tidy metadata data frame.
 #'
 #'This function takes a tidy format. Coerces vectors to correct type.
@@ -153,7 +147,6 @@ get_biomart <- function(gene_ids, host, organism){
 #'
 #'@param md A data frame with sample identifiers in a column.
 #'@param count_matrix A matrix with sample identifiers as columnnames and gene Ids as rownames.
-#'
 filter_genes <- function(md, count_matrix) {
   genes_to_analyze <- md %>%
     plyr::dlply(.(diagnosis), .fun = function(md, counts){
