@@ -16,15 +16,40 @@ get_data <- function(synID, version = NULL){
   df <- as_tibble(data.table::fread(synapser::synGet(synID, version = as.numeric(version))$path))
   df
 }
+#'Coerce objects to type factors
+#'
+#'@param md
+#'@param factors A vector of factor variables
+coerce_factors <- function(md, factors){
+  md[,factors] <- lapply(md[,factors, drop = FALSE], factor)
+  md
+}
+#'Coerce objects to type numeric
+#'
+#'@param md
+#'@param continuous A vector of continuous variables
+coerce_continuous <- function(md, continuous){
+  test_coercion <- lapply(continuous, function(x) class(type.convert(md[,x])))
+  if(all(test_coercion %in% c("integer", "numeric"))){
+    md[,continuous] <- lapply(md[,continuous, drop = FALSE], function(x) as.numeric(x))
+    md
+  } else {
+    mismatched <- continuous[which(!test_coercion %in% c("integer","numeric"))]
+    stop(glue::glue("Variable {mismatched} can not be coerced to numeric."))
+  }
+}
+#'
+#'
+#'
+#'
 #'
 #'Create covariate matrix from tidy metadata data frame.
 #'
-#'This function takes a tidy format. Coerces objects to correct type.
+#'This function takes a tidy format. Coerces vectors to correct type.
 #'
 #'@param md
 #'@param factors A vector of factor variables
 #'@param continuous A vector of continuous variables
-#' Remove primary variable for now - A vector of primary variables
 #'
 #'@export
 #'@return A data frame with coerced variables.
@@ -38,8 +63,8 @@ clean_covariates <- function(md, factors, continuous){
   } else if (!(factors %in% colnames(md) | !(continuous %in% colnames(md)))) {
     stop("Variables provided are not present in the metadata.")
   } else {
-    md[,factors] <- lapply(md[,factors, drop = FALSE], factor)
-    md[,continuous] <- lapply(md[,continuous, drop = FALSE], as.numeric)
+    md <- coerce_factors(md, factors)
+    md <- coerce_continuous(md, continuous)
     md
   }
 }
