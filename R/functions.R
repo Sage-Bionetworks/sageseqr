@@ -145,6 +145,19 @@ get_biomart <- function(gene_ids, host, organism) {
                      mart = ensembl)
 
     biomart_results <- dplyr::full_join(gc_content, length)
+
+    #Downstream analysis requires the removal of duplicate ensembl gene Ids,
+    #removed HGNC symbol will be printed in the console
+    removed_hgnc_symbol <- biomart_results %>%
+      dplyr::group_by(ensembl_gene_id) %>%
+      dplyr::filter(row_number(hgnc_symbol) != 1)
+    vec <- glue::glue_collapse(glue::glue("{vec}"), sep = ", ", last = " and ")
+    message(glue::glue("The following HGNC symbols were removed due to duplicate gene Ids:{vec}"))
+
+    biomart_results <- biomart_results %>%
+      dplyr::group_by(ensembl_gene_id) %>%
+      dplyr::filter(row_number(hgnc_symbol) == 1)
+
     biomart_results
 }
 #' Filter genes
