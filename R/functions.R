@@ -192,6 +192,15 @@ convert_geneids <- function(count_matrix) {
 #' CQN library normalization method is applied.
 cqn <- function(filtered_counts, biomart_results) {
   normalized_counts <- cqn::cqn(filtered_counts$filteredExprMatrix$counts,
-                                x = biomart_results[])
+                                x = biomart_results[biomart_results$ensembl_gene_id %in%
+                                                      filtered_counts$filteredExprMatrix$genes$ensembl_gene_id,
+                                                    "percentage_gene_gc_content"],
+                                lengths = biomart_results[biomart_results$ensembl_gene_id %in%
+                                                            filtered_counts$filteredExprMatrix$genes$ensembl_gene_id,
+                                                          "gene_length"],
+                                lengthMethod = "smooth",
+                                verbose = FALSE
+                                )
+
 }
 #'
