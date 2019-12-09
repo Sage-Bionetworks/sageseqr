@@ -11,7 +11,10 @@ processing_plan <- drake_plan(
                                              "pct_ribosomal_bases"),
                               sample_variable = c("sampleid")),
   covar_correlation = CovariateAnalysis::getAssociationStatistics(clean_md, PVAL = 0.05),
-  filtered_counts = filter_genes(md = clean_md, count_matrix = counts)
+  geneids = convert_geneids(count_matrix = counts),
+  biomart_results = biomart_obj(geneids$ensembl_gene_id, host = "sep2019.archive.ensembl.org", organism = "hsa"),
+  filtered_counts = filter_genes(md = clean_md, count_matrix = counts),
+
 )
 config <- drake_config(processing_plan)
 drake::vis_drake_graph(config)
