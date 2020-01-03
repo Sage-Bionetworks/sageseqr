@@ -21,7 +21,7 @@ get_data <- function(synid, version = NULL) {
 }
 #'Coerce objects to type factors
 #'
-#'@param md
+#'@inheritParams md
 #'@param factors A vector of factor variables
 coerce_factors <- function(md, factors) {
   md[, factors] <- lapply(md[, factors, drop = FALSE], factor)
@@ -29,7 +29,7 @@ coerce_factors <- function(md, factors) {
 }
 #'Coerce objects to type numeric
 #'
-#'@param md
+#'@inheritParams md
 #'@param continuous A vector of continuous variables
 coerce_continuous <- function(md, continuous) {
   test_coercion <- lapply(continuous, function(x) class(type.convert(md[,x])))
@@ -45,9 +45,9 @@ coerce_continuous <- function(md, continuous) {
 #'
 #'This function takes a tidy format. Coerces vectors to correct type.
 #'
-#'@param md
-#'@param factors A vector of factor variables
-#'@param continuous A vector of continuous variables
+#'@inheritParams md
+#'@inheritParams factors
+#'@inheritParams continuous
 #'
 #'@export
 #'@return A data frame with coerced variables.
@@ -71,7 +71,7 @@ clean_covariates <- function(md, factors, continuous) {
 #'
 #'This function produces boxplots from the variables provided.
 #'
-#'@param md
+#'@inheritParams md
 #'@param vars A vector of variables to visualize
 #'
 #'@export
@@ -160,14 +160,14 @@ get_biomart <- function(gene_ids, host, organism) {
 
     biomart_results
 }
-#' Filter genes
+#'Filter genes
 #'
-#' Remove genes that have less than 1 counts per million (cpm) in at least 50%
-#' of samples per condition. If a biomaRt object is provided, gene lengths and
-#' gene GC content is required and genes with missing values are also removed.
+#'Remove genes that have less than 1 counts per million (cpm) in at least 50%
+#'of samples per condition. If a biomaRt object is provided, gene lengths and
+#'gene GC content is required and genes with missing values are also removed.
 #'
 #'@param md A data frame with sample identifiers in a column.
-#'@param count_matrix A matrix with sample identifiers as columnnames and gene
+#'@param count_matrix A matrix with sample identifiers as column names and gene
 #'Ids as rownames.
 filter_genes <- function(md, count_matrix) {
   genes_to_analyze <- md %>%
@@ -182,5 +182,38 @@ filter_genes <- function(md, count_matrix) {
   processed_counts <- CovariateAnalysis::getGeneFilteredGeneExprMatrix(counts[genes_to_analyze, ],
                                                                        MIN_GENE_CPM = 0,
                                                                        MIN_SAMPLE_PERCENT_WITH_MIN_GENE_CPM = 0)
+  #convert transcript Ids to gene Ids with convert_geneids()
+  processed_counts$filteredExprMatrix$genes <- convert_geneids(processed_counts$filteredExprMatrix$counts)
+  rownames(processed_counts$filteredExprMatrix$counts) <- convert_geneids(filtered_counts$filteredExprMatrix$counts)$ensembl_gene_id
   processed_counts
 }
+#'Get gene Ids
+#'
+#'@inheritParams count_matrix
+#'
+convert_geneids <- function(count_matrix) {
+  if (all(grepl("\\.", rownames(count_matrix)))) {
+    geneids <- tibble(ids = rownames(count_matrix)) %>%
+      tidyr::separate(ids, c("ensembl_gene_id", "position"), sep = "\\.")
+    geneids
+  } else {
+    geneids <- rownames(count_matrix)
+  }
+}
+#' Conditional Quantile Normalization (CQN)
+#'
+#' CQN library normalization method is applied.
+cqn <- function(filtered_counts, biomart_results) {
+  normalized_counts <- cqn::cqn(filtered_counts$filteredExprMatrix$counts,
+                                x = biomart_results[biomart_results$ensembl_gene_id %in%
+                                                      filtered_counts$filteredExprMatrix$genes$ensembl_gene_id,
+                                                    "percentage_gene_gc_content"],
+                                lengths = biomart_results[biomart_results$ensembl_gene_id %in%
+                                                            filtered_counts$filteredExprMatrix$genes$ensembl_gene_id,
+                                                          "gene_length"],
+                                lengthMethod = "smooth",
+                                verbose = FALSE
+                                )
+
+}
+#'
