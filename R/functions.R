@@ -59,7 +59,7 @@ clean_covariates <- function(md, factors, continuous) {
   } else if (length(intersect(factors, continuous)) != 0) {
     stop("Variables are present in both the continuous and factor arguments. Variables must be designated
          numeric or factor, not both.")
-  } else if (!(factors %in% colnames(md) | !(continuous %in% colnames(md)))) {
+  } else if (any(!(factors %in% colnames(md))) | any(!(all(continuous %in% colnames(md))))) {
     stop("Variables provided are not present in the metadata.")
   } else {
     md <- coerce_factors(md, factors)
