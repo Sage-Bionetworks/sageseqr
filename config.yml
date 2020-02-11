@@ -1,17 +1,7 @@
 default:
-  metadata:
-    synID: "syn21072902"
+  counts:
+    synID: syn21587392
     version: 1
-  counts:
-    synID:
-    version:
-  gene lengths:
-    synID:
-    version:
-rosmap:
   metadata:
-    synID:
-    version:
-  counts:
-    synID: syn20833110
+    synID: syn21587404
     version: 1
