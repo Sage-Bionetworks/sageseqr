@@ -1,17 +1,24 @@
 default:
-  metadata:
-    synID: "syn21072902"
-    version: 1
   counts:
-    synID:
-    version:
-  gene lengths:
-    synID:
-    version:
-rosmap:
-  metadata:
-    synID:
-    version:
-  counts:
-    synID: syn20833110
+    synID: syn21587392
     version: 1
+  metadata:
+    synID: syn21587404
+    version: 3
+  factors:
+  continuous:
+  sample:
+mayo:
+  counts:
+    synID: syn21587392
+    version: 1
+  metadata:
+    synID: syn21587404
+    version: 2
+  factors: [ "donorid", "source", "sex", "flowcell", "source_tissue_diagnosis", "tissue_diagnosis", "tissue_APOE4" ]
+  continuous: [ "rin", "rin2", "age_death", "pct_pf_reads_aligned",
+                "pct_coding_bases", "pct_intergenic_bases", "pct_intronic_bases",
+                "pct_ribosomal_bases" ] #pmi missing at the moment
+  sample: sampleid
+
+
