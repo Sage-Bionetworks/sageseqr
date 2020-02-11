@@ -32,7 +32,8 @@ coerce_factors <- function(md, factors) {
 #'@inheritParams md
 #'@param continuous A vector of continuous variables
 coerce_continuous <- function(md, continuous) {
-  test_coercion <- lapply(continuous, function(x) class(type.convert(md[,x])))
+  subset <- md[,continuous]
+  test_coercion <- lapply(subset, function(x) class(type.convert(x)))
   if (all(test_coercion %in% c("integer", "numeric"))) {
     md[, continuous] <- lapply(md[, continuous, drop = FALSE], function(x) as.numeric(x))
     md
