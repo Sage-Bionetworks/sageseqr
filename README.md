@@ -1,3 +1,6 @@
+<!-- badges: start -->
+  [![R build status](https://github.com/kelshmo/sageseqr/workflows/R-CMD-check/badge.svg)](https://github.com/kelshmo/sageseqr/actions)
+<!-- badges: end -->
 # sage-seqr
 RNASeq normalization pipeline with R.
 
