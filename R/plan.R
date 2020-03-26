@@ -1,6 +1,6 @@
 plan <- drake_plan(
   metadata = get_data(config::get("metadata")$synID,
-                config::get("counts")$version),
+                config::get("metadata")$version),
   counts = get_data(config::get("counts")$synID,
                     config::get("counts")$version),
   clean_md = clean_covariates(md = metadata, factors = config::get("factors"),
