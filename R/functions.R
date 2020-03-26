@@ -180,7 +180,7 @@ filter_genes <- function(md, count_matrix) {
     }, count_matrix)
   genes_to_analyze <- unlist(genes_to_analyze) %>%
     unique()
-  processed_counts <- CovariateAnalysis::getGeneFilteredGeneExprMatrix(counts[genes_to_analyze, ],
+  processed_counts <- CovariateAnalysis::getGeneFilteredGeneExprMatrix(count_matrix[genes_to_analyze, ],
                                                                        MIN_GENE_CPM = 0,
                                                                        MIN_SAMPLE_PERCENT_WITH_MIN_GENE_CPM = 0)
   #convert transcript Ids to gene Ids with convert_geneids()
