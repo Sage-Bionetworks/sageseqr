@@ -168,37 +168,38 @@ get_biomart <- function(gene_ids, host, organism) {
 #'gene GC content is required and genes with missing values are also removed.
 #'
 #'@param md A data frame with sample identifiers in a column.
-#'@param count_matrix A matrix with sample identifiers as column names and gene
-#'Ids as rownames.
-filter_genes <- function(md, count_matrix) {
+#'@param count_df A counts data frame with sample identifiers as rownames.
+#'
+filter_genes <- function(md, count_df) {
   genes_to_analyze <- md %>%
     plyr::dlply(.(diagnosis), .fun = function(md, counts){
       processed_counts <- CovariateAnalysis::getGeneFilteredGeneExprMatrix(counts,
                                                                           MIN_GENE_CPM = 1,
                                                                           MIN_SAMPLE_PERCENT_WITH_MIN_GENE_CPM = 0.5)
       processed_counts$filteredExprMatrix$gen
-    }, count_matrix)
+    }, count_df)
   genes_to_analyze <- unlist(genes_to_analyze) %>%
     unique()
-  processed_counts <- CovariateAnalysis::getGeneFilteredGeneExprMatrix(count_matrix[genes_to_analyze, ],
+  processed_counts <- CovariateAnalysis::getGeneFilteredGeneExprMatrix(count_df[genes_to_analyze, ],
                                                                        MIN_GENE_CPM = 0,
                                                                        MIN_SAMPLE_PERCENT_WITH_MIN_GENE_CPM = 0)
-  #convert transcript Ids to gene Ids with convert_geneids()
+  # Convert transcript Ids to gene Ids in counts and gene list with convert_geneids()
   processed_counts$filteredExprMatrix$genes <- convert_geneids(processed_counts$filteredExprMatrix$counts)
-  rownames(processed_counts$filteredExprMatrix$counts) <- convert_geneids(filtered_counts$filteredExprMatrix$counts)$ensembl_gene_id
+  rownames(processed_counts$filteredExprMatrix$counts) <- convert_geneids(processed_counts$filteredExprMatrix$counts)$ensembl_gene_id
+
   processed_counts
 }
 #'Get gene Ids
 #'
-#'@inheritParams count_matrix
+#'@inheritParams count_df
 #'
-convert_geneids <- function(count_matrix) {
-  if (all(grepl("\\.", rownames(count_matrix)))) {
-    geneids <- tibble(ids = rownames(count_matrix)) %>%
+convert_geneids <- function(count_df) {
+  if (all(grepl("\\.", rownames(count_df)))) {
+    geneids <- tibble(ids = rownames(count_df)) %>%
       tidyr::separate(ids, c("ensembl_gene_id", "position"), sep = "\\.")
     geneids
   } else {
-    geneids <- rownames(count_matrix)
+    geneids <- rownames(count_df)
   }
 }
 #' Conditional Quantile Normalization (CQN)

@@ -1,6 +1,6 @@
 library(CovariateAnalysis)
 library(data.table)
-library(plyr)
+library(plyr); library(dplyr)
 library(tidyverse)
 library(psych)
 library(limma)

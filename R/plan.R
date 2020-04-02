@@ -7,9 +7,9 @@ plan <- drake_plan(
   clean_md = clean_covariates(md = import_metadata, factors = config::get("factors"),
                               continuous = config::get("continuous")),
   #covar_correlation = CovariateAnalysis::getAssociationStatistics(clean_md, PVAL = 0.05),
-  geneids = convert_geneids(count_matrix = counts),
+  geneids = convert_geneids(count_df = counts),
   biomart_results = get_biomart(geneids$ensembl_gene_id, host = "uswest.ensembl.org", organism = "hsa"),# Ensembl Release 99 (January 2020)
-  filtered_counts = filter_genes(md = clean_md, count_matrix = as.data.frame(counts))
+  filtered_counts = filter_genes(md = clean_md, count_df = as.data.frame(counts)) #ideally remove this as.data.frame
 )
 
 config <- drake::drake_config(plan)
