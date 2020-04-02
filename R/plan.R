@@ -9,10 +9,8 @@ plan <- drake_plan(
   #covar_correlation = CovariateAnalysis::getAssociationStatistics(clean_md, PVAL = 0.05),
   geneids = convert_geneids(count_df = counts),
   biomart_results = get_biomart(geneids$ensembl_gene_id, host = "uswest.ensembl.org", organism = "hsa"),# Ensembl Release 99 (January 2020)
-  filtered_counts = filter_genes(md = clean_md, count_df = as.data.frame(counts)) #ideally remove this as.data.frame
+  filtered_counts = filter_genes(md = clean_md, count_df = counts)
 )
 
 config <- drake::drake_config(plan)
 drake::vis_drake_graph(config, targets_only = TRUE)
-
-
