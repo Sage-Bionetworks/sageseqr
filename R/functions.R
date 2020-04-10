@@ -21,7 +21,7 @@ get_data <- function(synid, version = NULL) {
 }
 #'Coerce objects to type factors
 #'
-#'@inheritParams md
+#'@param md  A data frame with sample identifiers in a column and relevant experimental covariates.
 #'@param factors A vector of factor variables
 coerce_factors <- function(md, factors) {
   md[, factors] <- lapply(md[, factors, drop = FALSE], factor)
@@ -44,7 +44,8 @@ coerce_continuous <- function(md, continuous) {
 }
 #'Create covariate matrix from tidy metadata data frame.
 #'
-#'This function takes a tidy format. Coerces vectors to correct type.
+#'This function takes a tidy format. Coerces vectors to correct type. Only include
+#'covariates that have 2 or more levels.
 #'
 #'@inheritParams md
 #'@inheritParams factors
@@ -167,7 +168,7 @@ get_biomart <- function(gene_ids, host, organism) {
 #'of samples per condition. If a biomaRt object is provided, gene lengths and
 #'gene GC content is required and genes with missing values are also removed.
 #'
-#'@param md A data frame with sample identifiers in a column.
+#'@inheritParams md
 #'@param count_df A counts data frame with sample identifiers as rownames.
 #'
 filter_genes <- function(md, count_df) {
@@ -204,7 +205,12 @@ convert_geneids <- function(count_df) {
 }
 #' Conditional Quantile Normalization (CQN)
 #'
-#' CQN library normalization method is applied.
+#' Normalize counts by CQN. By providing a biomart object, the systematic effect of GC content
+#' is removed and gene length (in bp) variation is accounted for.
+#'
+#' @param filtered_counts
+#' @param biomart_results
+#'
 cqn <- function(filtered_counts, biomart_results) {
   normalized_counts <- cqn::cqn(filtered_counts$filteredExprMatrix$counts,
                                 x = biomart_results[biomart_results$ensembl_gene_id %in%
@@ -216,6 +222,4 @@ cqn <- function(filtered_counts, biomart_results) {
                                 lengthMethod = "smooth",
                                 verbose = FALSE
                                 )
-
 }
-#'
