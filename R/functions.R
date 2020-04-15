@@ -255,7 +255,7 @@ cqn <- function(filtered_counts, biomart_results) {
 
     normalized_counts$E <- normalized_counts$y + normalized_counts$offset
 
-    normalized_counts
+    return(normalized_counts)
 
   }
 
