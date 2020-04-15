@@ -164,13 +164,16 @@ get_biomart <- function(gene_ids, host, organism) {
     biomart_results
   } else {
     biomart_results <- get_data(config::get("biomart")$synID,
-             config::get("biomart")$version)
+             config::get("biomart")$version) %>%
+      tibble::column_to_rownames(var = config::get("biomart")$`gene id`)
     required_variables <- c("gene_length", "percentage_gene_gc_content")
     if (!(required_variables %in% colnames(biomart_results))) {
       vars <- glue::glue_collapse(setdiff(required_variables, colnames(biomart_results)),
                                   sep = ", ",
                                   last = " and ")
-      message(glue::glue("Warning: {vars} missing from biomart object. This information is required for Conditional Quantile Normalization"))
+      message(glue::glue("Warning: {vars} missing from biomart object.
+                         This information is required for Conditional
+                         Quantile Normalization"))
     }
     biomart_results
   }
@@ -238,10 +241,10 @@ cqn <- function(filtered_counts, biomart_results) {
 
     counts <- filtered_counts$filteredExprMatrix$counts
 
-    genes_to_analyze <- intersect(rownames(counts), biomart_results$ensembl_gene_id)
+    genes_to_analyze <- intersect(rownames(counts), rownames(biomart_results))
 
     to_normalize <- subset(counts, rownames(counts) %in% genes_to_analyze)
-    gc_length <- subset(biomart_results, biomart_results$ensembl_gene_id %in% genes_to_analyze)
+    gc_length <- subset(biomart_results, rownames(biomart_results) %in% genes_to_analyze)
 
     normalized_counts <- cqn::cqn(to_normalize,
                                   x = gc_length[, "percentage_gene_gc_content"],
