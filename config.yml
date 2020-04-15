@@ -21,6 +21,7 @@ mayo:
   biomart:
     synID: syn21907998
     version:
+    gene id: ensembl_gene_id
   factors: [ "donorid", "sampleid", "source", "sex", "flowcell", "diagnosis", "source_tissue_diagnosis", "tissue_diagnosis", "tissue_APOE4" ]
   continuous: [ "rin", "rin2", "age_death", "pct_pf_reads_aligned",
                 "pct_coding_bases", "pct_intergenic_bases", "pct_intronic_bases",
