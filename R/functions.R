@@ -124,6 +124,7 @@ biomart_obj <- function(organism, host) {
 #'@param organism A character vector of the organism name. This argument
 #'takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".
 get_biomart <- function(gene_ids, host, organism) {
+  if (is.null(config::get("biomart")$synID)) {
     id_type <- "ensembl_gene_id"
     ensembl <- biomart_obj(organism, host)
     message(paste0("Downloading sequence",
@@ -161,6 +162,21 @@ get_biomart <- function(gene_ids, host, organism) {
       dplyr::filter(row_number(hgnc_symbol) == 1)
 
     biomart_results
+  } else {
+    biomart_results <- get_data(config::get("biomart")$synID,
+             config::get("biomart")$version) %>%
+      tibble::column_to_rownames(var = config::get("biomart")$`gene id`)
+    required_variables <- c("gene_length", "percentage_gene_gc_content")
+    if (!(required_variables %in% colnames(biomart_results))) {
+      vars <- glue::glue_collapse(setdiff(required_variables, colnames(biomart_results)),
+                                  sep = ", ",
+                                  last = " and ")
+      message(glue::glue("Warning: {vars} missing from biomart object.
+                         This information is required for Conditional
+                         Quantile Normalization"))
+    }
+    return(biomart_results)
+  }
 }
 #'Filter genes
 #'
@@ -206,21 +222,42 @@ convert_geneids <- function(count_df) {
 #' Conditional Quantile Normalization (CQN)
 #'
 #' Normalize counts by CQN. By providing a biomart object, the systematic effect of GC content
-#' is removed and gene length (in bp) variation is accounted for.
+#' is removed and gene length (in bp) variation is accounted for. Genes with missing GC content
+#' or gene lengths will be removed from the counts matrix.
 #'
 #' @param filtered_counts
 #' @param biomart_results
 #'
 cqn <- function(filtered_counts, biomart_results) {
-  normalized_counts <- cqn::cqn(filtered_counts$filteredExprMatrix$counts,
-                                x = biomart_results[biomart_results$ensembl_gene_id %in%
-                                                      filtered_counts$filteredExprMatrix$genes$ensembl_gene_id,
-                                                    "percentage_gene_gc_content"],
-                                lengths = biomart_results[biomart_results$ensembl_gene_id %in%
-                                                            filtered_counts$filteredExprMatrix$genes$ensembl_gene_id,
-                                                          "gene_length"],
-                                lengthMethod = "smooth",
-                                verbose = FALSE
-                                )
-  normalized_counts$E <- normalized_counts$y + normalized_counts$offset
+
+  required_variables <- c("gene_length", "percentage_gene_gc_content")
+
+  if (!all(required_variables %in% colnames(biomart_results))) {
+    message(glue::glue("Error:{setdiff(required_variables,
+                       colnames(biomart_results))} missing from
+                       biomart object. This information is required
+                       for Conditional Quantile Normalization"))
+  } else {
+
+    counts <- filtered_counts$filteredExprMatrix$counts
+
+    genes_to_analyze <- intersect(rownames(counts), rownames(biomart_results))
+
+    to_normalize <- subset(counts, rownames(counts) %in% genes_to_analyze)
+    gc_length <- subset(biomart_results, rownames(biomart_results) %in% genes_to_analyze)
+
+    normalized_counts <- cqn::cqn(to_normalize,
+                                  x = gc_length[, "percentage_gene_gc_content"],
+                                  lengths = gc_length[, "gene_length"],
+                                  lengthMethod = "smooth",
+                                  verbose = FALSE
+    )
+
+    normalized_counts$E <- normalized_counts$y + normalized_counts$offset
+
+    return(normalized_counts)
+
+  }
+
+
 }
