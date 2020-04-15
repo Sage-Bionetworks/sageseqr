@@ -175,7 +175,7 @@ get_biomart <- function(gene_ids, host, organism) {
                          This information is required for Conditional
                          Quantile Normalization"))
     }
-    biomart_results
+    return(biomart_results)
   }
 }
 #'Filter genes
