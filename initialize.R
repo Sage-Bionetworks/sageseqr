@@ -1,4 +1,4 @@
-Sys.setenv(R_CONFIG_ACTIVE = "mayo")
+Sys.setenv(R_CONFIG_ACTIVE = "ihab")
 
 # TO DO: how to setup cache for end user
 # make_cache
@@ -10,4 +10,4 @@ synLogin()
 
 source("R/plan.R")
 
-drake::make(plan)
+drake::make(plan, verbose=2)

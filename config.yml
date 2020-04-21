@@ -28,5 +28,55 @@ mayo:
                 "pct_ribosomal_bases" ] #pmi missing at the moment
   gene id: feature
   sample: sampleid
-
+ihab:
+  counts:
+    synID: syn21969017
+    version: 1
+  metadata:
+    synID: syn21822937
+    version: 1
+  biomart:
+    synID: syn21907998
+    version: 2
+    gene id: feature
+  factors: [ "species",	"sex", "race", "yearsEducation", "diagnosis", "visit", 
+  "bpmed",	"diabeticmed",	"cholesterolmed",	"heartmed",	"antideprmed",	"hxmi",	"afib",	
+  "pacemaker",	"angina",	"hxchf",	"hxbp",	"hxhighchol",	"hxdiabetes",	"hxulcer",
+  "hxkidneydisease",	"hxliverdisease",	"hxanemia", "cdrtotal", "smoker",	"drinker",
+  "fhxdementia",	"fhxalzheimer", "Scan_Date", "AlignmentSummaryMetrics__CATEGORY" ]
+  continuous: [ "age",	"weight",	"height", "sit1_sbp1", "sit1_dbp1", "sit1_pulse1",	"sit2_sbp1",
+  "sit2_dbp1", "sit2_pulse1",	"sd1_sbp1",	"sd1_dbp1",	"sd1_pulse1",	"sd2_sbp1",	"sd2_dbp1",	
+  "sd2_pulse1",	"mocatotal", "story_b_score1", "story_b_score2", "walk1", "walk2", "partaerrors",	"partberrors",
+  "hvltrtrial4",	"drttotalrecalltscore",	"drtboston",	"partatest",	"partbtest",	"cesd",	"faqtotal",
+  "pwv",	"rc_mean",	"lc_mean", "Frontal_CBF",	"Occipital_CBF",	"Parietal_CBF",	"Temporal_CBF",	
+  "Left_Cerebellum_White_Matter",	"Left_Cerebellum_Cortex",	"Left_Thalamus_Proper",	"Left_Caudate",
+  "Left_Putamen",	"Left_Pallidum",	"_3rd_Ventricle",	"_4th_Ventricle",	"Brain_Stem",	
+  "Left_Hippocampus",	"Left_Amygdala",	"CSF",	"Left_Accumbens_area",	"Left_VentralDC",
+  "Left_vessel",	"Left_choroid_plexus",	"Right_Lateral_Ventricle",	"Right_Inf_Lat_Vent",
+  "Right_Cerebellum_White_Matter",	"Right_Cerebellum_Cortex",	"Right_Thalamus_Proper",
+  "Right_Caudate",	"Right_Putamen",	"Right_Pallidum",	"Right_Hippocampus",	"Right_Amygdala",
+  "Right_Accumbens_area",	"Right_VentralDC",	"Right_vessel",	"Right_choroid_plexus",
+  "EstimatedTotalIntraCranialVol", "AlignmentSummaryMetrics__BAD_CYCLES", "AlignmentSummaryMetrics__MEAN_READ_LENGTH",
+  "AlignmentSummaryMetrics__PCT_ADAPTER",	"AlignmentSummaryMetrics__PCT_CHIMERAS",
+  "AlignmentSummaryMetrics__PCT_PF_READS",	"AlignmentSummaryMetrics__PCT_PF_READS_ALIGNED",
+  "AlignmentSummaryMetrics__PCT_READS_ALIGNED_IN_PAIRS",	
+  "AlignmentSummaryMetrics__PF_ALIGNED_BASES",	"AlignmentSummaryMetrics__PF_HQ_ALIGNED_BASES",
+  "AlignmentSummaryMetrics__PF_HQ_ALIGNED_Q20_BASES",	"AlignmentSummaryMetrics__PF_HQ_ALIGNED_READS",
+  "AlignmentSummaryMetrics__PF_HQ_ERROR_RATE",	"AlignmentSummaryMetrics__PF_HQ_MEDIAN_MISMATCHES",
+  "AlignmentSummaryMetrics__PF_INDEL_RATE", "AlignmentSummaryMetrics__PF_MISMATCH_RATE",
+  "AlignmentSummaryMetrics__PF_NOISE_READS",	"AlignmentSummaryMetrics__PF_READS",
+  "AlignmentSummaryMetrics__PF_READS_ALIGNED",	"AlignmentSummaryMetrics__READS_ALIGNED_IN_PAIRS",
+  "AlignmentSummaryMetrics__STRAND_BALANCE",
+  "AlignmentSummaryMetrics__TOTAL_READS", "RnaSeqMetrics__CODING_BASES",	
+  "RnaSeqMetrics__CORRECT_STRAND_READS",	"RnaSeqMetrics__IGNORED_READS",
+  "RnaSeqMetrics__INCORRECT_STRAND_READS",	"RnaSeqMetrics__INTERGENIC_BASES",
+  "RnaSeqMetrics__INTRONIC_BASES",	"RnaSeqMetrics__MEDIAN_3PRIME_BIAS",	
+  "RnaSeqMetrics__MEDIAN_5PRIME_BIAS","RnaSeqMetrics__MEDIAN_5PRIME_TO_3PRIME_BIAS",
+  "RnaSeqMetrics__MEDIAN_CV_COVERAGE", "RnaSeqMetrics__PCT_CODING_BASES",
+  "RnaSeqMetrics__PCT_CORRECT_STRAND_READS",	"RnaSeqMetrics__PCT_INTERGENIC_BASES",
+  "RnaSeqMetrics__PCT_INTRONIC_BASES",	"RnaSeqMetrics__PCT_MRNA_BASES",
+  "RnaSeqMetrics__PCT_RIBOSOMAL_BASES",	"RnaSeqMetrics__PCT_USABLE_BASES",
+  "RnaSeqMetrics__PCT_UTR_BASES",	"RnaSeqMetrics__PF_ALIGNED_BASES",
+  "RnaSeqMetrics__PF_BASES",	"RnaSeqMetrics__RIBOSOMAL_BASES",	"RnaSeqMetrics__UTR_BASES" ]
+  sample: individualID
 
