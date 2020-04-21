@@ -10,4 +10,9 @@ synLogin()
 
 source("R/plan.R")
 
-drake::make(plan, verbose=2)
+# Run the analysis
+drake::make(plan)
+
+# Visualize the results
+drake::vis_drake_graph(plan, targets_only = TRUE)
+

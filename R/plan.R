@@ -3,7 +3,7 @@ plan <- drake_plan(
                 config::get("metadata")$version),
   import_counts = get_data(config::get("counts")$synID,
                     config::get("counts")$version),
-  counts = tibble::column_to_rownames(import_counts, var = config::get("gene id")),
+  counts = tibble::column_to_rownames(import_counts, var = config::get("counts")$`gene id`),
   clean_md = clean_covariates(md = import_metadata, factors = config::get("factors"),
                               continuous = config::get("continuous")),
   #covar_correlation = CovariateAnalysis::getAssociationStatistics(clean_md, PVAL = 0.05),
@@ -12,7 +12,3 @@ plan <- drake_plan(
   filtered_counts = filter_genes(md = clean_md, count_df = counts),
   cqn_counts = cqn(filtered_counts, biomart_results)
 )
-
-make_the_plan <- drake::drake_plan(plan)
-drake::vis_drake_graph(make_the_plan, targets_only = TRUE)
-

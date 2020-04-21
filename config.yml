@@ -2,22 +2,25 @@ default:
   counts:
     synID: syn21587392
     version: 1
+    gene id:
   metadata:
     synID: syn21587404
     version: 3
+    sample id:
   biomart:
     synID: syn21907998
     version:
   factors:
   continuous:
-  sample:
 mayo:
   counts:
     synID: syn21587392
-    version: 2
+    version: 3
+    gene id: feature
   metadata:
     synID: syn21587404
     version: 4
+    sample id: sampleid
   biomart:
     synID: syn21907998
     version:
