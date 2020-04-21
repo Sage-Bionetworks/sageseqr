@@ -33,6 +33,10 @@ password: <password>
 
 * To find your container name `docker ps -a`
 
+# Clone the Repo
+
+`git clone https://github.com/kelshmo/sageseqr.git` to get the `sageseqr` tool in your Docker repository.
+
 # Access to Data 
 
 Data access requires a [Synapse account](https://docs.synapse.org/articles/getting_started.html) and access to the [AMP-AD Knowledge portal](https://www.synapse.org/#!Synapse:syn2580853/wiki/409854).   
