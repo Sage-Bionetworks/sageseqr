@@ -62,4 +62,5 @@ biomart:
 factors: List of factor variables in brackets. Variables must be present in the metadata as column names (e.g. [ "donorid", "source"]).
 continuous: List of continuous variables in brackets. Variables must be present in the metadata as column names (e.g[ "rin", "rin2"]).
 ```
+2. `initialize.R` sets the config file and loads the package dependencies, functions and drake plan. Set `Sys.setenv(R_CONFIG_ACTIVE = "default")` in `initialize.R`. 
 

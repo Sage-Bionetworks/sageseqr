@@ -1,4 +1,4 @@
-Sys.setenv(R_CONFIG_ACTIVE = "mayo")
+Sys.setenv(R_CONFIG_ACTIVE = "default")
 
 # TO DO: how to setup cache for end user
 # make_cache
