@@ -15,7 +15,7 @@ default:
 mayo:
   counts:
     synID: syn21587392
-    version: 2
+    version: 3
     gene id: feature
   metadata:
     synID: syn21587404
