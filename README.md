@@ -55,6 +55,10 @@ metadata:
   synID: Synapse ID to cleaned metadata file with sample identifiers in a column and variables of interest as column names.
   version: Optionally, include Synapse file version number (e.g. 3).
   sample id: Column name that corresponds to the sample ids (e.g. donorid).
+biomart:
+  synID: This input is optional. If left blank, Ensembl will be queried with the gene ids provided in the counts. Otherwise, you may provide the Synapse ID to gene metadata from Ensembl. This must include gene length and GC content in order to implement Conditional Quantile Normalization. 
+  version: Optionally, include Synapse file version number (e.g. 3).
+  gene id: Column name that corresponds to the gene ids (e.g. ensembl_gene_id)
 factors: List of factor variables in brackets. Variables must be present in the metadata as column names (e.g. [ "donorid", "source"]).
 continuous: List of continuous variables in brackets. Variables must be present in the metadata as column names (e.g[ "rin", "rin2"]).
 ```
