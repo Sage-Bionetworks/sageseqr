@@ -6,7 +6,8 @@ Sys.setenv(R_CONFIG_ACTIVE = "mayo")
 source("R/packages.R")
 source("R/functions.R")
 
-synLogin()
+# Login to Synapse. Make a Synapse account and use synaper to login: https://r-docs.synapse.org/articles/manageSynapseCredentials.html
+synapser::synLogin()
 
 source("R/plan.R")
 
