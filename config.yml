@@ -35,6 +35,7 @@ ihab:
   metadata:
     synID: syn21822937
     version: 1
+    sample id: individualID
   biomart:
     synID: syn21907998
     version: 2
@@ -79,4 +80,3 @@ ihab:
   "RnaSeqMetrics__PCT_UTR_BASES",	"RnaSeqMetrics__PF_ALIGNED_BASES",
   "RnaSeqMetrics__PF_BASES",	"RnaSeqMetrics__RIBOSOMAL_BASES",	"RnaSeqMetrics__UTR_BASES" ]
   sample: individualID
-
