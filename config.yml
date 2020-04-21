@@ -2,22 +2,25 @@ default:
   counts:
     synID: syn21587392
     version: 1
+    gene id:
   metadata:
     synID: syn21587404
     version: 3
+    sample id:
   biomart:
     synID: syn21907998
     version:
   factors:
   continuous:
-  sample:
 mayo:
   counts:
     synID: syn21587392
     version: 2
+    gene id: feature
   metadata:
     synID: syn21587404
     version: 4
+    sample id: sampleid
   biomart:
     synID: syn21907998
     version:
@@ -26,7 +29,5 @@ mayo:
   continuous: [ "rin", "rin2", "age_death", "pct_pf_reads_aligned",
                 "pct_coding_bases", "pct_intergenic_bases", "pct_intronic_bases",
                 "pct_ribosomal_bases" ] #pmi missing at the moment
-  gene id: feature
-  sample: sampleid
 
 
