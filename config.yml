@@ -39,9 +39,9 @@ ihab:
     version: 1
     sample id: individualID
   biomart:
-    synID:
-    version:
-    gene id:
+    synID: syn21983044
+    version: 1
+    gene id: ensembl_gene_id
   factors: [ "species",	"sex", "race", "yearsEducation", "diagnosis", "visit",
   "bpmed",	"diabeticmed",	"cholesterolmed",	"heartmed",	"antideprmed",	"hxmi",	"afib",
   "pacemaker",	"angina",	"hxchf",	"hxbp",	"hxhighchol",	"hxdiabetes",	"hxulcer",

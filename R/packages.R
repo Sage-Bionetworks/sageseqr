@@ -1,3 +1,4 @@
+library(config)
 library(CovariateAnalysis)
 library(data.table)
 library(plyr); library(dplyr)
