@@ -167,7 +167,8 @@ get_biomart <- function(gene_ids, host, organism) {
              config::get("biomart")$version) %>%
       tibble::column_to_rownames(var = config::get("biomart")$`gene id`)
     required_variables <- c("gene_length", "percentage_gene_gc_content")
-    if (!(required_variables %in% colnames(biomart_results))) {
+    #JKG# add all
+    if (!(all(required_variables %in% colnames(biomart_results)))) {
       vars <- glue::glue_collapse(setdiff(required_variables, colnames(biomart_results)),
                                   sep = ", ",
                                   last = " and ")
@@ -188,6 +189,8 @@ get_biomart <- function(gene_ids, host, organism) {
 #'@param count_df A counts data frame with sample identifiers as rownames.
 #'
 filter_genes <- function(md, count_df) {
+  #JKG#
+  count_df  <- count_df[ (row.names(count_df) %in% c("N_unmapped", "N_multimapping", "N_noFeature", "N_ambiguous")) == F, ]
   genes_to_analyze <- md %>%
     plyr::dlply(.(diagnosis), .fun = function(md, counts){
       processed_counts <- CovariateAnalysis::getGeneFilteredGeneExprMatrix(counts,
@@ -211,6 +214,8 @@ filter_genes <- function(md, count_df) {
 #'@inheritParams count_df
 #'
 convert_geneids <- function(count_df) {
+  #JKG#
+  count_df  <- count_df[ (row.names(count_df) %in% c("N_unmapped", "N_multimapping", "N_noFeature", "N_ambiguous")) == F, ]
   if (all(grepl("\\.", rownames(count_df)))) {
     geneids <- tibble(ids = rownames(count_df)) %>%
       tidyr::separate(ids, c("ensembl_gene_id", "position"), sep = "\\.")
