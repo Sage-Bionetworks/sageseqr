@@ -9,7 +9,8 @@ default:
     sample id:
   biomart:
     synID: syn21907998
-    version:
+    version: 1
+    gene id: ensembl_gene_id
   factors:
   continuous:
 mayo:
