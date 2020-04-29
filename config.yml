@@ -9,8 +9,15 @@ default:
     sample id:
   biomart:
     synID: syn21907998
+<<<<<<< HEAD
     version: 1
     gene id: ensembl_gene_id
+=======
+    version:
+    gene id:
+    host: ensembl.org
+    organism: hsa
+>>>>>>> upstream/master
   factors:
   continuous:
 mayo:
@@ -26,6 +33,9 @@ mayo:
     synID:
     version:
     gene id: ensembl_gene_id
+    filters: ensembl_gene_id
+    host: ensembl.org # Ensembl Release 99 (January 2020)
+    organism: hsa
   factors: [ "donorid", "sampleid", "source", "sex", "flowcell", "diagnosis", "source_tissue_diagnosis", "tissue_diagnosis", "tissue_APOE4" ]
   continuous: [ "rin", "rin2", "age_death", "pct_pf_reads_aligned",
                 "pct_coding_bases", "pct_intergenic_bases", "pct_intronic_bases",
