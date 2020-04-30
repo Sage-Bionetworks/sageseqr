@@ -2,4 +2,4 @@
 ^\.Rproj\.user$
 ^\.drake
 ^LICENSE\.md$
-
+^config\.yml$
