@@ -1,0 +1,77 @@
+---
+title: "sage-seqr-report"
+author: "Kelsey Montgomery"
+date: "10/1/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## RNA-Seq Normalization Pipeline using drake
+
+```{r scope}
+#ROSMAP
+samples_inline <- glue::glue_collapse(removed_samples, sep = ", ", last = " and ")
+```
+
+Samples `r samples_inline` were removed from the analysis due to missing metadata.
+
+# Todo: verify if FDR <= 0.1
+```{r covariates_correlation, fig.width=9, fig.height=6}
+draw(covar_correlation$plot, heatmap_legend_side = 'left', padding  = unit(c(18,2,2,18), 'mm'))
+```
+
+## Explore Metadata
+
+```{r metadata, fig.width = 10, fig.height = 14}
+# RIN
+p = list()
+p[[1]] = ggplot(clean_md, aes(x = diagnosis, y = RINcontinuous)) + geom_boxplot()
+p[[1]] = p[[1]] + ggtitle('RIN') + theme(legend.position = 'top')
+# AgeAtDeath
+p[[2]] = ggplot(clean_md, aes(x = diagnosis, y = age_death)) + geom_boxplot()
+p[[2]] = p[[2]] + ggtitle('AgeOfDeath') + theme(legend.position = 'top')
+# PMI
+p[[3]] = ggplot(clean_md, aes(x = diagnosis, y = pmi)) + geom_boxplot()
+p[[3]] = p[[3]] + ggtitle('PMI') + theme(legend.position = 'top')
+# Education
+p[[4]] = ggplot(clean_md, aes(x = diagnosis, y = educ)) + geom_boxplot()
+p[[4]] = p[[4]] + ggtitle('Education') + theme(legend.position = 'top')
+# Intronic bases
+p[[5]] = ggplot(clean_md, aes(x = diagnosis, y = PCT_INTRONIC_BASES)) + geom_boxplot()
+p[[5]] = p[[5]] + ggtitle('Fraction Intronic Bases') + theme(legend.position = 'top')
+# Ribosomal bases
+p[[6]] = ggplot(clean_md, aes(x = diagnosis, y = PCT_RIBOSOMAL_BASES)) + geom_boxplot()
+p[[6]] = p[[6]] + ggtitle('Fraction Ribosomal Bases') + theme(legend.position = 'top')
+multiplot(plotlist = p, cols = 2)
+```
+
+
+# Covariates of Interest
+```{r}
+null_model_covars[["PEC_res"]][[2]]$plotData
+```
+
+# Outliers 
+```{r plot_outliers}
+
+# Identify outliers - samples 4SDs from the mean
+outliers <- as.character(plotdata$SampleID[c(which(plotdata$PC1 < mean(plotdata$PC1) - 4*sd(plotdata$PC1)),
+                              which(plotdata$PC1 > mean(plotdata$PC1) + 4*sd(plotdata$PC1))), drop = T])
+outliers <- c(outliers, as.character(plotdata$SampleID[c(which(plotdata$PC2 < mean(plotdata$PC2) - 4*sd(plotdata$PC2)),
+                                           which(plotdata$PC2 > mean(plotdata$PC2) + 4*sd(plotdata$PC2))), drop = T] ))
+  
+plotdata <- left_join(plotdata, rownameToFirstColumn(COVARIATES, "SampleID")) %>%
+    tidyr::separate(Dx.Tissue, c('Dx','Tissue'), sep = '_') %>%
+  dplyr::mutate(label = SampleID) %>% 
+  dplyr::mutate(label = ifelse((label %in% outliers), label, NA))
+p <- ggplot(plotdata, aes(x=PC1, y=PC2))
+p <- p + geom_point(aes(color=Institution, shape=Tissue, size=ageOfDeath))
+p <- p + theme_bw() + theme(legend.position="right") + facet_grid(Tissue~.)
+p <- p + geom_text(aes(label= label), size=4, hjust=0)
+p
+
+```
+
