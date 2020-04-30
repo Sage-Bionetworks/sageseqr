@@ -29,7 +29,7 @@ coerce_factors <- function(md, factors) {
 }
 #'Coerce objects to type numeric.
 #'
-#'@inheritParams md
+#'@inheritParams coerce_factors
 #'@param continuous A vector of continuous variables.
 coerce_continuous <- function(md, continuous) {
   subset <- md[,continuous]
@@ -47,9 +47,8 @@ coerce_continuous <- function(md, continuous) {
 #'This function takes a tidy format. Coerces vectors to correct type. Only include
 #'covariates that have 2 or more levels.
 #'
-#'@inheritParams md
-#'@inheritParams factors
-#'@inheritParams continuous
+#'@inheritParams coerce_factors
+#'@inheritParams coerce_continuous
 #'
 #'@export
 #'@return A data frame with coerced variables.
@@ -79,13 +78,12 @@ clean_covariates <- function(md, factors, continuous) {
 #'
 #'This function produces boxplots from the variables provided.
 #'
-#'@inheritParams md
+#'@inheritParams coerce_factors
 #'@param include_vars A vector of variables to visualize
 #'@param x_var Variable to plot on the x-axis.
 #'
 #'@export
 #'@return
-#'@examples
 boxplot_vars <- function(md, include_vars, x_var) {
   md %>%
     dplyr::select(c(include_vars, x_var)) %>%
@@ -119,14 +117,13 @@ biomart_obj <- function(organism, host) {
   ensembl
 }
 #'Get Ensembl biomaRt object
-
+#'
 #'Get GC content, gene Ids, gene symbols, gene biotypes, gene lengths
 #'and other metadata from Ensembl BioMart. Object returned contains gene Ids
 #'as rownames.
 #'
 #'@param count_df A counts data frame with sample identifiers as rownames.
-#'@inheritParams synid
-#'@inheritParams version
+#'@inheritParams get_data
 #'@param gene_id Column name of gene Ids
 #'@param filters A character vector listing biomaRt query filters.
 #'(For a list of filters see \code{"biomaRt::listFilters()"})
@@ -224,8 +221,8 @@ collapse_duplicate_hgnc_symbol <- function(biomart_results){
 #'of samples per condition. If a biomaRt object is provided, gene lengths and
 #'gene GC content is required and genes with missing values are also removed.
 #'
-#'@inheritParams md
-#'@inheritParams count_df
+#'@inheritParams coerce_factors
+#'@inheritParams get_biomart
 #'
 #'@export
 filter_genes <- function(md, count_df) {
@@ -249,7 +246,7 @@ filter_genes <- function(md, count_df) {
 }
 #'Get gene Ids
 #'
-#'@inheritParams count_df
+#'@inheritParams get_biomart
 #'
 #'@export
 convert_geneids <- function(count_df) {
@@ -264,7 +261,7 @@ convert_geneids <- function(count_df) {
 #' or gene lengths will be removed from the counts matrix.
 #'
 #'@param filtered_counts A counts data frame with genes removed that have low expression.
-#'@inheritParams biomart_results
+#'@inheritParams collapse_duplicate_hgnc_symbol
 #'
 #'@export
 cqn <- function(filtered_counts, biomart_results) {
