@@ -19,18 +19,18 @@ get_data <- function(synid, version = NULL) {
                                                      )$path))
   df
 }
-#'Coerce objects to type factors
+#'Coerce objects to type factors.
 #'
 #'@param md  A data frame with sample identifiers in a column and relevant experimental covariates.
-#'@param factors A vector of factor variables
+#'@param factors A vector of factor variables.
 coerce_factors <- function(md, factors) {
   md[, factors] <- lapply(md[, factors, drop = FALSE], factor)
   md
 }
-#'Coerce objects to type numeric
+#'Coerce objects to type numeric.
 #'
 #'@inheritParams md
-#'@param continuous A vector of continuous variables
+#'@param continuous A vector of continuous variables.
 coerce_continuous <- function(md, continuous) {
   subset <- md[,continuous]
   test_coercion <- lapply(subset, function(x) class(type.convert(x)))
@@ -54,6 +54,12 @@ coerce_continuous <- function(md, continuous) {
 #'@export
 #'@return A data frame with coerced variables.
 #'@examples
+#'data <- tibble::tribble(
+#'  ~individualID, ~diagnosis, ~RIN,
+#'  "ind5436", "control", 7.7,
+#'  "ind234", "disease", 7.1
+#'  )
+#' clean_covariates(data, factors = c("individualID", "diagnosis"), continuous = c("RIN"))
 clean_covariates <- function(md, factors, continuous) {
   if (missing(factors) | missing(continuous)) {
     stop("Factor and continuous variables are required.")
@@ -95,6 +101,7 @@ boxplot_vars <- function(md, include_vars, x_var) {
 #'
 #'@param organism A character vector of the organism name. This argument takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".
 #'@param host An optional character vector specifying the release version. This specification is highly recommended for a reproducible workflow. (see \code{"biomaRt::listEnsemblArchives()"})
+#'@export
 biomart_obj <- function(organism, host) {
   message("Connecting to BioMart ...")
   ensembl <- biomaRt::useMart("ENSEMBL_MART_ENSEMBL", host = host)
@@ -128,6 +135,7 @@ biomart_obj <- function(organism, host) {
 #'(see \code{"biomaRt::listEnsemblArchives()"})
 #'@param organism A character vector of the organism name. This argument
 #'takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".
+#'@export
 get_biomart <- function(count_df, gene_id, synid, version, host, filters, organism) {
   if (is.null(config::get("biomart")$synID)) {
     # Get available datset from Ensembl
@@ -203,6 +211,7 @@ get_biomart <- function(count_df, gene_id, synid, version, host, filters, organi
 #'a single entry by appending the HGNC symbols in a comma separated list.
 #'@param biomart_results Output of `get_biomart()`
 #'
+#'@export
 collapse_duplicate_hgnc_symbol <- function(biomart_results){
   biomart_results %>%
     dplyr::group_by(ensembl_gene_id) %>%
@@ -218,6 +227,7 @@ collapse_duplicate_hgnc_symbol <- function(biomart_results){
 #'@inheritParams md
 #'@inheritParams count_df
 #'
+#'@export
 filter_genes <- function(md, count_df) {
   genes_to_analyze <- md %>%
     plyr::dlply(.(diagnosis), .fun = function(md, counts){
@@ -241,6 +251,7 @@ filter_genes <- function(md, count_df) {
 #'
 #'@inheritParams count_df
 #'
+#'@export
 convert_geneids <- function(count_df) {
     geneids <- tibble(ids = rownames(count_df)) %>%
       tidyr::separate(ids, c("ensembl_gene_id", "position"), sep = "\\.")
@@ -252,9 +263,10 @@ convert_geneids <- function(count_df) {
 #' is removed and gene length (in bp) variation is accounted for. Genes with missing GC content
 #' or gene lengths will be removed from the counts matrix.
 #'
-#' @param filtered_counts
-#' @param biomart_results
+#'@param filtered_counts A counts data frame with genes removed that have low expression.
+#'@inheritParams biomart_results
 #'
+#'@export
 cqn <- function(filtered_counts, biomart_results) {
 
   required_variables <- c("gene_length", "percentage_gene_gc_content")
