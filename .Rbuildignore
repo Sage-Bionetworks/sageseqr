@@ -1,4 +1,5 @@
 ^sageseqr\.Rproj$
 ^\.Rproj\.user$
-/.drake
+^\.drake
 ^LICENSE\.md$
+^.Rmd
