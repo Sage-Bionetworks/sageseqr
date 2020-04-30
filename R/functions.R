@@ -14,7 +14,7 @@
 #'
 #'}
 get_data <- function(synid, version = NULL) {
-  df <- as_tibble(data.table::fread(synapser::synGet(synid,
+  df <- tibble::as_tibble(data.table::fread(synapser::synGet(synid,
                                                      version = as.numeric(version)
                                                      )$path))
   df
@@ -33,7 +33,7 @@ coerce_factors <- function(md, factors) {
 #'@param continuous A vector of continuous variables.
 coerce_continuous <- function(md, continuous) {
   subset <- md[,continuous]
-  test_coercion <- lapply(subset, function(x) class(type.convert(x)))
+  test_coercion <- lapply(subset, function(x) class(utils::type.convert(x)))
   if (all(test_coercion %in% c("integer", "numeric"))) {
     md[, continuous] <- lapply(md[, continuous, drop = FALSE], function(x) as.numeric(x))
     md
@@ -80,20 +80,20 @@ clean_covariates <- function(md, factors, continuous) {
 #'This function produces boxplots from the variables provided.
 #'
 #'@inheritParams md
-#'@param vars A vector of variables to visualize
+#'@param include_vars A vector of variables to visualize
+#'@param x_var Variable to plot on the x-axis.
 #'
 #'@export
 #'@return
 #'@examples
-#' TO DO: test this
 boxplot_vars <- function(md, include_vars, x_var) {
   md %>%
-    dplyr::select(., c(include_vars, x_var)) %>%
-    gather(key, value, -x_var) %>%
-    ggplot(aes(x = x_var, y = value)) +
-    geom_boxplot() +
-    theme(legend.position = "top") +
-    facet_grid(key ~ !! x_var, scales = "free")
+    dplyr::select(c(include_vars, x_var)) %>%
+    dplyr::gather(key, value, -x_var) %>%
+    ggplot2::ggplot(aes(x = x_var, y = value)) +
+    ggplot2::geom_boxplot() +
+    ggplot2::theme(legend.position = "top") +
+    ggplot2::facet_grid(key ~ !! x_var, scales = "free")
 }
 #'Get available Ensembl dataset
 #'
@@ -105,7 +105,7 @@ boxplot_vars <- function(md, include_vars, x_var) {
 biomart_obj <- function(organism, host) {
   message("Connecting to BioMart ...")
   ensembl <- biomaRt::useMart("ENSEMBL_MART_ENSEMBL", host = host)
-  ds <- listDatasets(ensembl)[, "dataset"]
+  ds <- biomaRt::listDatasets(ensembl)[, "dataset"]
   ds <- grep(paste0("^", organism), ds, value = TRUE)
   if (length(ds) == 0) {
     stop(paste("Mart not found for:", organism))
@@ -253,7 +253,7 @@ filter_genes <- function(md, count_df) {
 #'
 #'@export
 convert_geneids <- function(count_df) {
-    geneids <- tibble(ids = rownames(count_df)) %>%
+    geneids <- tibble::tibble(ids = rownames(count_df)) %>%
       tidyr::separate(ids, c("ensembl_gene_id", "position"), sep = "\\.")
     geneids$ensembl_gene_id
 }

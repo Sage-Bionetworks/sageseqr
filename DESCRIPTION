@@ -14,3 +14,24 @@ LazyData: true
 Suggests: 
     testthat (>= 2.1.0)
 RoxygenNote: 7.1.0
+Imports: 
+    config,
+    CovariateAnalysis,
+    data.table,
+    plyr,
+    dplyr,
+    tibble,
+    psych,
+    limma,
+    edgeR,
+    biomaRt,
+    RColorBrewer,
+    cqn,
+    synapser,
+    knitr,
+    foreach,
+    drake,
+    GenomicRanges,
+    IRanges,
+    glue,
+    tidyr
