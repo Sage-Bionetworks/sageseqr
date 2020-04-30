@@ -89,7 +89,7 @@ clean_covariates <- function(md, factors, continuous) {
 boxplot_vars <- function(md, include_vars, x_var) {
   md %>%
     dplyr::select(c(include_vars, x_var)) %>%
-    dplyr::gather(key, value, -x_var) %>%
+    tidyr::gather(key, value, -x_var) %>%
     ggplot2::ggplot(aes(x = x_var, y = value)) +
     ggplot2::geom_boxplot() +
     ggplot2::theme(legend.position = "top") +

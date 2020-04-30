@@ -34,4 +34,5 @@ Imports:
     GenomicRanges,
     IRanges,
     glue,
-    tidyr
+    tidyr,
+    ggplot2
