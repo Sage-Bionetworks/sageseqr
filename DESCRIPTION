@@ -8,34 +8,37 @@ Authors@R:
            email = "kelsey.montgomery@sagebase.org",
            comment = c(ORCID = "0000-0002-0126-8944"))
 Description: This workflow normalizes counts, performs model selection from known 
-covariates using multivariate regression, automates outlier analysis using a 
-customizable threshold and performs differential expression analysis for repeated
-measures.
+    covariates using multivariate regression, automates outlier analysis using a 
+    customizable threshold and performs differential expression analysis for repeated
+    measures.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Suggests: 
     testthat (>= 2.1.0)
 RoxygenNote: 7.1.0
+biocViews:
+    limma,
+    edgeR,
+    biomaRt,
+    cqn,
+    GenomicRanges,
+    IRanges
 Imports: 
     config,
-    CovariateAnalysis,
     data.table,
     plyr,
     dplyr,
     tibble,
     psych,
-    limma,
-    edgeR,
-    biomaRt,
     RColorBrewer,
-    cqn,
     synapser,
     knitr,
     foreach,
     drake,
-    GenomicRanges,
-    IRanges,
     glue,
     tidyr,
-    ggplot2
+    ggplot2,
+    utils
+Remotes:
+    th1vairam/CovariateAnalysis@dev
