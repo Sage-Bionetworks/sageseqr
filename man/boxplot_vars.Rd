@@ -7,14 +7,13 @@
 boxplot_vars(md, include_vars, x_var)
 }
 \arguments{
-\item{vars}{A vector of variables to visualize}
+\item{include_vars}{A vector of variables to visualize}
+
+\item{x_var}{Variable to plot on the x-axis.}
 }
 \value{
 
 }
 \description{
 This function produces boxplots from the variables provided.
-}
-\examples{
-TO DO: test this
 }
