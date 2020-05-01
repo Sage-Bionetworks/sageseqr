@@ -233,7 +233,7 @@ filter_genes <- function(md, count_df) {
                                                                        MIN_SAMPLE_PERCENT_WITH_MIN_GENE_CPM = 0)
   # Convert transcript Ids to gene Ids in counts and gene list with convert_geneids()
   processed_counts$filteredExprMatrix$genes <- convert_geneids(processed_counts$filteredExprMatrix$counts)
-  rownames(processed_counts$filteredExprMatrix$counts) <- convert_geneids(processed_counts$filteredExprMatrix$counts)$ensembl_gene_id
+  rownames(processed_counts$filteredExprMatrix$counts) <- convert_geneids(processed_counts$filteredExprMatrix$counts)
 
   processed_counts
 }
