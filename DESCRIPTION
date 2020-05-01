@@ -1,5 +1,5 @@
 Package: sageseqr
-Title: Identify differentially expressed genes counts data.
+Title: Identify differentially expressed genes counts data
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Kelsey",
