@@ -7,6 +7,8 @@
 boxplot_vars(md, include_vars, x_var)
 }
 \arguments{
+\item{md}{A data frame with sample identifiers in a column and relevant experimental covariates.}
+
 \item{include_vars}{A vector of variables to visualize}
 
 \item{x_var}{Variable to plot on the x-axis.}

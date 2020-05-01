@@ -8,6 +8,8 @@ cqn(filtered_counts, biomart_results)
 }
 \arguments{
 \item{filtered_counts}{A counts data frame with genes removed that have low expression.}
+
+\item{biomart_results}{Output of `get_biomart()`}
 }
 \description{
 Normalize counts by CQN. By providing a biomart object, the systematic effect of GC content

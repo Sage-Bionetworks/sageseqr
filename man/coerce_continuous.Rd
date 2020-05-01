@@ -7,6 +7,8 @@
 coerce_continuous(md, continuous)
 }
 \arguments{
+\item{md}{A data frame with sample identifiers in a column and relevant experimental covariates.}
+
 \item{continuous}{A vector of continuous variables.}
 }
 \description{

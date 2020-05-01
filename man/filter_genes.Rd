@@ -6,6 +6,11 @@
 \usage{
 filter_genes(md, count_df)
 }
+\arguments{
+\item{md}{A data frame with sample identifiers in a column and relevant experimental covariates.}
+
+\item{count_df}{A counts data frame with sample identifiers as rownames.}
+}
 \description{
 Remove genes that have less than 1 counts per million (cpm) in at least 50%
 of samples per condition. If a biomaRt object is provided, gene lengths and

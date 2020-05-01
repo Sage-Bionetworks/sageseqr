@@ -6,6 +6,13 @@
 \usage{
 clean_covariates(md, factors, continuous)
 }
+\arguments{
+\item{md}{A data frame with sample identifiers in a column and relevant experimental covariates.}
+
+\item{factors}{A vector of factor variables.}
+
+\item{continuous}{A vector of continuous variables.}
+}
 \value{
 A data frame with coerced variables.
 }

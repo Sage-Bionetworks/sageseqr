@@ -2,10 +2,7 @@
 % Please edit documentation in R/functions.R
 \name{get_biomart}
 \alias{get_biomart}
-\title{Get Ensembl biomaRt object
-Get GC content, gene Ids, gene symbols, gene biotypes, gene lengths
-and other metadata from Ensembl BioMart. Object returned contains gene Ids
-as rownames.}
+\title{Get Ensembl biomaRt object}
 \usage{
 get_biomart(count_df, gene_id, synid, version, host, filters, organism)
 }
@@ -13,6 +10,11 @@ get_biomart(count_df, gene_id, synid, version, host, filters, organism)
 \item{count_df}{A counts data frame with sample identifiers as rownames.}
 
 \item{gene_id}{Column name of gene Ids}
+
+\item{synid}{A character vector with a Synapse Id.}
+
+\item{version}{Optional. A numeric vector with the Synapse file
+version number.}
 
 \item{host}{An optional character vector specifying the release version.
 This specification is highly recommended for a reproducible workflow.
@@ -25,7 +27,6 @@ This specification is highly recommended for a reproducible workflow.
 takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".}
 }
 \description{
-Get Ensembl biomaRt object
 Get GC content, gene Ids, gene symbols, gene biotypes, gene lengths
 and other metadata from Ensembl BioMart. Object returned contains gene Ids
 as rownames.
