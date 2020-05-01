@@ -3,3 +3,4 @@
 ^\.drake
 ^LICENSE\.md$
 ^config\.yml$
+^initialize.R
