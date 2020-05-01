@@ -18,29 +18,29 @@ Suggests:
     testthat (>= 2.1.0)
 RoxygenNote: 7.1.0
 biocViews:
-    limma,
-    edgeR,
+Imports:
     biomaRt,
-    cqn,
-    GenomicRanges,
-    IRanges
-Imports: 
     config,
+    cqn,
     data.table,
-    plyr,
+    drake,
     dplyr,
-    tibble,
+    edgeR,
+    foreach,
+    GenomicRanges,
+    glue,
+    ggplot2,
+    IRanges,
+    knitr,
+    limma,
+    magrittr,
+    plyr,
     psych,
     RColorBrewer,
+    rlang,
     synapser,
-    knitr,
-    foreach,
-    drake,
-    glue,
     tidyr,
-    ggplot2,
-    utils,
-    magrittr,
-    rlang
+    tibble,
+    utils
 Remotes:
     th1vairam/CovariateAnalysis@dev
