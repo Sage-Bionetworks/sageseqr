@@ -21,6 +21,7 @@ biocViews:
 Imports:
     biomaRt,
     config,
+    CovariateAnalysis,
     cqn,
     data.table,
     drake,
