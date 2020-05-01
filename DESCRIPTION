@@ -39,6 +39,8 @@ Imports:
     glue,
     tidyr,
     ggplot2,
-    utils
+    utils,
+    magrittr,
+    rlang
 Remotes:
     th1vairam/CovariateAnalysis@dev
