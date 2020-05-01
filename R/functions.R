@@ -31,6 +31,7 @@ coerce_factors <- function(md, factors) {
 #'
 #'@inheritParams coerce_factors
 #'@param continuous A vector of continuous variables.
+#'@importFrom magrittr %>%
 coerce_continuous <- function(md, continuous) {
   subset <- md[,continuous]
   test_coercion <- lapply(subset, function(x) class(utils::type.convert(x)))
@@ -81,14 +82,15 @@ clean_covariates <- function(md, factors, continuous) {
 #'@inheritParams coerce_factors
 #'@param include_vars A vector of variables to visualize
 #'@param x_var Variable to plot on the x-axis.
+#'@importFrom rlang .data
 #'
 #'@export
 #'@return
 boxplot_vars <- function(md, include_vars, x_var) {
   md %>%
     dplyr::select(c(include_vars, x_var)) %>%
-    tidyr::gather(key, value, -x_var) %>%
-    ggplot2::ggplot(aes(x = x_var, y = value)) +
+    tidyr::gather(.data$key, .data$value, -x_var) %>%
+    ggplot2::ggplot(ggplot2::aes(x = x_var, y = value)) +
     ggplot2::geom_boxplot() +
     ggplot2::theme(legend.position = "top") +
     ggplot2::facet_grid(key ~ !! x_var, scales = "free")
@@ -132,6 +134,7 @@ biomart_obj <- function(organism, host) {
 #'(see \code{"biomaRt::listEnsemblArchives()"})
 #'@param organism A character vector of the organism name. This argument
 #'takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".
+#'@importFrom rlang .data
 #'@export
 get_biomart <- function(count_df, gene_id, synid, version, host, filters, organism) {
   if (is.null(config::get("biomart")$synID)) {
@@ -162,7 +165,7 @@ get_biomart <- function(count_df, gene_id, synid, version, host, filters, organi
     })
 
     length <- plyr::ldply(coords[gene_ids], function(x) sum(IRanges::width(x)), .id = "ensembl_gene_id") %>%
-      dplyr::rename(gene_length = V1)
+      dplyr::rename(gene_length = .data$V1)
 
     gc_content <- biomaRt::getBM(filters = filters,
                                  attributes = c(filters, "hgnc_symbol", "percentage_gene_gc_content",
@@ -207,12 +210,13 @@ get_biomart <- function(count_df, gene_id, synid, version, host, filters, organi
 #'than one HGNC symbol per gene Id. This function collapses the duplicate entries into
 #'a single entry by appending the HGNC symbols in a comma separated list.
 #'@param biomart_results Output of `get_biomart()`
+#'@importFrom rlang .data
 #'
 #'@export
 collapse_duplicate_hgnc_symbol <- function(biomart_results){
   biomart_results %>%
-    dplyr::group_by(ensembl_gene_id) %>%
-    dplyr::mutate(hgnc_symbol = paste(hgnc_symbol, collapse = ", ")) %>%
+    dplyr::group_by(.data$ensembl_gene_id) %>%
+    dplyr::mutate(hgnc_symbol = paste(.data$hgnc_symbol, collapse = ", ")) %>%
     unique()
 }
 #'Filter genes
@@ -247,11 +251,12 @@ filter_genes <- function(md, count_df) {
 #'Get gene Ids
 #'
 #'@inheritParams get_biomart
+#'@importFrom rlang .data
 #'
 #'@export
 convert_geneids <- function(count_df) {
     geneids <- tibble::tibble(ids = rownames(count_df)) %>%
-      tidyr::separate(ids, c("ensembl_gene_id", "position"), sep = "\\.")
+      tidyr::separate(.data$ids, c("ensembl_gene_id", "position"), sep = "\\.")
     geneids$ensembl_gene_id
 }
 #' Conditional Quantile Normalization (CQN)
