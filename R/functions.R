@@ -85,7 +85,7 @@ clean_covariates <- function(md, factors, continuous) {
 #'@importFrom rlang .data
 #'
 #'@export
-#'@return
+#'@return A boxplot with mutiple groups defined by the include_vars argument.
 boxplot_vars <- function(md, include_vars, x_var) {
   md %>%
     dplyr::select(c(include_vars, x_var)) %>%
