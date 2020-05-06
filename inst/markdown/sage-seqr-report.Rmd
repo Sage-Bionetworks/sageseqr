@@ -48,3 +48,30 @@ p[[6]] = p[[6]] + ggtitle('Fraction Ribosomal Bases') + theme(legend.position = 
 multiplot(plotlist = p, cols = 2)
 ```
 
+
+# Covariates of Interest
+```{r}
+null_model_covars[["PEC_res"]][[2]]$plotData
+```
+
+# Outliers 
+```{r plot_outliers}
+
+# Identify outliers - samples 4SDs from the mean
+outliers <- as.character(plotdata$SampleID[c(which(plotdata$PC1 < mean(plotdata$PC1) - 4*sd(plotdata$PC1)),
+                              which(plotdata$PC1 > mean(plotdata$PC1) + 4*sd(plotdata$PC1))), drop = T])
+outliers <- c(outliers, as.character(plotdata$SampleID[c(which(plotdata$PC2 < mean(plotdata$PC2) - 4*sd(plotdata$PC2)),
+                                           which(plotdata$PC2 > mean(plotdata$PC2) + 4*sd(plotdata$PC2))), drop = T] ))
+  
+plotdata <- left_join(plotdata, rownameToFirstColumn(COVARIATES, "SampleID")) %>%
+    tidyr::separate(Dx.Tissue, c('Dx','Tissue'), sep = '_') %>%
+  dplyr::mutate(label = SampleID) %>% 
+  dplyr::mutate(label = ifelse((label %in% outliers), label, NA))
+p <- ggplot(plotdata, aes(x=PC1, y=PC2))
+p <- p + geom_point(aes(color=Institution, shape=Tissue, size=ageOfDeath))
+p <- p + theme_bw() + theme(legend.position="right") + facet_grid(Tissue~.)
+p <- p + geom_text(aes(label= label), size=4, hjust=0)
+p
+
+```
+

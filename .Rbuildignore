@@ -1,2 +1,6 @@
 ^sageseqr\.Rproj$
 ^\.Rproj\.user$
+^\.drake
+^LICENSE\.md$
+^config\.yml$
+^initialize.R

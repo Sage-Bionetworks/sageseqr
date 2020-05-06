@@ -1,23 +1,19 @@
 default:
   counts:
-    synID: syn21587392
+    synID: syn22002998
     version: 1
-    gene id:
+    gene id: feature
   metadata:
-    synID: syn21587404
-    version: 3
+    synID: syn21072902
+    version: 1
     sample id:
   biomart:
-    synID: syn21907998
-<<<<<<< HEAD
-    version: 1
-    gene id: ensembl_gene_id
-=======
+    synID:
     version:
-    gene id:
+    gene id: ensembl_gene_id
+    filters: ensembl_gene_id
     host: ensembl.org
     organism: hsa
->>>>>>> upstream/master
   factors:
   continuous:
 mayo:
