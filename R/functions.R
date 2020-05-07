@@ -118,10 +118,9 @@ biomart_obj <- function(organism, host) {
 #' extraneous rows and is especially meant to address output from the STAR aligner.
 #' @inheritParams count_df
 parse_counts <- function(count_df){
-  if (any(sapply(count_df, function(x) grepl("N_",x)))) {
-    check_rows <- sapply(count_df, function(x) !grepl("N_", x))
-    ind <- which(apply(check_rows, 1, function(x) all(x)))
-    df_parsed <- count_df[ind,]
+  if (any(grepl("N_", row.names(count_df)))) {
+    ind <- which(grepl("N_", row.names(count_df)))
+    df_parsed <- count_df[-ind,]
     df_parsed
   } else {
     count_df
