@@ -3,9 +3,16 @@ Sys.setenv(R_CONFIG_ACTIVE = "mayo")
 # TO DO: how to setup cache for end user
 # make_cache
 
-synLogin()
-
 source("R/packages.R")
 source("R/functions.R")
 
+# Login to Synapse. Make a Synapse account and use synaper to login: https://r-docs.synapse.org/articles/manageSynapseCredentials.html
+synapser::synLogin()
+
+source("R/plan.R")
+
+# Run the analysis
 drake::make(plan)
+
+# Visualize the results
+drake::vis_drake_graph(plan, targets_only = TRUE)

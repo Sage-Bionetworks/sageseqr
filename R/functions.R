@@ -14,26 +14,27 @@
 #'
 #'}
 get_data <- function(synid, version = NULL) {
-  df <- as_tibble(data.table::fread(synapser::synGet(synid,
+  df <- tibble::as_tibble(data.table::fread(synapser::synGet(synid,
                                                      version = as.numeric(version)
                                                      )$path))
   df
 }
-#'Coerce objects to type factors
+#'Coerce objects to type factors.
 #'
-#'@inheritParams md
-#'@param factors A vector of factor variables
+#'@param md  A data frame with sample identifiers in a column and relevant experimental covariates.
+#'@param factors A vector of factor variables.
 coerce_factors <- function(md, factors) {
   md[, factors] <- lapply(md[, factors, drop = FALSE], factor)
   md
 }
-#'Coerce objects to type numeric
+#'Coerce objects to type numeric.
 #'
-#'@inheritParams md
-#'@param continuous A vector of continuous variables
+#'@inheritParams coerce_factors
+#'@param continuous A vector of continuous variables.
+#'@importFrom magrittr %>%
 coerce_continuous <- function(md, continuous) {
   subset <- md[,continuous]
-  test_coercion <- lapply(subset, function(x) class(type.convert(x)))
+  test_coercion <- lapply(subset, function(x) class(utils::type.convert(x)))
   if (all(test_coercion %in% c("integer", "numeric"))) {
     md[, continuous] <- lapply(md[, continuous, drop = FALSE], function(x) as.numeric(x))
     md
@@ -44,15 +45,21 @@ coerce_continuous <- function(md, continuous) {
 }
 #'Create covariate matrix from tidy metadata data frame.
 #'
-#'This function takes a tidy format. Coerces vectors to correct type.
+#'This function takes a tidy format. Coerces vectors to correct type. Only include
+#'covariates that have 2 or more levels.
 #'
-#'@inheritParams md
-#'@inheritParams factors
-#'@inheritParams continuous
+#'@inheritParams coerce_factors
+#'@inheritParams coerce_continuous
 #'
 #'@export
 #'@return A data frame with coerced variables.
 #'@examples
+#'data <- tibble::tribble(
+#'  ~individualID, ~diagnosis, ~RIN,
+#'  "ind5436", "control", 7.7,
+#'  "ind234", "disease", 7.1
+#'  )
+#' clean_covariates(data, factors = c("individualID", "diagnosis"), continuous = c("RIN"))
 clean_covariates <- function(md, factors, continuous) {
   if (missing(factors) | missing(continuous)) {
     stop("Factor and continuous variables are required.")
@@ -72,21 +79,21 @@ clean_covariates <- function(md, factors, continuous) {
 #'
 #'This function produces boxplots from the variables provided.
 #'
-#'@inheritParams md
-#'@param vars A vector of variables to visualize
+#'@inheritParams coerce_factors
+#'@param include_vars A vector of variables to visualize
+#'@param x_var Variable to plot on the x-axis.
+#'@importFrom rlang .data
 #'
 #'@export
-#'@return
-#'@examples
-#' TO DO: test this
+#'@return A boxplot with mutiple groups defined by the include_vars argument.
 boxplot_vars <- function(md, include_vars, x_var) {
   md %>%
-    dplyr::select(., c(include_vars, x_var)) %>%
-    gather(key, value, -x_var) %>%
-    ggplot(aes(x = x_var, y = value)) +
-    geom_boxplot() +
-    theme(legend.position = "top") +
-    facet_grid(key ~ !! x_var, scales = "free")
+    dplyr::select(c(include_vars, x_var)) %>%
+    tidyr::gather(.data$key, .data$value, -x_var) %>%
+    ggplot2::ggplot(ggplot2::aes(x = x_var, y = value)) +
+    ggplot2::geom_boxplot() +
+    ggplot2::theme(legend.position = "top") +
+    ggplot2::facet_grid(key ~ !! x_var, scales = "free")
 }
 #'Get available Ensembl dataset
 #'
@@ -94,10 +101,11 @@ boxplot_vars <- function(md, include_vars, x_var) {
 #'
 #'@param organism A character vector of the organism name. This argument takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".
 #'@param host An optional character vector specifying the release version. This specification is highly recommended for a reproducible workflow. (see \code{"biomaRt::listEnsemblArchives()"})
+#'@export
 biomart_obj <- function(organism, host) {
   message("Connecting to BioMart ...")
   ensembl <- biomaRt::useMart("ENSEMBL_MART_ENSEMBL", host = host)
-  ds <- listDatasets(ensembl)[, "dataset"]
+  ds <- biomaRt::listDatasets(ensembl)[, "dataset"]
   ds <- grep(paste0("^", organism), ds, value = TRUE)
   if (length(ds) == 0) {
     stop(paste("Mart not found for:", organism))
@@ -110,56 +118,124 @@ biomart_obj <- function(organism, host) {
   ensembl <- biomaRt::useDataset(ds, mart = ensembl)
   ensembl
 }
-#'Get Ensembl biomaRt object
-
-#'Get GC content, gene Ids, gene symbols, gene biotypes, gene lengths
-#'and other metadata from Ensembl BioMart.
+#' Subset counts data frame
 #'
-#'@param gene_ids Ensembl gene Ids. Transcript Ids must be converted to
-#'gene Ids.
+#' The biomaRt query requires only gene identifiers to be passed as input. Some alignment
+#' output combines additional metadata with the counts file. This function will remove
+#' extraneous rows and is especially meant to address output from the STAR aligner.
+#' @inheritParams count_df
+parse_counts <- function(count_df){
+  if (any(grepl("N_", row.names(count_df)))) {
+    ind <- which(grepl("N_", row.names(count_df)))
+    df_parsed <- count_df[-ind,]
+    df_parsed
+  } else {
+    count_df
+  }
+}
+#'Get Ensembl biomaRt object
+#'
+#'Get GC content, gene Ids, gene symbols, gene biotypes, gene lengths
+#'and other metadata from Ensembl BioMart. Object returned contains gene Ids
+#'as rownames.
+#'
+#'@param count_df A counts data frame with sample identifiers as rownames.
+#'@inheritParams get_data
+#'@param gene_id Column name of gene Ids
+#'@param filters A character vector listing biomaRt query filters.
+#'(For a list of filters see \code{"biomaRt::listFilters()"})
 #'@param host An optional character vector specifying the release version.
 #'This specification is highly recommended for a reproducible workflow.
 #'(see \code{"biomaRt::listEnsemblArchives()"})
 #'@param organism A character vector of the organism name. This argument
 #'takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".
-get_biomart <- function(gene_ids, host, organism) {
-    id_type <- "ensembl_gene_id"
+#'@importFrom rlang .data
+#'@export
+get_biomart <- function(count_df, gene_id, synid, version, host, filters, organism) {
+  if (is.null(config::get("biomart")$synID)) {
+    # Get available datset from Ensembl
     ensembl <- biomart_obj(organism, host)
+
+    # Check for extraneous rows
+    count_df <- parse_counts(count_df)
+
+    # Parse gene IDs to use in query
+    gene_ids <- convert_geneids(count_df)
+
     message(paste0("Downloading sequence",
                    ifelse(length(gene_ids) > 1, "s", ""), " ..."))
+
     if (length(gene_ids) > 100)
       message("This may take a few minutes ...")
-    attrs <- c(id_type, "ensembl_exon_id", "chromosome_name", "exon_chrom_start", "exon_chrom_end")
-    coords <- biomaRt::getBM(filters = id_type, attributes = attrs, values = gene_ids, mart = ensembl)
-    gene_ids <- unique(coords[, id_type])
+
+    attrs <- c(filters, "ensembl_exon_id", "chromosome_name", "exon_chrom_start", "exon_chrom_end")
+    coords <- biomaRt::getBM(filters = filters,
+                             attributes = attrs,
+                             values = gene_ids,
+                             mart = ensembl,
+                             useCache = FALSE)
+    gene_ids <- unique(coords[, filters])
+
     coords <- sapply(gene_ids, function(i) {
       i.coords <- coords[coords[, 1] == i, 3:5]
       g <- GenomicRanges::GRanges(i.coords[, 1], IRanges::IRanges(i.coords[, 2], i.coords[, 3]))
       g
     })
-    length <- plyr::ldply(coords[gene_ids], function(x) sum(IRanges::width(x)), .id = "ensembl_gene_id") %>%
-      dplyr::rename(gene_length = V1)
 
-    gc_content <- getBM(filters = id_type,
-                     attributes = c(id_type, "hgnc_symbol", "percentage_gene_gc_content",
-                                    "gene_biotype", "chromosome_name"), values = gene_ids,
-                     mart = ensembl)
+    length <- plyr::ldply(coords[gene_ids], function(x) sum(IRanges::width(x)), .id = "ensembl_gene_id") %>%
+      dplyr::rename(gene_length = .data$V1)
+
+    gc_content <- biomaRt::getBM(filters = filters,
+                                 attributes = c(filters, "hgnc_symbol", "percentage_gene_gc_content",
+                                                "gene_biotype", "chromosome_name"),
+                                 values = gene_ids,
+                                 mart = ensembl,
+                                 useCache = FALSE)
 
     biomart_results <- dplyr::full_join(gc_content, length)
 
-    #Downstream analysis requires the removal of duplicate ensembl gene Ids,
-    #removed HGNC symbol will be printed in the console
-    removed_hgnc_symbol <- biomart_results %>%
-      dplyr::group_by(ensembl_gene_id) %>%
-      dplyr::filter(row_number(hgnc_symbol) != 1)
-    vec <- glue::glue_collapse(glue::glue("{vec}"), sep = ", ", last = " and ")
-    message(glue::glue("The following HGNC symbols were removed due to duplicate gene Ids:{vec}"))
+    # Duplicate Ensembl Ids are collapsed into a single entry
+    biomart_results <- collapse_duplicate_hgnc_symbol(biomart_results)
 
-    biomart_results <- biomart_results %>%
-      dplyr::group_by(ensembl_gene_id) %>%
-      dplyr::filter(row_number(hgnc_symbol) == 1)
+    # Biomart IDs as rownames
+    biomart_results <- tibble::column_to_rownames(biomart_results, var = gene_id)
 
     biomart_results
+  } else {
+    # Download biomart object from syndID specified in config.yml
+    biomart_results <- get_data(synid, version)
+
+    # Biomart IDs as rownames
+    biomart_results <- tibble::column_to_rownames(biomart_results, var = gene_id)
+
+    # Gene metadata required for count CQN
+    required_variables <- c("gene_length", "percentage_gene_gc_content")
+
+    if (!all(required_variables %in% colnames(biomart_results))) {
+      vars <- glue::glue_collapse(setdiff(required_variables, colnames(biomart_results)),
+                                  sep = ", ",
+                                  last = " and ")
+      message(glue::glue("Warning: {vars} missing from biomart object.
+                         This information is required for Conditional
+                         Quantile Normalization"))
+    }
+    return(biomart_results)
+  }
+}
+#'Duplicate HGNC
+#'
+#'Count normalization requires Ensembl Ids to be unique. In rare cases, there are more
+#'than one HGNC symbol per gene Id. This function collapses the duplicate entries into
+#'a single entry by appending the HGNC symbols in a comma separated list.
+#'@param biomart_results Output of `get_biomart()`
+#'@importFrom rlang .data
+#'
+#'@export
+collapse_duplicate_hgnc_symbol <- function(biomart_results){
+  biomart_results %>%
+    dplyr::group_by(.data$ensembl_gene_id) %>%
+    dplyr::mutate(hgnc_symbol = paste(.data$hgnc_symbol, collapse = ", ")) %>%
+    unique()
 }
 #'Filter genes
 #'
@@ -167,54 +243,80 @@ get_biomart <- function(gene_ids, host, organism) {
 #'of samples per condition. If a biomaRt object is provided, gene lengths and
 #'gene GC content is required and genes with missing values are also removed.
 #'
-#'@param md A data frame with sample identifiers in a column.
-#'@param count_matrix A matrix with sample identifiers as column names and gene
-#'Ids as rownames.
-filter_genes <- function(md, count_matrix) {
+#'@inheritParams coerce_factors
+#'@inheritParams get_biomart
+#'
+#'@export
+filter_genes <- function(md, count_df) {
+  # Check for extraneous rows
+  count_df <- parse_counts(count_df)
+
   genes_to_analyze <- md %>%
     plyr::dlply(.(diagnosis), .fun = function(md, counts){
       processed_counts <- CovariateAnalysis::getGeneFilteredGeneExprMatrix(counts,
                                                                           MIN_GENE_CPM = 1,
                                                                           MIN_SAMPLE_PERCENT_WITH_MIN_GENE_CPM = 0.5)
       processed_counts$filteredExprMatrix$gen
-    }, count_matrix)
+    }, count_df)
   genes_to_analyze <- unlist(genes_to_analyze) %>%
     unique()
-  processed_counts <- CovariateAnalysis::getGeneFilteredGeneExprMatrix(counts[genes_to_analyze, ],
+  processed_counts <- CovariateAnalysis::getGeneFilteredGeneExprMatrix(count_df[genes_to_analyze, ],
                                                                        MIN_GENE_CPM = 0,
                                                                        MIN_SAMPLE_PERCENT_WITH_MIN_GENE_CPM = 0)
-  #convert transcript Ids to gene Ids with convert_geneids()
+  # Convert transcript Ids to gene Ids in counts and gene list with convert_geneids()
   processed_counts$filteredExprMatrix$genes <- convert_geneids(processed_counts$filteredExprMatrix$counts)
-  rownames(processed_counts$filteredExprMatrix$counts) <- convert_geneids(filtered_counts$filteredExprMatrix$counts)$ensembl_gene_id
+  rownames(processed_counts$filteredExprMatrix$counts) <- convert_geneids(processed_counts$filteredExprMatrix$counts)
+
   processed_counts
 }
 #'Get gene Ids
 #'
-#'@inheritParams count_matrix
+#'@inheritParams get_biomart
+#'@importFrom rlang .data
 #'
-convert_geneids <- function(count_matrix) {
-  if (all(grepl("\\.", rownames(count_matrix)))) {
-    geneids <- tibble(ids = rownames(count_matrix)) %>%
-      tidyr::separate(ids, c("ensembl_gene_id", "position"), sep = "\\.")
-    geneids
-  } else {
-    geneids <- rownames(count_matrix)
-  }
+#'@export
+convert_geneids <- function(count_df) {
+    geneids <- tibble::tibble(ids = rownames(count_df)) %>%
+      tidyr::separate(.data$ids, c("ensembl_gene_id", "position"), sep = "\\.")
+    geneids$ensembl_gene_id
 }
 #' Conditional Quantile Normalization (CQN)
 #'
-#' CQN library normalization method is applied.
-cqn <- function(filtered_counts, biomart_results) {
-  normalized_counts <- cqn::cqn(filtered_counts$filteredExprMatrix$counts,
-                                x = biomart_results[biomart_results$ensembl_gene_id %in%
-                                                      filtered_counts$filteredExprMatrix$genes$ensembl_gene_id,
-                                                    "percentage_gene_gc_content"],
-                                lengths = biomart_results[biomart_results$ensembl_gene_id %in%
-                                                            filtered_counts$filteredExprMatrix$genes$ensembl_gene_id,
-                                                          "gene_length"],
-                                lengthMethod = "smooth",
-                                verbose = FALSE
-                                )
-
-}
+#' Normalize counts by CQN. By providing a biomart object, the systematic effect of GC content
+#' is removed and gene length (in bp) variation is accounted for. Genes with missing GC content
+#' or gene lengths will be removed from the counts matrix.
 #'
+#'@param filtered_counts A counts data frame with genes removed that have low expression.
+#'@inheritParams collapse_duplicate_hgnc_symbol
+#'
+#'@export
+cqn <- function(filtered_counts, biomart_results) {
+
+  required_variables <- c("gene_length", "percentage_gene_gc_content")
+
+  if (!all(required_variables %in% colnames(biomart_results))) {
+    message(glue::glue("Error:{setdiff(required_variables,
+                       colnames(biomart_results))} missing from
+                       biomart object. This information is required
+                       for Conditional Quantile Normalization"))
+  } else {
+
+    counts <- filtered_counts$filteredExprMatrix$counts
+
+    genes_to_analyze <- intersect(rownames(counts), rownames(biomart_results))
+
+    to_normalize <- subset(counts, rownames(counts) %in% genes_to_analyze)
+    gc_length <- subset(biomart_results, rownames(biomart_results) %in% genes_to_analyze)
+
+    normalized_counts <- cqn::cqn(to_normalize,
+                                  x = gc_length[, "percentage_gene_gc_content"],
+                                  lengths = gc_length[, "gene_length"],
+                                  lengthMethod = "smooth",
+                                  verbose = FALSE
+    )
+
+    normalized_counts$E <- normalized_counts$y + normalized_counts$offset
+
+    return(normalized_counts)
+  }
+}

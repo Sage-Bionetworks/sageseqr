@@ -1,5 +1,5 @@
 
-metadata <- tribble(
+metadata <- tibble::tribble(
   ~samples, ~sex, ~batch, ~age, ~RIN,
   "S567", "F", "1", "68", "7.5",
   "S453", "F", "1", "60", "7",
@@ -38,7 +38,9 @@ test_that("user cannot omit factor and continuous vector arguments", {
 })
 
 test_that("factor and continous variables are discrete.",{
-  expect_error(clean_covariates(df_metadata, factors = c("sex"), continous = c("sex")))
+  expect_error(clean_covariates(df_metadata,
+                                factors = c("sex"),
+                                continuous = c("sex")))
 })
 
 test_that("variables are in md", {
