@@ -118,6 +118,21 @@ biomart_obj <- function(organism, host) {
   ensembl <- biomaRt::useDataset(ds, mart = ensembl)
   ensembl
 }
+#' Subset counts data frame
+#'
+#' The biomaRt query requires only gene identifiers to be passed as input. Some alignment
+#' output combines additional metadata with the counts file. This function will remove
+#' extraneous rows and is especially meant to address output from the STAR aligner.
+#' @inheritParams count_df
+parse_counts <- function(count_df){
+  if (any(grepl("N_", row.names(count_df)))) {
+    ind <- which(grepl("N_", row.names(count_df)))
+    df_parsed <- count_df[-ind,]
+    df_parsed
+  } else {
+    count_df
+  }
+}
 #'Get Ensembl biomaRt object
 #'
 #'Get GC content, gene Ids, gene symbols, gene biotypes, gene lengths
@@ -140,6 +155,9 @@ get_biomart <- function(count_df, gene_id, synid, version, host, filters, organi
   if (is.null(config::get("biomart")$synID)) {
     # Get available datset from Ensembl
     ensembl <- biomart_obj(organism, host)
+
+    # Check for extraneous rows
+    count_df <- parse_counts(count_df)
 
     # Parse gene IDs to use in query
     gene_ids <- convert_geneids(count_df)
@@ -230,6 +248,9 @@ collapse_duplicate_hgnc_symbol <- function(biomart_results){
 #'
 #'@export
 filter_genes <- function(md, count_df) {
+  # Check for extraneous rows
+  count_df <- parse_counts(count_df)
+
   genes_to_analyze <- md %>%
     plyr::dlply(.(diagnosis), .fun = function(md, counts){
       processed_counts <- CovariateAnalysis::getGeneFilteredGeneExprMatrix(counts,
