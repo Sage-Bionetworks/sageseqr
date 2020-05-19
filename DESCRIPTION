@@ -12,7 +12,6 @@ Description: This workflow normalizes counts, performs model selection from know
     customizable threshold and performs differential expression analysis for repeated
     measures.
 License: MIT + file LICENSE
->>>>>>> origin/master
 Encoding: UTF-8
 LazyData: true
 Suggests: 
