@@ -1,7 +1,7 @@
 default:
   counts:
     synID: syn22002998
-    version: 1
+    version: 2
     gene id: feature
   metadata:
     synID: syn21072902
