@@ -1,14 +1,14 @@
 default:
   counts:
-    synID: syn22002998
-    version: 2
+    synID: syn22084837
+    version:
     gene id: feature
   metadata:
-    synID: syn21072902
+    synID: syn22090070
     version: 1
     sample id:
   biomart:
-    synID:
+    synID: syn21907998
     version:
     gene id: ensembl_gene_id
     filters: ensembl_gene_id
