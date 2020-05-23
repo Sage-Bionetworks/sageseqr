@@ -1,5 +1,6 @@
 ^sageseqr\.Rproj$
 ^\.Rproj\.user$
+^\.github/workflows/R-CMD-check\.yaml$
 ^\.drake
 ^LICENSE\.md$
 ^config\.yml$

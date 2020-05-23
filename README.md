@@ -1,3 +1,6 @@
+<!-- badges: start -->
+  [![R build status](https://github.com/kelshmo/sageseqr/workflows/R-CMD-check/badge.svg)](https://github.com/kelshmo/sageseqr/actions)
+<!-- badges: end -->
 # sage-seqr
 RNASeq normalization pipeline with R.
 
@@ -63,4 +66,3 @@ factors: List of factor variables in brackets. Variables must be present in the 
 continuous: List of continuous variables in brackets. Variables must be present in the metadata as column names (e.g[ "rin", "rin2"]).
 ```
 2. `initialize.R` sets the config file and loads the package dependencies, functions and drake plan. Set `Sys.setenv(R_CONFIG_ACTIVE = "default")` in `initialize.R`. 
-
