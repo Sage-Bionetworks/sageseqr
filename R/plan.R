@@ -1,4 +1,4 @@
-plan <- drake_plan(
+plan <- drake::drake_plan(
   import_metadata = get_data(config::get("metadata")$synID,
                 config::get("metadata")$version),
   import_counts = get_data(config::get("counts")$synID,
