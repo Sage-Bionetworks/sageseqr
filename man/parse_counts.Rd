@@ -6,6 +6,9 @@
 \usage{
 parse_counts(count_df)
 }
+\arguments{
+\item{count_df}{A counts data frame with sample identifiers as rownames.}
+}
 \description{
 The biomaRt query requires only gene identifiers to be passed as input. Some alignment
 output combines additional metadata with the counts file. This function will remove
