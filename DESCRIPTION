@@ -43,5 +43,7 @@ Imports:
     tidyr,
     tibble,
     utils
+Additional_repositories:
+    http://ran.synapse.org
 Remotes:
     th1vairam/CovariateAnalysis@dev
