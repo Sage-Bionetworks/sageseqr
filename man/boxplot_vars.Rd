@@ -14,7 +14,7 @@ boxplot_vars(md, include_vars, x_var)
 \item{x_var}{Variable to plot on the x-axis.}
 }
 \value{
-
+A boxplot with mutiple groups defined by the include_vars argument.
 }
 \description{
 This function produces boxplots from the variables provided.
