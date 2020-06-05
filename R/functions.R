@@ -123,7 +123,7 @@ biomart_obj <- function(organism, host) {
 #' The biomaRt query requires only gene identifiers to be passed as input. Some alignment
 #' output combines additional metadata with the counts file. This function will remove
 #' extraneous rows and is especially meant to address output from the STAR aligner.
-#' @inheritParams count_df
+#' @inheritParams get_biomart
 parse_counts <- function(count_df){
   if (any(grepl("N_", row.names(count_df)))) {
     ind <- which(grepl("N_", row.names(count_df)))
