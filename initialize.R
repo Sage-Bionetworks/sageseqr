@@ -1,11 +1,6 @@
 Sys.setenv(R_CONFIG_ACTIVE = "default")
 
-# TO DO: how to setup cache for end user
-# make_cache
-
-source("R/functions.R")
-source("R/plan.R")
-
+library(sageseqr)
 # Login to Synapse. Make a Synapse account and use synaper to login: https://r-docs.synapse.org/articles/manageSynapseCredentials.html
 synapser::synLogin()
 
