@@ -245,7 +245,7 @@ collapse_duplicate_hgnc_symbol <- function(biomart_results){
 #'
 #'@inheritParams coerce_factors
 #'@inheritParams get_biomart
-#'
+#'@importFrom magrittr %>%
 #'@export
 filter_genes <- function(md, count_df) {
   # Check for extraneous rows
