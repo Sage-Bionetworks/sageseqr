@@ -252,7 +252,7 @@ filter_genes <- function(md, count_df) {
   count_df <- parse_counts(count_df)
 
   genes_to_analyze <- md %>%
-    plyr::dlply(.(diagnosis), .fun = function(md, counts){
+    plyr::dlply(plyr::.(diagnosis), .fun = function(md, counts){
       processed_counts <- CovariateAnalysis::getGeneFilteredGeneExprMatrix(counts,
                                                                           MIN_GENE_CPM = 1,
                                                                           MIN_SAMPLE_PERCENT_WITH_MIN_GENE_CPM = 0.5)
