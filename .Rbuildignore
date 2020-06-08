@@ -5,3 +5,6 @@
 ^LICENSE\.md$
 ^config\.yml$
 ^initialize.R
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
