@@ -1,0 +1,58 @@
+---
+title: "Run the drake plan"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Run the drake plan}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+1. [Write your own config file](https://kelshmo.github.io/sageseqr/articles/customize-config.html).
+
+2. Specify the active configuration by setting `R_CONFIG_ACTIVE`.
+
+```{r config-setup}
+Sys.setenv(R_CONFIG_ACTIVE = "default")
+```
+
+3. Load the `sageseqr` library and login to [Synapse](https://www.synapse.org/). `rnaseq_plan()` calls the arguments from the config file and creates the `drake` plan. Execute `drake::make(plan)` to compute. Run this code from your project root.
+
+```{r run-plan}
+library(sageseqr)
+
+# Login to Synapse. Make a Synapse account and use synapser to login: https://r-docs.synapse.org/articles/manageSynapseCredentials.html
+synapser::synLogin()
+
+# Run the analysis
+plan <- sageseqr::rnaseq_plan(metadata_id = config::get("metadata")$synID,
+                    metadata_version = config::get("metadata")$version,
+                    counts_id = config::get("counts")$synID,
+                    counts_version = config::get("counts")$version,
+                    gene_id_input = config::get("counts")$`gene id`,
+                    factor_input = config::get("factors"),
+                    continuous_input = config::get("continuous"),
+                    gene_id = config::get("biomart")$`gene id`,
+                    biomart_id = config::get("biomart")$synID,
+                    biomart_version = config::get("biomart")$version,
+                    filters = config::get("biomart")$filters,
+                    host = config::get("biomart")$host,
+                    organism = config::get("biomart")$organism
+)
+
+drake::make(plan)
+```
+
+4. Visualize the results of your work. 
+
+```{r visualize}
+drake::vis_drake_graph(plan,
+                       targets_only = TRUE)
+```
