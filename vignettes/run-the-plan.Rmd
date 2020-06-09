@@ -23,7 +23,7 @@ knitr::opts_chunk$set(
 Sys.setenv(R_CONFIG_ACTIVE = "default")
 ```
 
-3. Load the `sageseqr` library and login to [Synapse](https://www.synapse.org/). `rnaseq_plan()` calls the arguments from the config file and creates the `drake` plan. Execute `drake::make(plan)` to compute.
+3. Load the `sageseqr` library and login to [Synapse](https://www.synapse.org/). `rnaseq_plan()` calls the arguments from the config file and creates the `drake` plan. Execute `drake::make(plan)` to compute. Run this code from your project root.
 
 ```{r run-plan}
 library(sageseqr)
