@@ -74,7 +74,6 @@ clean_covariates <- function(md, factors, continuous) {
     md
   }
 }
-#'
 #'Explore metadata by variable.
 #'
 #'This function produces boxplots from the variables provided.
@@ -288,7 +287,6 @@ convert_geneids <- function(count_df) {
 #'
 #'@param filtered_counts A counts data frame with genes removed that have low expression.
 #'@inheritParams collapse_duplicate_hgnc_symbol
-#'
 #'@export
 cqn <- function(filtered_counts, biomart_results) {
 
@@ -308,11 +306,12 @@ cqn <- function(filtered_counts, biomart_results) {
     to_normalize <- subset(counts, rownames(counts) %in% genes_to_analyze)
     gc_length <- subset(biomart_results, rownames(biomart_results) %in% genes_to_analyze)
 
-    normalized_counts <- cqn::cqn(to_normalize,
+    normalized_counts <- suppressWarnings(cqn::cqn(to_normalize,
                                   x = gc_length[, "percentage_gene_gc_content"],
                                   lengths = gc_length[, "gene_length"],
                                   lengthMethod = "smooth",
                                   verbose = FALSE
+    )
     )
 
     normalized_counts$E <- normalized_counts$y + normalized_counts$offset
@@ -320,3 +319,12 @@ cqn <- function(filtered_counts, biomart_results) {
     return(normalized_counts)
   }
 }
+#'@importFrom quantreg rq
+#'@export
+rq <- quantreg::rq
+#'@importFrom mclust Mclust
+#'@export
+Mclust <- mclust::Mclust
+#'@importFrom mclust mclustBIC
+#'@export
+mclustBIC <- mclust::mclustBIC
