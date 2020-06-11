@@ -17,6 +17,7 @@
 #' @param biomart_id Synapse ID to biomart object.
 #' @param biomart_version Optionally, include Synapse file version number.
 #' @inheritParams get_biomart
+#' @inheritParams filter_genes
 #' @export
 rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                         counts_version, gene_id_input, factor_input,
