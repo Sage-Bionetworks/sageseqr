@@ -4,12 +4,14 @@
 \alias{filter_genes}
 \title{Filter genes}
 \usage{
-filter_genes(md, count_df)
+filter_genes(md, count_df, conditions)
 }
 \arguments{
 \item{md}{A data frame with sample identifiers in a column and relevant experimental covariates.}
 
 \item{count_df}{A counts data frame with sample identifiers as rownames.}
+
+\item{conditions}{Conditions to bin gene counts that correspond to variables in `md`.}
 }
 \description{
 Remove genes that have less than 1 counts per million (cpm) in at least 50%

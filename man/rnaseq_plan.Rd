@@ -17,7 +17,8 @@ rnaseq_plan(
   biomart_version,
   host,
   filters,
-  organism
+  organism,
+  conditions
 )
 }
 \arguments{

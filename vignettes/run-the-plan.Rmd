@@ -44,7 +44,8 @@ plan <- sageseqr::rnaseq_plan(metadata_id = config::get("metadata")$synID,
                     biomart_version = config::get("biomart")$version,
                     filters = config::get("biomart")$filters,
                     host = config::get("biomart")$host,
-                    organism = config::get("biomart")$organism
+                    organism = config::get("biomart")$organism, 
+                    conditions = config::get("conditions")
 )
 
 drake::make(plan)

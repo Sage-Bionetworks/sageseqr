@@ -30,5 +30,6 @@ biomart:
   version: Optionally, include Synapse file version number (e.g. 3).
   gene id: Column name that corresponds to the gene ids (e.g. ensembl_gene_id)
 factors: List of factor variables in brackets. Variables must be present in the metadata as column names (e.g. [ "donorid", "source"]).
-continuous: List of continuous variables in brackets. Variables must be present in the metadata as column names (e.g[ "rin", "rin2"]).
+continuous: List of continuous variables in brackets. Variables must be present in the metadata as column names (e.g. [ "rin", "rin2"]).
+conditions: Filtering low-expression genes is a common practice to improve sensitivity in detection of differentially expressed genes. Low count genes that have less than 1 counts per million (cpm) in 50% of the samples per the conditions provided here will be removed. (e.g. ["diagnosis", "sex"])
 ```

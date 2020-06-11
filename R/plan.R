@@ -22,7 +22,7 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                         counts_version, gene_id_input, factor_input,
                         continuous_input, gene_id,
                         biomart_id, biomart_version, host, filters,
-                        organism){
+                        organism, conditions){
   drake::drake_plan(
     import_metadata = get_data(!!metadata_id,
                                !!metadata_version),
@@ -41,7 +41,8 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                                 host = !!host,
                                 organism = !!organism),
     filtered_counts = filter_genes(md = clean_md,
-                                   count_df = counts),
+                                   count_df = counts,
+                                   conditions = !!conditions),
     cqn_counts = cqn(filtered_counts,
                      biomart_results)
 )

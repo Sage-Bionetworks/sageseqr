@@ -87,13 +87,14 @@ clean_covariates <- function(md, factors, continuous) {
 #'@export
 #'@return A boxplot with mutiple groups defined by the include_vars argument.
 boxplot_vars <- function(md, include_vars, x_var) {
-  md %>%
-    dplyr::select(c(include_vars, x_var)) %>%
-    tidyr::gather(.data$key, .data$value, -x_var) %>%
-    ggplot2::ggplot(ggplot2::aes(x = x_var, y = value)) +
-    ggplot2::geom_boxplot() +
-    ggplot2::theme(legend.position = "top") +
-    ggplot2::facet_grid(key ~ !! x_var, scales = "free")
+  df <- dplyr::select(md, !!include_vars, !!x_var) %>%
+    tidyr::pivot_longer(-!!x_var, names_to = "key", values_to = "value")
+  p <- ggplot2::ggplot(df, ggplot2::aes(x = .data[[x_var]],
+                                        y = .data$value,
+                                        group = .data[[x_var]])) +
+    ggplot2::geom_boxplot(ggplot2::aes(fill = .data[[x_var]])) +
+    ggplot2::facet_wrap(key ~ ., scales = "free")
+  p
 }
 #'Get available Ensembl dataset
 #'
@@ -227,7 +228,7 @@ get_biomart <- function(count_df, gene_id, synid, version, host, filters, organi
 #'Count normalization requires Ensembl Ids to be unique. In rare cases, there are more
 #'than one HGNC symbol per gene Id. This function collapses the duplicate entries into
 #'a single entry by appending the HGNC symbols in a comma separated list.
-#'@param biomart_results Output of `get_biomart()`
+#'@param biomart_results Output of \code{"sageseqr::get_biomart()"}.
 #'@importFrom rlang .data
 #'
 #'@export
@@ -245,14 +246,15 @@ collapse_duplicate_hgnc_symbol <- function(biomart_results){
 #'
 #'@inheritParams coerce_factors
 #'@inheritParams get_biomart
+#'@param conditions Conditions to bin gene counts that correspond to variables in `md`.
 #'@importFrom magrittr %>%
 #'@export
-filter_genes <- function(md, count_df) {
+filter_genes <- function(md, count_df, conditions) {
   # Check for extraneous rows
   count_df <- parse_counts(count_df)
 
   genes_to_analyze <- md %>%
-    plyr::dlply(plyr::.(diagnosis), .fun = function(md, counts){
+    plyr::dlply(plyr::.(conditions), .fun = function(md, counts){
       processed_counts <- CovariateAnalysis::getGeneFilteredGeneExprMatrix(counts,
                                                                           MIN_GENE_CPM = 1,
                                                                           MIN_SAMPLE_PERCENT_WITH_MIN_GENE_CPM = 0.5)
