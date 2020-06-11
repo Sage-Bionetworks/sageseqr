@@ -276,9 +276,13 @@ filter_genes <- function(md, count_df) {
 #'
 #'@export
 convert_geneids <- function(count_df) {
+  if (any(grepl("\\.", rownames(count_df)))) {
     geneids <- tibble::tibble(ids = rownames(count_df)) %>%
       tidyr::separate(.data$ids, c("ensembl_gene_id", "position"), sep = "\\.")
     geneids$ensembl_gene_id
+  } else {
+    rownames(count_df)
+  }
 }
 #' Conditional Quantile Normalization (CQN)
 #'
