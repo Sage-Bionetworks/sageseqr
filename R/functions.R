@@ -321,10 +321,10 @@ cqn <- function(filtered_counts, biomart_results) {
 }
 #'@importFrom quantreg rq
 #'@export
-rq <- quantreg::rq
+quantreg::rq
 #'@importFrom mclust Mclust
 #'@export
-Mclust <- mclust::Mclust
+mclust::Mclust
 #'@importFrom mclust mclustBIC
 #'@export
-mclustBIC <- mclust::mclustBIC
+mclust::mclustBIC
