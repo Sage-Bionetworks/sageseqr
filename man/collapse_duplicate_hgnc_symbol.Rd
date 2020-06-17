@@ -7,7 +7,7 @@
 collapse_duplicate_hgnc_symbol(biomart_results)
 }
 \arguments{
-\item{biomart_results}{Output of `get_biomart()`}
+\item{biomart_results}{Output of \code{"sageseqr::get_biomart()"}.}
 }
 \description{
 Count normalization requires Ensembl Ids to be unique. In rare cases, there are more

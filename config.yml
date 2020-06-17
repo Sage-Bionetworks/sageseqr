@@ -16,6 +16,7 @@ default:
     organism: hsa
   factors:
   continuous:
+  conditions: diagnosis, sex
 mayo:
   counts:
     synID: syn21587392
