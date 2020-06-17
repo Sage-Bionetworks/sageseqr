@@ -129,7 +129,7 @@ rectangular file type from Synapse." />
 rectangular file type from Synapse.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_data</span>(<span class='no'>synid</span>, <span class='kw'>version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>get_data</span>(<span class='kw'>synid</span>, version = <span class='kw'>NULL</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -150,8 +150,8 @@ version number.</p></td>
     <p>A tibble.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
-<span class='no'>file</span> <span class='kw'>&lt;-</span> <span class='fu'>get_data</span>(<span class='kw'>synID</span> <span class='kw'>=</span> <span class='st'>"syn1234"</span>, <span class='kw'>version</span> <span class='kw'>=</span> <span class='fl'>7</span>)
+    <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='kw'>file</span> <span class='op'>&lt;-</span> <span class='fu'>get_data</span>(synID = <span class='st'>"syn1234"</span>, version = <span class='fl'>7</span>)
 
 }</div></pre>
   </div>

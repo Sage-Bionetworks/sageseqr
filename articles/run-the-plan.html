@@ -89,37 +89,43 @@
 <li><p><a href="https://kelshmo.github.io/sageseqr/articles/customize-config.html">Write your own config file</a>.</p></li>
 <li><p>Specify the active configuration by setting <code>R_CONFIG_ACTIVE</code>.</p></li>
 </ol>
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html">Sys.setenv</a></span>(<span class="kw">R_CONFIG_ACTIVE</span> <span class="kw">=</span> <span class="st">"default"</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb1"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html">Sys.setenv</a></span>(R_CONFIG_ACTIVE = <span class="st">"default"</span>)
+</pre></div>
 <ol start="3" style="list-style-type: decimal">
 <li>Load the <code>sageseqr</code> library and login to <a href="https://www.synapse.org/">Synapse</a>. <code><a href="../reference/rnaseq_plan.html">rnaseq_plan()</a></code> calls the arguments from the config file and creates the <code>drake</code> plan. Execute <code><a href="https://docs.ropensci.org/drake/reference/make.html">drake::make(plan)</a></code> to compute. Run this code from your project root.</li>
 </ol>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">sageseqr</span>)
+<div class="sourceCode" id="cb2"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw">sageseqr</span>)
 
 <span class="co"># Login to Synapse. Make a Synapse account and use synapser to login: https://r-docs.synapse.org/articles/manageSynapseCredentials.html</span>
-<span class="kw pkg">synapser</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/synapser/man/synLogin.html">synLogin</a></span>()
+<span class="kw">synapser</span>::<span class="fu"><a href="https://rdrr.io/pkg/synapser/man/synLogin.html">synLogin</a></span>()
 
 <span class="co"># Run the analysis</span>
-<span class="no">plan</span> <span class="kw">&lt;-</span> <span class="kw pkg">sageseqr</span><span class="kw ns">::</span><span class="fu"><a href="../reference/rnaseq_plan.html">rnaseq_plan</a></span>(<span class="kw">metadata_id</span> <span class="kw">=</span> <span class="kw pkg">config</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"metadata"</span>)$<span class="no">synID</span>,
-                    <span class="kw">metadata_version</span> <span class="kw">=</span> <span class="kw pkg">config</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"metadata"</span>)$<span class="no">version</span>,
-                    <span class="kw">counts_id</span> <span class="kw">=</span> <span class="kw pkg">config</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"counts"</span>)$<span class="no">synID</span>,
-                    <span class="kw">counts_version</span> <span class="kw">=</span> <span class="kw pkg">config</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"counts"</span>)$<span class="no">version</span>,
-                    <span class="kw">gene_id_input</span> <span class="kw">=</span> <span class="kw pkg">config</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"counts"</span>)$<span class="no">`gene id`</span>,
-                    <span class="kw">factor_input</span> <span class="kw">=</span> <span class="kw pkg">config</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"factors"</span>),
-                    <span class="kw">continuous_input</span> <span class="kw">=</span> <span class="kw pkg">config</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"continuous"</span>),
-                    <span class="kw">gene_id</span> <span class="kw">=</span> <span class="kw pkg">config</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"biomart"</span>)$<span class="no">`gene id`</span>,
-                    <span class="kw">biomart_id</span> <span class="kw">=</span> <span class="kw pkg">config</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"biomart"</span>)$<span class="no">synID</span>,
-                    <span class="kw">biomart_version</span> <span class="kw">=</span> <span class="kw pkg">config</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"biomart"</span>)$<span class="no">version</span>,
-                    <span class="kw">filters</span> <span class="kw">=</span> <span class="kw pkg">config</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"biomart"</span>)$<span class="no">filters</span>,
-                    <span class="kw">host</span> <span class="kw">=</span> <span class="kw pkg">config</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"biomart"</span>)$<span class="no">host</span>,
-                    <span class="kw">organism</span> <span class="kw">=</span> <span class="kw pkg">config</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"biomart"</span>)$<span class="no">organism</span>
+<span class="kw">plan</span> <span class="op">&lt;-</span> <span class="kw">sageseqr</span>::<span class="fu"><a href="../reference/rnaseq_plan.html">rnaseq_plan</a></span>(metadata_id = <span class="kw">config</span>::<span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"metadata"</span>)<span class="op">$</span><span class="kw">synID</span>,
+                    metadata_version = <span class="kw">config</span>::<span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"metadata"</span>)<span class="op">$</span><span class="kw">version</span>,
+                    counts_id = <span class="kw">config</span>::<span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"counts"</span>)<span class="op">$</span><span class="kw">synID</span>,
+                    counts_version = <span class="kw">config</span>::<span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"counts"</span>)<span class="op">$</span><span class="kw">version</span>,
+                    gene_id_input = <span class="kw">config</span>::<span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"counts"</span>)<span class="op">$</span><span class="kw">`gene id`</span>,
+                    factor_input = <span class="kw">config</span>::<span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"factors"</span>),
+                    continuous_input = <span class="kw">config</span>::<span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"continuous"</span>),
+                    gene_id = <span class="kw">config</span>::<span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"biomart"</span>)<span class="op">$</span><span class="kw">`gene id`</span>,
+                    biomart_id = <span class="kw">config</span>::<span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"biomart"</span>)<span class="op">$</span><span class="kw">synID</span>,
+                    biomart_version = <span class="kw">config</span>::<span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"biomart"</span>)<span class="op">$</span><span class="kw">version</span>,
+                    filters = <span class="kw">config</span>::<span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"biomart"</span>)<span class="op">$</span><span class="kw">filters</span>,
+                    host = <span class="kw">config</span>::<span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"biomart"</span>)<span class="op">$</span><span class="kw">host</span>,
+                    organism = <span class="kw">config</span>::<span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"biomart"</span>)<span class="op">$</span><span class="kw">organism</span>
 )
 
-<span class="kw pkg">drake</span><span class="kw ns">::</span><span class="fu"><a href="https://docs.ropensci.org/drake/reference/make.html">make</a></span>(<span class="no">plan</span>)</pre></body></html></div>
+<span class="kw">drake</span>::<span class="fu"><a href="https://docs.ropensci.org/drake/reference/make.html">make</a></span>(<span class="kw">plan</span>)
+</pre></div>
 <ol start="4" style="list-style-type: decimal">
 <li>Visualize the results of your work.</li>
 </ol>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="kw pkg">drake</span><span class="kw ns">::</span><span class="fu"><a href="https://docs.ropensci.org/drake/reference/vis_drake_graph.html">vis_drake_graph</a></span>(<span class="no">plan</span>,
-                       <span class="kw">targets_only</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb3"><pre class="downlit">
+<span class="kw">drake</span>::<span class="fu"><a href="https://docs.ropensci.org/drake/reference/vis_drake_graph.html">vis_drake_graph</a></span>(<span class="kw">plan</span>,
+                       targets_only = <span class="fl">TRUE</span>)
+</pre></div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

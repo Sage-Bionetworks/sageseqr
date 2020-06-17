@@ -129,7 +129,7 @@ covariates that have 2 or more levels." />
 covariates that have 2 or more levels.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>clean_covariates</span>(<span class='no'>md</span>, <span class='no'>factors</span>, <span class='no'>continuous</span>)</pre>
+    <pre class="usage"><span class='fu'>clean_covariates</span>(<span class='kw'>md</span>, <span class='kw'>factors</span>, <span class='kw'>continuous</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -153,12 +153,12 @@ covariates that have 2 or more levels.</p>
     <p>A data frame with coerced variables.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>data</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>tibble</span><span class='kw ns'>::</span><span class='fu'><a href='https://tibble.tidyverse.org/reference/tribble.html'>tribble</a></span>(
- ~<span class='no'>individualID</span>, ~<span class='no'>diagnosis</span>, ~<span class='no'>RIN</span>,
+    <pre class="examples"><div class='input'><span class='kw'>data</span> <span class='op'>&lt;-</span> <span class='kw'>tibble</span>::<span class='fu'><a href='https://tibble.tidyverse.org/reference/tribble.html'>tribble</a></span>(
+ <span class='op'>~</span><span class='kw'>individualID</span>, <span class='op'>~</span><span class='kw'>diagnosis</span>, <span class='op'>~</span><span class='kw'>RIN</span>,
  <span class='st'>"ind5436"</span>, <span class='st'>"control"</span>, <span class='fl'>7.7</span>,
  <span class='st'>"ind234"</span>, <span class='st'>"disease"</span>, <span class='fl'>7.1</span>
  )
-<span class='fu'>clean_covariates</span>(<span class='no'>data</span>, <span class='kw'>factors</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"individualID"</span>, <span class='st'>"diagnosis"</span>), <span class='kw'>continuous</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"RIN"</span>))</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 2 x 3</span><span>
+<span class='fu'>clean_covariates</span>(<span class='kw'>data</span>, factors = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"individualID"</span>, <span class='st'>"diagnosis"</span>), continuous = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"RIN"</span>))</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 2 x 3</span><span>
 #&gt;   individualID diagnosis   RIN
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;fct&gt;</span><span>        </span><span style='color: #555555;font-style: italic;'>&lt;fct&gt;</span><span>     </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
 #&gt; </span><span style='color: #555555;'>1</span><span> ind5436      control     7.7
