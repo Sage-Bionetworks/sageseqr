@@ -35,6 +35,7 @@ Imports:
     knitr,
     limma,
     magrittr,
+    mclust,
     plyr,
     psych,
     RColorBrewer,
@@ -42,7 +43,8 @@ Imports:
     synapser,
     tidyr,
     tibble,
-    utils
+    utils,
+    quantreg
 Additional_repositories:
     http://ran.synapse.org
 Remotes:
