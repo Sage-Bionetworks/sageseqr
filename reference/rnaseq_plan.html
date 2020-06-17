@@ -140,7 +140,8 @@
   <span class='kw'>biomart_version</span>,
   <span class='kw'>host</span>,
   <span class='kw'>filters</span>,
-  <span class='kw'>organism</span>
+  <span class='kw'>organism</span>,
+  <span class='kw'>conditions</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -206,6 +207,10 @@ This specification is highly recommended for a reproducible workflow.
       <th>organism</th>
       <td><p>A character vector of the organism name. This argument
 takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".</p></td>
+    </tr>
+    <tr>
+      <th>conditions</th>
+      <td><p>Conditions to bin gene counts that correspond to variables in `md`.</p></td>
     </tr>
     </table>
 

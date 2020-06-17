@@ -116,7 +116,8 @@
                     biomart_version = <span class="kw">config</span>::<span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"biomart"</span>)<span class="op">$</span><span class="kw">version</span>,
                     filters = <span class="kw">config</span>::<span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"biomart"</span>)<span class="op">$</span><span class="kw">filters</span>,
                     host = <span class="kw">config</span>::<span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"biomart"</span>)<span class="op">$</span><span class="kw">host</span>,
-                    organism = <span class="kw">config</span>::<span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"biomart"</span>)<span class="op">$</span><span class="kw">organism</span>
+                    organism = <span class="kw">config</span>::<span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"biomart"</span>)<span class="op">$</span><span class="kw">organism</span>, 
+                    conditions = <span class="kw">config</span>::<span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"conditions"</span>)
 )
 
 <span class="kw">drake</span>::<span class="fu"><a href="https://docs.ropensci.org/drake/reference/make.html">make</a></span>(<span class="kw">plan</span>)
