@@ -334,3 +334,70 @@ mclust::Mclust
 #'@importFrom mclust mclustBIC
 #'@export
 mclust::mclustBIC
+#' Formula Builder
+#'
+#' If a linear mixed model is used, all categorical variables must be
+#' modeled as a random effect. This function identifies the variable class
+#' to scale numeric variables and model categorical variables as a random
+#' effect. Additionally, variables are scaled to account for
+#' multiple variables that might have an order of magnitude difference.
+#'
+#' @param model_variables Vector of variables to include in the linear (mixed) model.
+#' @param primary_variable Vector of variables that will be collapsed into a single fixed effect interaction term.
+#' @inheritParams coerce_factors
+build_formula <- function(md, model_variables, primary_variable){
+  col_type <- dplyr::select(md, all_of(model_variables)) %>%
+    dplyr::summarise_all(class) %>%
+    tidyr::gather(variable, class)
+
+  formula <- sapply(1:length(col_type$class), function(i){
+    switch(col_type$class[i],
+           "factor" = glue::glue("(1|", col_type$variable[i], ")"),
+           "numeric" = glue::glue("scale(", col_type$variable[i], ")")
+    )
+  })
+
+  interaction_term <- glue::glue_collapse({primary_variable}, "_")
+
+  object <- list(metadata = md %>%
+                  tidyr::unite(!!interaction_term, all_of(primary_variable), sep = "_"),
+                formula = glue::glue("~ {interaction_term}+",
+                                     glue::glue_collapse(formula, sep = "+")),
+                formula_non_intercept = glue::glue("~ 0+{interaction_term}+",
+                                                   glue::glue_collapse(formula, sep = "+"))
+  )
+
+  object
+}
+#' Differential Expression with variance partition
+#'
+#' Count data is transformed to log2-counts per million (logCPM). The model
+#' to be fitted is specified as input. The variances of the model residuals
+#' are calculated for each gene. A smoothed curve is used to compute
+#' observation -level weights.
+#'
+#' @param cqn_counts A counts data frame normalized by CQN.
+#' @inheritParams cqn
+#' @inheritParams coerce_factors
+#' @inheritParams build_formula
+de <- function(filtered_counts, cqn_counts, md, model_variables, primary_variable){
+  metadata_input <- build_formula(md, model_variables, primary_variable)
+  gene_expression <- edgeR::DGEList(filtered_counts$filteredExprMatrix)
+  gene_expression <- edgeR::calcNormFactors(gene_expression)
+  voom_gene_expression <- variancePartition::voomWithDreamWeights(counts = gene_expression,
+                                                                  formula = metadata_input$formula,
+                                                                  data = metadata_input$metadata)
+  voom_gene_expression$E <- cqn_counts
+
+  voom_gene_expression
+}
+#' Compute residuals
+#'
+compute_residuals <- function(){
+  # adjusted_fit <- variancePartition::dream(exprObj = voom_gene_expression$E,
+  #                                          formula = metadata_input$formula,
+  #                                          data = metadata_input$metadata,
+  #                                          computeResidulas = TRUE
+  #                                          )
+  # compute_residuals <- residuals(adjusted_fit, cqn_counts)
+}
