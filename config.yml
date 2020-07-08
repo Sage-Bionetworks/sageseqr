@@ -14,8 +14,8 @@ default:
     filters: ensembl_gene_id
     host: ensembl.org
     organism: hsa
-  factors:
-  continuous:
+  factors: ["sampleID", "study", "RIN", "batch", "sex", "diagnosis"]
+  continuous: ["pmi", "ageofdeath"]
   conditions: diagnosis, sex
 mayo:
   counts:
