@@ -46,10 +46,11 @@ coerce_continuous <- function(md, continuous) {
 #'Create covariate matrix from tidy metadata data frame.
 #'
 #'This function takes a tidy format. Coerces vectors to correct type. Only include
-#'covariates that have 2 or more levels.
+#'covariates that have 2 or more levels. Sample identifiers are stored as rownames.
 #'
 #'@inheritParams coerce_factors
 #'@inheritParams coerce_continuous
+#'@param sample_identifier The name of the column with the sample identifiers that map to the gene counts data frame.
 #'
 #'@export
 #'@return A data frame with coerced variables.
@@ -59,8 +60,10 @@ coerce_continuous <- function(md, continuous) {
 #'  "ind5436", "control", 7.7,
 #'  "ind234", "disease", 7.1
 #'  )
-#' clean_covariates(data, factors = c("individualID", "diagnosis"), continuous = c("RIN"))
-clean_covariates <- function(md, factors, continuous) {
+#' clean_covariates(data, factors = c("individualID", "diagnosis"),
+#' continuous = c("RIN"),
+#' sample_identifier = c("individualID"))
+clean_covariates <- function(md, factors, continuous, sample_identifier) {
   if (missing(factors) | missing(continuous)) {
     stop("Factor and continuous variables are required.")
   } else if (length(intersect(factors, continuous)) != 0) {
@@ -71,6 +74,7 @@ clean_covariates <- function(md, factors, continuous) {
   } else {
     md <- coerce_factors(md, factors)
     md <- coerce_continuous(md, continuous)
+    md <- tibble::column_to_rownames(md, var = sample_identifier)
     md
   }
 }
@@ -240,24 +244,29 @@ collapse_duplicate_hgnc_symbol <- function(biomart_results){
 #'Filter genes
 #'
 #'Remove genes that have less than 1 counts per million (cpm) in at least 50%
-#'of samples per condition. If a biomaRt object is provided, gene lengths and
-#'gene GC content is required and genes with missing values are also removed.
+#'of samples per condition.
 #'
 #'@inheritParams coerce_factors
 #'@inheritParams get_biomart
 #'@param conditions Conditions to bin gene counts that correspond to variables in `md`.
+#'@param clean_metadata A data frame with sample identifiers as rownames and variables as factors or numeric as determined
+#'by \code{"sageseqr::clean_covariates()"})
 #'@importFrom magrittr %>%
 #'@export
-filter_genes <- function(md, count_df, conditions) {
+filter_genes <- function(clean_metadata, count_df, conditions) {
+  if (!(conditions %in% colnames(clean_metadata))){
+    stop("Condition is missing from the metadata.")
+  }
   # Check for extraneous rows
   count_df <- parse_counts(count_df)
 
-  genes_to_analyze <- md %>%
-    plyr::dlply(plyr::.(conditions), .fun = function(md, counts){
-      processed_counts <- CovariateAnalysis::getGeneFilteredGeneExprMatrix(counts,
+  order <- rownames(clean_metadata)
+
+  genes_to_analyze <- plyr::dlply(clean_metadata, plyr::.(conditions), .fun = function(mtd, counts){
+      processed_counts <- CovariateAnalysis::getGeneFilteredGeneExprMatrix(counts[, order],
                                                                           MIN_GENE_CPM = 1,
                                                                           MIN_SAMPLE_PERCENT_WITH_MIN_GENE_CPM = 0.5)
-      processed_counts$filteredExprMatrix$gen
+      processed_counts$filteredExprMatrix$genes
     }, count_df)
   genes_to_analyze <- unlist(genes_to_analyze) %>%
     unique()

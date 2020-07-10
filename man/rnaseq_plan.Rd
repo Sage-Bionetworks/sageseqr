@@ -10,6 +10,7 @@ rnaseq_plan(
   counts_id,
   counts_version,
   gene_id_input,
+  sample_id_input,
   factor_input,
   continuous_input,
   gene_id,
@@ -34,6 +35,8 @@ column names and gene ids in a column.}
 \item{counts_version}{Optionally, include Synapse file version number.}
 
 \item{gene_id_input}{Column name of the gene ids in the counts_id file.}
+
+\item{sample_id_input}{Column name of the sample ids in the metadata_id file.}
 
 \item{factor_input}{Vector of factor variables. Variables must be present
 in the metadata as column names.}

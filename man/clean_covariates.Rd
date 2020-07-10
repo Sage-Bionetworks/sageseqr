@@ -4,7 +4,7 @@
 \alias{clean_covariates}
 \title{Create covariate matrix from tidy metadata data frame.}
 \usage{
-clean_covariates(md, factors, continuous)
+clean_covariates(md, factors, continuous, sample_identifier)
 }
 \arguments{
 \item{md}{A data frame with sample identifiers in a column and relevant experimental covariates.}
@@ -12,13 +12,15 @@ clean_covariates(md, factors, continuous)
 \item{factors}{A vector of factor variables.}
 
 \item{continuous}{A vector of continuous variables.}
+
+\item{sample_identifier}{The name of the column with the sample identifiers that map to the gene counts data frame.}
 }
 \value{
 A data frame with coerced variables.
 }
 \description{
 This function takes a tidy format. Coerces vectors to correct type. Only include
-covariates that have 2 or more levels.
+covariates that have 2 or more levels. Sample identifiers are stored as rownames.
 }
 \examples{
 data <- tibble::tribble(
@@ -26,5 +28,7 @@ data <- tibble::tribble(
  "ind5436", "control", 7.7,
  "ind234", "disease", 7.1
  )
-clean_covariates(data, factors = c("individualID", "diagnosis"), continuous = c("RIN"))
+clean_covariates(data, factors = c("individualID", "diagnosis"),
+continuous = c("RIN"),
+sample_identifier = c("individualID"))
 }
