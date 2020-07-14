@@ -10,7 +10,7 @@ metadata <- tibble::column_to_rownames(metadata, var = "samples")
 
 counts <- tibble::tribble(
   ~geneId, ~S567, ~S453, ~S444, ~S231,
-  "ENGS1", 0, 0, 500, 0,
+  "ENSG1", 0, 0, 500, 0,
   "ENSG2", 23, 25, 29, 30,
   "ENSG3", 84, 82, 0, 0,
   "ENSG4", 0, 0, 0, 0,
@@ -19,7 +19,8 @@ counts <- tibble::tribble(
 
 counts <- tibble::column_to_rownames(counts, var = "geneId")
 
-# test_that("zero count genes are removed", {
-#   filtered <- filter_genes(metadata, counts, conditions = "sex")
-#   expect_equal(c("ENSG1", "ENSG2", "ENSG3"), rownames(filtered))
-# })
+test_that("zero count genes are removed", {
+  filtered <- filter_genes(metadata, counts, conditions = "sex",
+                           cpm_threshold = 1, conditions_threshold = 0.5)
+  expect_equal(c("ENSG1", "ENSG2", "ENSG3", "ENSG5"), rownames(filtered))
+})
