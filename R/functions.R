@@ -345,7 +345,12 @@ mclust::mclustBIC
 #' @param model_variables Vector of variables to include in the linear (mixed) model.
 #' @param primary_variable Vector of variables that will be collapsed into a single fixed effect interaction term.
 #' @inheritParams coerce_factors
-build_formula <- function(md, model_variables, primary_variable){
+build_formula <- function(md, model_variables, primary_variable) {
+
+  if (!(all(unique(sapply(md, class)) %in% c("factor","numeric")))) {
+    stop("Use sageseqr::clean_covariates() to coerce variables into factor and numeric types.")
+  }
+
   col_type <- dplyr::select(md, all_of(model_variables)) %>%
     dplyr::summarise_all(class) %>%
     tidyr::gather(variable, class)
@@ -374,7 +379,7 @@ build_formula <- function(md, model_variables, primary_variable){
 #' Count data is transformed to log2-counts per million (logCPM). The model
 #' to be fitted is specified as input. The variances of the model residuals
 #' are calculated for each gene. A smoothed curve is used to compute
-#' observation -level weights.
+#' observation-level weights.
 #'
 #' @param cqn_counts A counts data frame normalized by CQN.
 #' @inheritParams cqn
@@ -382,7 +387,7 @@ build_formula <- function(md, model_variables, primary_variable){
 #' @inheritParams build_formula
 de <- function(filtered_counts, cqn_counts, md, model_variables, primary_variable){
   metadata_input <- build_formula(md, model_variables, primary_variable)
-  gene_expression <- edgeR::DGEList(filtered_counts$filteredExprMatrix)
+  gene_expression <- edgeR::DGEList(filtered_counts)
   gene_expression <- edgeR::calcNormFactors(gene_expression)
   voom_gene_expression <- variancePartition::voomWithDreamWeights(counts = gene_expression,
                                                                   formula = metadata_input$formula,
