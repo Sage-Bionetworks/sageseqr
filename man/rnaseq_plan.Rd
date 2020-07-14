@@ -19,7 +19,9 @@ rnaseq_plan(
   host,
   filters,
   organism,
-  conditions
+  conditions,
+  cpm_threshold = 1,
+  conditions_threshold = 0.5
 )
 }
 \arguments{
@@ -61,6 +63,10 @@ This specification is highly recommended for a reproducible workflow.
 takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".}
 
 \item{conditions}{Conditions to bin gene counts that correspond to variables in `md`.}
+
+\item{cpm_threshold}{The minimum number of CPM allowed.}
+
+\item{conditions_threshold}{Percentage of samples that should contain the minimum CPM.}
 }
 \description{
 This function wraps the \code{"drake::plan()"}.
