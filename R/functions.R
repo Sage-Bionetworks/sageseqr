@@ -254,7 +254,6 @@ collapse_duplicate_hgnc_symbol <- function(biomart_results){
 #' @param clean_metadata A data frame with sample identifiers as rownames and variables as
 #' factors or numeric as determined by \code{"sageseqr::clean_covariates()"}.
 #' @importFrom magrittr %>%
-#' @importFrom rlang .data
 #' @export
 filter_genes <- function(clean_metadata, count_df, conditions,
                          cpm_threshold, conditions_threshold) {
@@ -265,13 +264,17 @@ filter_genes <- function(clean_metadata, count_df, conditions,
   # Check for extraneous rows
   count_df <- parse_counts(count_df)
 
-  split_data <- clean_metadata %>%
-    split(f = as.list(.[, conditions, drop = F]), drop = T) %>%
-    purrr::map(., function(x) simple_filter(count_df[, rownames(x), drop = F],
-                                            cpm_threshold,
-                                            conditions_threshold))
+  split_data <- split(clean_metadata,
+                      f = as.list(clean_metadata[, conditions, drop = F]),
+                      drop = T)
 
-  genes_to_analyze <- unlist(split_data) %>%
+  map_genes <- purrr::map(split_data, function(x) {
+    simple_filter(count_df[, rownames(x), drop = F],
+                  cpm_threshold,
+                  conditions_threshold)
+    })
+
+  genes_to_analyze <- unlist(map_genes) %>%
     unique() %>%
     sort()
 
