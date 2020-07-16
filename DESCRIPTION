@@ -38,6 +38,7 @@ Imports:
     mclust,
     plyr,
     psych,
+    purrr,
     RColorBrewer,
     rlang,
     synapser,

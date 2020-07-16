@@ -10,6 +10,7 @@ rnaseq_plan(
   counts_id,
   counts_version,
   gene_id_input,
+  sample_id_input,
   factor_input,
   continuous_input,
   gene_id,
@@ -18,7 +19,9 @@ rnaseq_plan(
   host,
   filters,
   organism,
-  conditions
+  conditions,
+  cpm_threshold = 1,
+  conditions_threshold = 0.5
 )
 }
 \arguments{
@@ -34,6 +37,8 @@ column names and gene ids in a column.}
 \item{counts_version}{Optionally, include Synapse file version number.}
 
 \item{gene_id_input}{Column name of the gene ids in the counts_id file.}
+
+\item{sample_id_input}{Column name of the sample ids in the metadata_id file.}
 
 \item{factor_input}{Vector of factor variables. Variables must be present
 in the metadata as column names.}
@@ -58,6 +63,10 @@ This specification is highly recommended for a reproducible workflow.
 takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".}
 
 \item{conditions}{Conditions to bin gene counts that correspond to variables in `md`.}
+
+\item{cpm_threshold}{The minimum number of CPM allowed.}
+
+\item{conditions_threshold}{Percentage of samples that should contain the minimum CPM.}
 }
 \description{
 This function wraps the \code{"drake::plan()"}.

@@ -4,17 +4,28 @@
 \alias{filter_genes}
 \title{Filter genes}
 \usage{
-filter_genes(md, count_df, conditions)
+filter_genes(
+  clean_metadata,
+  count_df,
+  conditions,
+  cpm_threshold,
+  conditions_threshold
+)
 }
 \arguments{
-\item{md}{A data frame with sample identifiers in a column and relevant experimental covariates.}
+\item{clean_metadata}{A data frame with sample identifiers as rownames and variables as
+factors or numeric as determined by \code{"sageseqr::clean_covariates()"}.}
 
 \item{count_df}{A counts data frame with sample identifiers as rownames.}
 
 \item{conditions}{Conditions to bin gene counts that correspond to variables in `md`.}
+
+\item{cpm_threshold}{The minimum number of CPM allowed.}
+
+\item{conditions_threshold}{Percentage of samples that should contain the minimum CPM.}
 }
 \description{
-Remove genes that have less than 1 counts per million (cpm) in at least 50%
-of samples per condition. If a biomaRt object is provided, gene lengths and
-gene GC content is required and genes with missing values are also removed.
+Filter genes with low expression. This function is more permissive by setting conditions
+that corresponds to metadata variables. The gene matrix is split by condition and the
+counts per million (CPM) for a given condition is computed by \code{"sageseqr::simple_filter()"}.
 }

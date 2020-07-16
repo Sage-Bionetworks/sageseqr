@@ -46,10 +46,11 @@ coerce_continuous <- function(md, continuous) {
 #'Create covariate matrix from tidy metadata data frame.
 #'
 #'This function takes a tidy format. Coerces vectors to correct type. Only include
-#'covariates that have 2 or more levels.
+#'covariates that have 2 or more levels. Sample identifiers are stored as rownames.
 #'
 #'@inheritParams coerce_factors
 #'@inheritParams coerce_continuous
+#'@param sample_identifier The name of the column with the sample identifiers that map to the gene counts data frame.
 #'
 #'@export
 #'@return A data frame with coerced variables.
@@ -59,8 +60,10 @@ coerce_continuous <- function(md, continuous) {
 #'  "ind5436", "control", 7.7,
 #'  "ind234", "disease", 7.1
 #'  )
-#' clean_covariates(data, factors = c("individualID", "diagnosis"), continuous = c("RIN"))
-clean_covariates <- function(md, factors, continuous) {
+#' clean_covariates(data, factors = c("individualID", "diagnosis"),
+#' continuous = c("RIN"),
+#' sample_identifier = c("individualID"))
+clean_covariates <- function(md, factors, continuous, sample_identifier) {
   if (missing(factors) | missing(continuous)) {
     stop("Factor and continuous variables are required.")
   } else if (length(intersect(factors, continuous)) != 0) {
@@ -71,6 +74,7 @@ clean_covariates <- function(md, factors, continuous) {
   } else {
     md <- coerce_factors(md, factors)
     md <- coerce_continuous(md, continuous)
+    md <- tibble::column_to_rownames(md, var = sample_identifier)
     md
   }
 }
@@ -237,38 +241,71 @@ collapse_duplicate_hgnc_symbol <- function(biomart_results){
     dplyr::mutate(hgnc_symbol = paste(.data$hgnc_symbol, collapse = ", ")) %>%
     unique()
 }
-#'Filter genes
+#' Filter genes
 #'
-#'Remove genes that have less than 1 counts per million (cpm) in at least 50%
-#'of samples per condition. If a biomaRt object is provided, gene lengths and
-#'gene GC content is required and genes with missing values are also removed.
+#' Filter genes with low expression. This function is more permissive by setting conditions
+#' that corresponds to metadata variables. The gene matrix is split by condition and the
+#' counts per million (CPM) for a given condition is computed by \code{"sageseqr::simple_filter()"}.
 #'
-#'@inheritParams coerce_factors
-#'@inheritParams get_biomart
-#'@param conditions Conditions to bin gene counts that correspond to variables in `md`.
-#'@importFrom magrittr %>%
-#'@export
-filter_genes <- function(md, count_df, conditions) {
+#' @inheritParams coerce_factors
+#' @inheritParams get_biomart
+#' @inheritParams simple_filter
+#' @param conditions Conditions to bin gene counts that correspond to variables in `md`.
+#' @param clean_metadata A data frame with sample identifiers as rownames and variables as
+#' factors or numeric as determined by \code{"sageseqr::clean_covariates()"}.
+#' @importFrom magrittr %>%
+#' @export
+filter_genes <- function(clean_metadata, count_df, conditions,
+                         cpm_threshold, conditions_threshold) {
+  if (!any(conditions %in% colnames(clean_metadata))) {
+    stop("Conditions are missing from the metadata.")
+  }
+
   # Check for extraneous rows
   count_df <- parse_counts(count_df)
 
-  genes_to_analyze <- md %>%
-    plyr::dlply(plyr::.(conditions), .fun = function(md, counts){
-      processed_counts <- CovariateAnalysis::getGeneFilteredGeneExprMatrix(counts,
-                                                                          MIN_GENE_CPM = 1,
-                                                                          MIN_SAMPLE_PERCENT_WITH_MIN_GENE_CPM = 0.5)
-      processed_counts$filteredExprMatrix$gen
-    }, count_df)
-  genes_to_analyze <- unlist(genes_to_analyze) %>%
-    unique()
-  processed_counts <- CovariateAnalysis::getGeneFilteredGeneExprMatrix(count_df[genes_to_analyze, ],
-                                                                       MIN_GENE_CPM = 0,
-                                                                       MIN_SAMPLE_PERCENT_WITH_MIN_GENE_CPM = 0)
-  # Convert transcript Ids to gene Ids in counts and gene list with convert_geneids()
-  processed_counts$filteredExprMatrix$genes <- convert_geneids(processed_counts$filteredExprMatrix$counts)
-  rownames(processed_counts$filteredExprMatrix$counts) <- convert_geneids(processed_counts$filteredExprMatrix$counts)
+  split_data <- split(clean_metadata,
+                      f = as.list(clean_metadata[, conditions, drop = F]),
+                      drop = T)
+
+  map_genes <- purrr::map(split_data, function(x) {
+    simple_filter(count_df[, rownames(x), drop = F],
+                  cpm_threshold,
+                  conditions_threshold)
+    })
+
+  genes_to_analyze <- unlist(map_genes) %>%
+    unique() %>%
+    sort()
+
+  processed_counts <- count_df[genes_to_analyze,]
+
+  # Convert transcript Ids to gene Ids in counts with convert_geneids()
+  rownames(processed_counts) <- convert_geneids(processed_counts)
 
   processed_counts
+}
+#' Filter genes with low expression
+#'
+#' `simple_filter` converts a gene counts matrix into counts per million (CPM) and identifies
+#' the genes that meet the minimum CPM threshold in a percentage of samples. The minimum CPM
+#' threshold and percent threshold is user defined. The function returns a list of genes.
+#'
+#' @inheritParams get_biomart
+#' @param cpm_threshold The minimum number of CPM allowed.
+#' @param conditions_threshold Percentage of samples that should contain the minimum CPM.
+#' @examples
+#'\dontrun{
+#'gene_list <- simple_filter(count_df = counts, cpm_threshold = 1, condition_threshold = 0.5)
+#'}
+simple_filter <- function(count_df, cpm_threshold, conditions_threshold) {
+  cpm  <- edgeR::cpm(count_df)
+  cpm[is.nan(cpm)] <- 0
+  fraction <- rowMeans(cpm >= cpm_threshold)
+  keep <- fraction >= conditions_threshold
+  genes <- keep[keep]
+  genes <- names(genes)
+  genes
 }
 #'Get gene Ids
 #'
@@ -305,11 +342,9 @@ cqn <- function(filtered_counts, biomart_results) {
                        for Conditional Quantile Normalization"))
   } else {
 
-    counts <- filtered_counts$filteredExprMatrix$counts
+    genes_to_analyze <- intersect(rownames(filtered_counts), rownames(biomart_results))
 
-    genes_to_analyze <- intersect(rownames(counts), rownames(biomart_results))
-
-    to_normalize <- subset(counts, rownames(counts) %in% genes_to_analyze)
+    to_normalize <- subset(filtered_counts, rownames(filtered_counts) %in% genes_to_analyze)
     gc_length <- subset(biomart_results, rownames(biomart_results) %in% genes_to_analyze)
 
     normalized_counts <- suppressWarnings(cqn::cqn(to_normalize,

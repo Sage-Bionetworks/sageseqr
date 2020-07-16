@@ -6,7 +6,7 @@ default:
   metadata:
     synID: syn22090070
     version: 1
-    sample id:
+    sample id: sampleID
   biomart:
     synID: syn21907998
     version:
@@ -16,7 +16,7 @@ default:
     organism: hsa
   factors:
   continuous:
-  conditions: diagnosis, sex
+  conditions: ["diagnosis", "sex"]
 mayo:
   counts:
     synID: syn21587392
