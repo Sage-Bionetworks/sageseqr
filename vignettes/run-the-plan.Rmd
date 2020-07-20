@@ -27,8 +27,6 @@ Sys.setenv(R_CONFIG_ACTIVE = "default")
 
 ```{r run-plan}
 library(sageseqr)
-library(edgeR)
-library(ggplot2)
 
 # Login to Synapse. Make a Synapse account and use synapser to login: https://r-docs.synapse.org/articles/manageSynapseCredentials.html
 synapser::synLogin()
@@ -39,6 +37,7 @@ plan <- sageseqr::rnaseq_plan(metadata_id = config::get("metadata")$synID,
                     counts_id = config::get("counts")$synID,
                     counts_version = config::get("counts")$version,
                     gene_id_input = config::get("counts")$`gene id`,
+                    sample_id_input = config::get("metadata")$`sample id`,
                     factor_input = config::get("factors"),
                     continuous_input = config::get("continuous"),
                     gene_id = config::get("biomart")$`gene id`,
