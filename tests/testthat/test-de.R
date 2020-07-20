@@ -23,22 +23,24 @@ counts <- tibble::column_to_rownames(counts, var = "geneId")
 
 counts <- as.matrix(counts)
 
-test_that("output is a list of 4", {
-  metadata <- clean_covariates(metadata,
-                               factors = c("samples", "sex", "batch", "diagnosis"),
-                               continuous = c("RIN", "age"),
-                               sample_identifier = c("samples")
-                               )
+metadata <- clean_covariates(metadata,
+                             factors = c("samples", "sex", "batch", "diagnosis"),
+                             continuous = c("RIN", "age"),
+                             sample_identifier = c("samples")
+)
 
-  biomart_results <- tibble::column_to_rownames(
-    tibble::tibble(ensembl_gene_id = rownames(counts), length = 400),
-    var = "ensembl_gene_id"
-  )
-  de <- differential_expression(counts,
-                                counts,
-                                md = metadata,
-                                model_variables = c("batch"),
-                                primary_variable = c("sex", "diagnosis"),
-                                biomart_results = biomart_results)
-  expect_equal(length(de), 4)
+biomart_results <- tibble::column_to_rownames(
+  tibble::tibble(ensembl_gene_id = rownames(counts), length = 400),
+  var = "ensembl_gene_id"
+)
+de <- differential_expression(counts,
+                              counts,
+                              md = metadata,
+                              model_variables = c("batch"),
+                              primary_variable = c("sex", "diagnosis"),
+                              biomart_results = biomart_results)
+
+test_that("output is a list of 5", {
+  expect_equal(length(de), 5)
 })
+
