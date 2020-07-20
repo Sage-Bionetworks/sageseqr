@@ -6,9 +6,12 @@ countMatrix <- countMatrix[1:100,]
 # Add continuous variable
 metadata$AlignmentRate <- 0.9
 
+rownames(metadata) <- NULL
+
 metadata <- clean_covariates(metadata,
                              factors = c("Individual", "Disease", "Experiment", "Sex"),
-                             continuous = c("AlignmentRate"))
+                             continuous = c("AlignmentRate"),
+                             sample_identifier = c("Experiment"))
 
 biomart_results <- tibble::column_to_rownames(
   tibble::tibble(ensembl_gene_id = rownames(countMatrix), length = 400),
