@@ -1,0 +1,15 @@
+---
+title: "sage-seqr-report"
+author: "`r config::get("author")`"
+date: "`r date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Outliers 
+```{r plot_outliers}
+```
+
