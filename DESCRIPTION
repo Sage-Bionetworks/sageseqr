@@ -16,7 +16,7 @@ Encoding: UTF-8
 LazyData: true
 Suggests: 
     testthat (>= 2.1.0)
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 biocViews:
 Imports:
     biomaRt,
@@ -31,6 +31,7 @@ Imports:
     GenomicRanges,
     glue,
     ggplot2,
+    gtools,
     IRanges,
     knitr,
     limma,
@@ -38,12 +39,15 @@ Imports:
     mclust,
     plyr,
     psych,
+    purrr,
     RColorBrewer,
     rlang,
+    stringr,
     synapser,
     tidyr,
     tibble,
     utils,
+    variancePartition,
     quantreg
 Additional_repositories:
     http://ran.synapse.org
