@@ -497,7 +497,9 @@ differential_expression <- function(filtered_counts, cqn_counts, md, model_varia
   object <- list(voom_object = voom_gene_expression,
                  contrasts_to_plot = contrasts,
                  fits = fit_contrasts,
-                 differential_expression = de)
+                 differential_expression = de,
+                 primary_variable = metadata_input$primary_variable,
+                 formula = metadata_input$formula_non_intercept)
 
   object
 }
