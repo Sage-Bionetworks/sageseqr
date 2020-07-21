@@ -47,12 +47,12 @@ Imports:
     tidyr,
     tibble,
     utils,
-    variancePartition,
+    variancePartition (>= 1.19.10),
     quantreg
 Additional_repositories:
     http://ran.synapse.org
 Remotes:
     th1vairam/CovariateAnalysis@dev,
-    GabrielHoffman/variancePartition@master
+    GabrielHoffman/variancePartition@e61a3de
 VignetteBuilder:
     knitr
