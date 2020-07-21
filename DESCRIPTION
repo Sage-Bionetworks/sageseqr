@@ -52,6 +52,7 @@ Imports:
 Additional_repositories:
     http://ran.synapse.org
 Remotes:
-    th1vairam/CovariateAnalysis@dev
+    th1vairam/CovariateAnalysis@dev,
+    GabrielHoffman/variancePartition@master
 VignetteBuilder:
     knitr
