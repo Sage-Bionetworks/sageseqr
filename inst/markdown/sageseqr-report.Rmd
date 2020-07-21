@@ -1,6 +1,5 @@
 ---
-title: "sage-seqr-report"
-author: "`r config::get("author")`"
+title: "sageseqr-report"
 date: "`r date()`"
 output: html_document
 ---

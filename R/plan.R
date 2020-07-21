@@ -50,6 +50,16 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                                    cpm_threshold = 1,
                                    conditions_threshold = 0.5),
     cqn_counts = cqn(filtered_counts,
-                     biomart_results)
-)
+                     biomart_results),
+    report = rmarkdown::render(
+      knitr_in(
+        !!system.file("markdown", "sageseqr-report.Rmd", package = "sageseqr")
+        ),
+      output_file = file_out(
+        !!glue::glue(getwd(), "/sageseqr-report.html")
+        ),
+      output_dir = ".",
+      quiet = TRUE
+      )
+    )
 }
