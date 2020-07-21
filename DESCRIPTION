@@ -41,6 +41,7 @@ Imports:
     purrr,
     RColorBrewer,
     rlang,
+    sagethemes,
     synapser,
     tidyr,
     tibble,
@@ -50,5 +51,6 @@ Additional_repositories:
     http://ran.synapse.org
 Remotes:
     th1vairam/CovariateAnalysis@dev
+    Sage-Bionetworks/sagethemes@main
 VignetteBuilder:
     knitr
