@@ -40,9 +40,9 @@
 
 
 <meta property="og:title" content="Filter genes — filter_genes" />
-<meta property="og:description" content="Remove genes that have less than 1 counts per million (cpm) in at least 50
-of samples per condition. If a biomaRt object is provided, gene lengths and
-gene GC content is required and genes with missing values are also removed." />
+<meta property="og:description" content="Filter genes with low expression. This function is more permissive by setting conditions
+that corresponds to metadata variables. The gene matrix is split by condition and the
+counts per million (CPM) for a given condition is computed by &quot;sageseqr::simple_filter()&quot;." />
 
 
 
@@ -126,19 +126,26 @@ gene GC content is required and genes with missing values are also removed." />
     </div>
 
     <div class="ref-description">
-    <p>Remove genes that have less than 1 counts per million (cpm) in at least 50<!-- % -->
-of samples per condition. If a biomaRt object is provided, gene lengths and
-gene GC content is required and genes with missing values are also removed.</p>
+    <p>Filter genes with low expression. This function is more permissive by setting conditions
+that corresponds to metadata variables. The gene matrix is split by condition and the
+counts per million (CPM) for a given condition is computed by <code>"sageseqr::simple_filter()"</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>filter_genes</span>(<span class='kw'>md</span>, <span class='kw'>count_df</span>, <span class='kw'>conditions</span>)</pre>
+    <pre class="usage"><span class='fu'>filter_genes</span>(
+  <span class='kw'>clean_metadata</span>,
+  <span class='kw'>count_df</span>,
+  <span class='kw'>conditions</span>,
+  <span class='kw'>cpm_threshold</span>,
+  <span class='kw'>conditions_threshold</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>md</th>
-      <td><p>A data frame with sample identifiers in a column and relevant experimental covariates.</p></td>
+      <th>clean_metadata</th>
+      <td><p>A data frame with sample identifiers as rownames and variables as
+factors or numeric as determined by <code>"sageseqr::clean_covariates()"</code>.</p></td>
     </tr>
     <tr>
       <th>count_df</th>
@@ -147,6 +154,14 @@ gene GC content is required and genes with missing values are also removed.</p>
     <tr>
       <th>conditions</th>
       <td><p>Conditions to bin gene counts that correspond to variables in `md`.</p></td>
+    </tr>
+    <tr>
+      <th>cpm_threshold</th>
+      <td><p>The minimum number of CPM allowed.</p></td>
+    </tr>
+    <tr>
+      <th>conditions_threshold</th>
+      <td><p>Percentage of samples that should contain the minimum CPM.</p></td>
     </tr>
     </table>
 

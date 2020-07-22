@@ -97,8 +97,6 @@
 </ol>
 <div class="sourceCode" id="cb2"><pre class="downlit">
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw">sageseqr</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="http://bioinf.wehi.edu.au/edgeR">edgeR</a></span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="http://ggplot2.tidyverse.org">ggplot2</a></span>)
 
 <span class="co"># Login to Synapse. Make a Synapse account and use synapser to login: https://r-docs.synapse.org/articles/manageSynapseCredentials.html</span>
 <span class="kw">synapser</span>::<span class="fu"><a href="https://rdrr.io/pkg/synapser/man/synLogin.html">synLogin</a></span>()
@@ -109,6 +107,7 @@
                     counts_id = <span class="kw">config</span>::<span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"counts"</span>)<span class="op">$</span><span class="kw">synID</span>,
                     counts_version = <span class="kw">config</span>::<span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"counts"</span>)<span class="op">$</span><span class="kw">version</span>,
                     gene_id_input = <span class="kw">config</span>::<span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"counts"</span>)<span class="op">$</span><span class="kw">`gene id`</span>,
+                    sample_id_input = <span class="kw">config</span>::<span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"metadata"</span>)<span class="op">$</span><span class="kw">`sample id`</span>,
                     factor_input = <span class="kw">config</span>::<span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"factors"</span>),
                     continuous_input = <span class="kw">config</span>::<span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"continuous"</span>),
                     gene_id = <span class="kw">config</span>::<span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span>(<span class="st">"biomart"</span>)<span class="op">$</span><span class="kw">`gene id`</span>,

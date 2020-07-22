@@ -41,7 +41,7 @@
 
 <meta property="og:title" content="Create covariate matrix from tidy metadata data frame. — clean_covariates" />
 <meta property="og:description" content="This function takes a tidy format. Coerces vectors to correct type. Only include
-covariates that have 2 or more levels." />
+covariates that have 2 or more levels. Sample identifiers are stored as rownames." />
 
 
 
@@ -126,10 +126,10 @@ covariates that have 2 or more levels." />
 
     <div class="ref-description">
     <p>This function takes a tidy format. Coerces vectors to correct type. Only include
-covariates that have 2 or more levels.</p>
+covariates that have 2 or more levels. Sample identifiers are stored as rownames.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>clean_covariates</span>(<span class='kw'>md</span>, <span class='kw'>factors</span>, <span class='kw'>continuous</span>)</pre>
+    <pre class="usage"><span class='fu'>clean_covariates</span>(<span class='kw'>md</span>, <span class='kw'>factors</span>, <span class='kw'>continuous</span>, <span class='kw'>sample_identifier</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -146,6 +146,10 @@ covariates that have 2 or more levels.</p>
       <th>continuous</th>
       <td><p>A vector of continuous variables.</p></td>
     </tr>
+    <tr>
+      <th>sample_identifier</th>
+      <td><p>The name of the column with the sample identifiers that map to the gene counts data frame.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
@@ -158,11 +162,11 @@ covariates that have 2 or more levels.</p>
  <span class='st'>"ind5436"</span>, <span class='st'>"control"</span>, <span class='fl'>7.7</span>,
  <span class='st'>"ind234"</span>, <span class='st'>"disease"</span>, <span class='fl'>7.1</span>
  )
-<span class='fu'>clean_covariates</span>(<span class='kw'>data</span>, factors = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"individualID"</span>, <span class='st'>"diagnosis"</span>), continuous = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"RIN"</span>))</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 2 x 3</span><span>
-#&gt;   individualID diagnosis   RIN
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;fct&gt;</span><span>        </span><span style='color: #555555;font-style: italic;'>&lt;fct&gt;</span><span>     </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span> ind5436      control     7.7
-#&gt; </span><span style='color: #555555;'>2</span><span> ind234       disease     7.1</div></span></pre>
+<span class='fu'>clean_covariates</span>(<span class='kw'>data</span>, factors = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"individualID"</span>, <span class='st'>"diagnosis"</span>),
+continuous = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"RIN"</span>),
+sample_identifier = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"individualID"</span>))</div><div class='output co'>#&gt;         diagnosis RIN
+#&gt; ind5436   control 7.7
+#&gt; ind234    disease 7.1</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

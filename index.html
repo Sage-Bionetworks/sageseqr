@@ -79,9 +79,14 @@
   <div class="contents col-md-9">
 
 
-<div id="rna-seq-normalization-workflow-in-r" class="section level1">
+<div id="installation" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
-<a href="#rna-seq-normalization-workflow-in-r" class="anchor"></a>RNA-seq normalization workflow in R</h1></div>
+<a href="#installation" class="anchor"></a>Installation</h1></div>
+<p><code><a href="https://remotes.r-lib.org/reference/install_github.html">remotes::install_github("Sage-Bionetworks/sageseqr")</a></code></p>
+</div>
+<div id="rna-seq-normalization-workflow-in-r" class="section level1">
+<h1 class="hasAnchor">
+<a href="#rna-seq-normalization-workflow-in-r" class="anchor"></a>RNA-seq normalization workflow in R</h1>
 <p>The <code>sageseqr</code> package integrates the <a href="https://github.com/ropensci/drake/"><code>drake</code> R package</a>, the <a href="https://cran.r-project.org/web/packages/config/vignettes/introduction.html"><code>config</code> package for R</a>, and <a href="https://www.synapse.org/">Synapse</a>. <code>drake</code> tracks dependency relationships in the workflow and only updates data when it has changed. A <code>config</code> file allows inputs and parameters to be explicitly defined in one location. Synapse is a data repository that allows sensitive data to be <a href="https://docs.synapse.org/articles/article_index.html#governance">stored and shared responsibly</a>.</p>
 <p>The workflow takes RNA-seq gene counts and sample metadata as inputs, normalizes counts by <a href="https://bioconductor.org/packages/release/bioc/html/cqn.html">CQN</a>, removes outliers based on a user-defined threshold, empirically selects meaningful covariates and returns differential expression analysis results.</p>
 </div>

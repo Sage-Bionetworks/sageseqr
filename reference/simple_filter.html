@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Execute the drake RNA-seq plan — rnaseq_plan • sageseqr</title>
+<title>Filter genes with low expression — simple_filter • sageseqr</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,10 @@
 
 
 
-<meta property="og:title" content="Execute the drake RNA-seq plan — rnaseq_plan" />
-<meta property="og:description" content="This function wraps the &quot;drake::plan()&quot;." />
+<meta property="og:title" content="Filter genes with low expression — simple_filter" />
+<meta property="og:description" content="`simple_filter` converts a gene counts matrix into counts per million (CPM) and identifies
+the genes that meet the minimum CPM threshold in a percentage of samples. The minimum CPM
+threshold and percent threshold is user defined. The function returns a list of genes." />
 
 
 
@@ -118,106 +120,25 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Execute the drake RNA-seq plan</h1>
+    <h1>Filter genes with low expression</h1>
     
-    <div class="hidden name"><code>rnaseq_plan.Rd</code></div>
+    <div class="hidden name"><code>simple_filter.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This function wraps the <code>"drake::plan()"</code>.</p>
+    <p>`simple_filter` converts a gene counts matrix into counts per million (CPM) and identifies
+the genes that meet the minimum CPM threshold in a percentage of samples. The minimum CPM
+threshold and percent threshold is user defined. The function returns a list of genes.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>rnaseq_plan</span>(
-  <span class='kw'>metadata_id</span>,
-  <span class='kw'>metadata_version</span>,
-  <span class='kw'>counts_id</span>,
-  <span class='kw'>counts_version</span>,
-  <span class='kw'>gene_id_input</span>,
-  <span class='kw'>sample_id_input</span>,
-  <span class='kw'>factor_input</span>,
-  <span class='kw'>continuous_input</span>,
-  <span class='kw'>gene_id</span>,
-  <span class='kw'>biomart_id</span>,
-  <span class='kw'>biomart_version</span>,
-  <span class='kw'>host</span>,
-  <span class='kw'>filters</span>,
-  <span class='kw'>organism</span>,
-  <span class='kw'>conditions</span>,
-  cpm_threshold = <span class='fl'>1</span>,
-  conditions_threshold = <span class='fl'>0.5</span>
-)</pre>
+    <pre class="usage"><span class='fu'>simple_filter</span>(<span class='kw'>count_df</span>, <span class='kw'>cpm_threshold</span>, <span class='kw'>conditions_threshold</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>metadata_id</th>
-      <td><p>Synapse ID to clean metadata file with sample identifiers in a
-column and variables of interest as column names. There cannot be any missing values.</p></td>
-    </tr>
-    <tr>
-      <th>metadata_version</th>
-      <td><p>Optionally, include Synapse file version number. If omitted,
-current version will be downloaded.</p></td>
-    </tr>
-    <tr>
-      <th>counts_id</th>
-      <td><p>Synapse ID to counts data frame with identifiers to the metadata as
-column names and gene ids in a column.</p></td>
-    </tr>
-    <tr>
-      <th>counts_version</th>
-      <td><p>Optionally, include Synapse file version number.</p></td>
-    </tr>
-    <tr>
-      <th>gene_id_input</th>
-      <td><p>Column name of the gene ids in the counts_id file.</p></td>
-    </tr>
-    <tr>
-      <th>sample_id_input</th>
-      <td><p>Column name of the sample ids in the metadata_id file.</p></td>
-    </tr>
-    <tr>
-      <th>factor_input</th>
-      <td><p>Vector of factor variables. Variables must be present
-in the metadata as column names.</p></td>
-    </tr>
-    <tr>
-      <th>continuous_input</th>
-      <td><p>Vector of continuous variables. Variables must be
-present in the metadata as column names.</p></td>
-    </tr>
-    <tr>
-      <th>gene_id</th>
-      <td><p>Column name of gene Ids</p></td>
-    </tr>
-    <tr>
-      <th>biomart_id</th>
-      <td><p>Synapse ID to biomart object.</p></td>
-    </tr>
-    <tr>
-      <th>biomart_version</th>
-      <td><p>Optionally, include Synapse file version number.</p></td>
-    </tr>
-    <tr>
-      <th>host</th>
-      <td><p>An optional character vector specifying the release version.
-This specification is highly recommended for a reproducible workflow.
-(see <code>"biomaRt::listEnsemblArchives()"</code>)</p></td>
-    </tr>
-    <tr>
-      <th>filters</th>
-      <td><p>A character vector listing biomaRt query filters.
-(For a list of filters see <code>"biomaRt::listFilters()"</code>)</p></td>
-    </tr>
-    <tr>
-      <th>organism</th>
-      <td><p>A character vector of the organism name. This argument
-takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".</p></td>
-    </tr>
-    <tr>
-      <th>conditions</th>
-      <td><p>Conditions to bin gene counts that correspond to variables in `md`.</p></td>
+      <th>count_df</th>
+      <td><p>A counts data frame with sample identifiers as rownames.</p></td>
     </tr>
     <tr>
       <th>cpm_threshold</th>
@@ -230,6 +151,10 @@ takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".</p>
     </table>
 
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='kw'>gene_list</span> <span class='op'>&lt;-</span> <span class='fu'>simple_filter</span>(count_df = <span class='kw'>counts</span>, cpm_threshold = <span class='fl'>1</span>, condition_threshold = <span class='fl'>0.5</span>)
+}</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
