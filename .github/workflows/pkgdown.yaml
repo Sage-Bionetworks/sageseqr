@@ -14,6 +14,13 @@ jobs:
 
       - uses: r-lib/actions/setup-pandoc@master
 
+      - name: Configure Git identity
+        run: |
+          env | sort
+          git config --global user.name "$GITHUB_WORKFLOW"
+          git config --global user.email "${GITHUB_EVENT_NAME}@ghactions.local"
+        shell: bash
+
       - name: Query dependencies
         run: |
           install.packages('remotes')
