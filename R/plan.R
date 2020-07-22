@@ -25,7 +25,8 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                         factor_input, continuous_input, gene_id,
                         biomart_id, biomart_version, host, filters,
                         organism, conditions, cpm_threshold = 1,
-                        conditions_threshold = 0.5){
+                        conditions_threshold = 0.5,
+                        x_var_for_plot){
   drake::drake_plan(
     import_metadata = get_data(!!metadata_id,
                                !!metadata_version),
@@ -51,6 +52,9 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                                    conditions_threshold = 0.5),
     cqn_counts = cqn(filtered_counts,
                      biomart_results),
+    boxplots = boxplot_vars(md = clean_md,
+                            include_vars = !!continuous_input,
+                            x_var = !!x_var_for_plot),
     report = rmarkdown::render(
       knitr_in(
         !!system.file("markdown", "sageseqr-report.Rmd", package = "sageseqr")
