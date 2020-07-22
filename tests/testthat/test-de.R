@@ -1,31 +1,21 @@
-metadata <- tibble::tribble(
-  ~samples, ~sex, ~batch, ~age, ~RIN, ~diagnosis,
-  "S567", "F", "1", "68", "7.5", "dx",
-  "S453", "F", "2", "60", "7", "dx",
-  "S231", "M", "2", "54", "7", "dx",
-  "S444", "M", "2", "55", "7", "dx",
-  "S555", "F", "1", "68", "7.5", "dx",
-  "S304", "F", "2", "60", "7", "ct",
-  "S232", "M", "2", "54", "7.5", "ct",
-  "S447", "M", "2", "55", "7.5", "ct"
+metadata <- data.frame(
+  batch = c("1", "2", "1", "2"),
+  diagnosis = c("dx", "dx", "ct", "ct"),
+  sex = c("M", "M", "F", "F"),
+  RIN = c(5, 5, 5, 5),
+  samples = c("S1", "S2", "S3", "S4"),
+  stringsAsFactors = FALSE
 )
 
-counts <- tibble::tribble(
-  ~geneId, ~S567, ~S453,~S231, ~S444, ~S555, ~S304, ~S232, ~S447,
-  "ENSG1", 0, 0, 500, 0, 10, 43, 432, 45,
-  "ENSG2", 23, 25, 29, 30, 56, 89, 73, 70,
-  "ENSG3", 84, 82, 0, 0, 98, 80, 200, 201,
-  "ENSG4", 0, 204, 350, 790, 353, 456, 555, 890,
-  "ENSG5", 0, 0, 0, 70, 0, 0, 0, 70
+counts <- matrix(
+  sample(0:100, size = 12),
+  ncol = 4,
+  dimnames = list(c("ENSG1", "ENSG2", "ENSG5"), c("S1", "S2", "S3", "S4"))
 )
-
-counts <- tibble::column_to_rownames(counts, var = "geneId")
-
-counts <- as.matrix(counts)
 
 metadata <- clean_covariates(metadata,
                              factors = c("samples", "sex", "batch", "diagnosis"),
-                             continuous = c("RIN", "age"),
+                             continuous = c("RIN"),
                              sample_identifier = c("samples")
 )
 
@@ -42,4 +32,12 @@ de <- differential_expression(counts,
 
 test_that("output is a list of 6", {
   expect_equal(length(de), 6)
+})
+
+test_that("voom output is complete", {
+  expect_equal(names(de$voom_object), c("targets", "E", "weights"))
+})
+
+test_that("formula is complete", {
+  expect_false(grepl("NULL", de$formula))
 })
