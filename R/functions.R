@@ -503,3 +503,17 @@ differential_expression <- function(filtered_counts, cqn_counts, md, model_varia
 
   object
 }
+#' Wrapper for Differential Expression Analysis
+#'
+#' This function will pass multiple conditions to test to \code{"sagseqr::differential_expression()"}.
+#'
+#' @param conditions A list of conditions to test as `primary_variable`
+#' in \code{"sagseqr::differential_expression()"}.
+#' @inheritParams differential_expression
+wrap_de <- function(conditions, filtered_counts, cqn_counts, md, model_variables, biomart_results) {
+  purrr::map(conditions,
+             function(x) differential_expression(filtered_counts, cqn_counts, md, model_variables,
+                                                 primary_variable = x, biomart_results))
+
+}
+#' @export
