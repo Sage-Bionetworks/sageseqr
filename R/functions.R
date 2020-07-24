@@ -384,7 +384,7 @@ mclust::mclustBIC
 #' @export
 build_formula <- function(md, model_variables, primary_variable) {
 
-  if (!(all(unique(sapply(md, class)) %in% c("factor","numeric")))) {
+  if (!(all(purrr::map(md, class) %in% c("factor","numeric")))) {
     stop("Use sageseqr::clean_covariates() to coerce variables into factor and numeric types.")
   }
   # Variables of factor or numeric class are required
@@ -394,7 +394,7 @@ build_formula <- function(md, model_variables, primary_variable) {
   # Categorical or factor variables are modeled as a random effect by (1|variable)
   # Numeric variables are scaled to account for when the spread of data values differs
   # by an order of magnitude
-  formula <- sapply(1:length(col_type$class), function(i){
+  formula <- purrr::map(1:length(col_type$class), function(i){
     switch(col_type$class[i],
            "factor" = glue::glue("(1|", col_type$variable[i], ")"),
            "numeric" = glue::glue("scale(", col_type$variable[i], ")")
@@ -441,11 +441,9 @@ differential_expression <- function(filtered_counts, cqn_counts, md, model_varia
 
   de_conditions <- levels(metadata_input$metadata[[metadata_input$primary_variable]])
 
-  conditions_for_contrast <- purrr::map(de_conditions,
+  conditions_for_contrast <- purrr::map_chr(de_conditions,
                                         function(x) glue::glue({metadata_input$primary_variable}, x)
                                         )
-
-  conditions_for_contrast <- unlist(conditions_for_contrast)
 
   setup_coefficients <- gtools::combinations(n = length(conditions_for_contrast),
                                              r = 2,
