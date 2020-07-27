@@ -16,7 +16,10 @@ default:
     organism: hsa
   factors: ["sampleID", "study", "RIN", "batch", "sex", "diagnosis"]
   continuous: ["pmi", "ageofdeath"]
-  conditions: diagnosis, sex
+  conditions:
+    sex-diagnosis interaction: ["diagnosis", "sex"]
+    diagnosis: ["diagnosis"]
+    sex: ["sex"]
 mayo:
   counts:
     synID: syn21587392
