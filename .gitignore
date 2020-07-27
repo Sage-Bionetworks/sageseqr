@@ -1,6 +1,6 @@
 .Rproj.user
-.txt
-.tsv
-.csv
+*.txt
+*.tsv
+*.csv
 /.drake
 docs
