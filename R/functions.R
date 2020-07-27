@@ -384,7 +384,7 @@ mclust::mclustBIC
 #' @export
 build_formula <- function(md, model_variables, primary_variable) {
 
-  if (!(all(purrr::map(md, class) %in% c("factor","numeric")))) {
+  if (!(all(purrr::map_lgl(md, ~ function(x) inherits(x, c("numeric", "factor")))))) {
     stop("Use sageseqr::clean_covariates() to coerce variables into factor and numeric types.")
   }
   # Variables of factor or numeric class are required
