@@ -16,7 +16,7 @@ Encoding: UTF-8
 LazyData: true
 Suggests: 
     testthat (>= 2.1.0)
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 biocViews:
 Imports:
     biomaRt,
@@ -31,6 +31,7 @@ Imports:
     GenomicRanges,
     glue,
     ggplot2,
+    gtools,
     IRanges,
     knitr,
     limma,
@@ -41,14 +42,17 @@ Imports:
     purrr,
     RColorBrewer,
     rlang,
+    stringr,
     synapser,
     tidyr,
     tibble,
     utils,
+    variancePartition (>= 1.19.11),
     quantreg
 Additional_repositories:
     http://ran.synapse.org
 Remotes:
-    th1vairam/CovariateAnalysis@dev
+    th1vairam/CovariateAnalysis@dev,
+    GabrielHoffman/variancePartition
 VignetteBuilder:
     knitr

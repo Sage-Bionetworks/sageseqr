@@ -369,3 +369,149 @@ mclust::Mclust
 #'@importFrom mclust mclustBIC
 #'@export
 mclust::mclustBIC
+#' Formula Builder
+#'
+#' If a linear mixed model is used, all categorical variables must be
+#' modeled as a random effect. This function identifies the variable class
+#' to scale numeric variables and model categorical variables as a random
+#' effect. Additionally, variables are scaled to account for
+#' multiple variables that might have an order of magnitude difference.
+#'
+#' @param model_variables Vector of variables to include in the linear (mixed) model.
+#' @param primary_variable Vector of variables that will be collapsed into a single
+#' fixed effect interaction term.
+#' @inheritParams coerce_factors
+#' @export
+build_formula <- function(md, model_variables, primary_variable) {
+
+  if (!(all(purrr::map_lgl(md, function(x) inherits(x, c("numeric", "factor")))))) {
+    stop("Use sageseqr::clean_covariates() to coerce variables into factor and numeric types.")
+  }
+  # Variables of factor or numeric class are required
+  col_type <- dplyr::select(md, dplyr::all_of(model_variables)) %>%
+    dplyr::summarise_all(class) %>%
+    tidyr::pivot_longer(tidyr::everything(), names_to = "variable", values_to = "class")
+  # Categorical or factor variables are modeled as a random effect by (1|variable)
+  # Numeric variables are scaled to account for when the spread of data values differs
+  # by an order of magnitude
+  formula <- purrr::map(1:length(col_type$class), function(i){
+    switch(col_type$class[i],
+           "factor" = glue::glue("(1|", col_type$variable[i], ")"),
+           "numeric" = glue::glue("scale(", col_type$variable[i], ")")
+    )
+  })
+  # A new categorical is created to model an interaction between two variables
+  interaction_term <- glue::glue_collapse({primary_variable}, "_")
+
+  object <- list(metadata = md %>%
+                   tidyr::unite(!!interaction_term, dplyr::all_of(primary_variable), sep = "_"),
+                formula = glue::glue("~ {interaction_term}+",
+                                     glue::glue_collapse(formula, sep = "+")),
+                formula_non_intercept = glue::glue("~ 0+{interaction_term}+",
+                                                   glue::glue_collapse(formula, sep = "+")),
+                primary_variable = interaction_term
+  )
+
+  # Resolve dropped class type of factor without losing samples as rownames
+  object$metadata[[interaction_term]] <- as.factor(object$metadata[[interaction_term]])
+
+  object
+}
+#' Differential Expression with Dream
+#'
+#' Differential expression testing is performed with \code{"variancePartition::dream()"} to increase power
+#' and decrease false positives for repeated measure designs. The `primary_variable` is modeled as a fixed
+#' effect. If you wish to test an interaction term, `primary_variable` can take multiple variable names.
+#'
+#' @param cqn_counts A counts data frame normalized by CQN.
+#' @inheritParams cqn
+#' @inheritParams coerce_factors
+#' @inheritParams build_formula
+#' @inheritParams cqn
+#' @export
+differential_expression <- function(filtered_counts, cqn_counts, md, model_variables,
+                                    primary_variable, biomart_results) {
+  metadata_input <- build_formula(md, model_variables, primary_variable)
+  gene_expression <- edgeR::DGEList(filtered_counts)
+  gene_expression <- edgeR::calcNormFactors(gene_expression)
+  voom_gene_expression <- variancePartition::voomWithDreamWeights(counts = gene_expression,
+                                                                  formula = metadata_input$formula,
+                                                                  data = metadata_input$metadata)
+  voom_gene_expression$E <- cqn_counts
+
+  de_conditions <- levels(metadata_input$metadata[[metadata_input$primary_variable]])
+
+  conditions_for_contrast <- purrr::map_chr(de_conditions,
+                                        function(x) glue::glue({metadata_input$primary_variable}, x)
+                                        )
+
+  setup_coefficients <- gtools::combinations(n = length(conditions_for_contrast),
+                                             r = 2,
+                                             v = conditions_for_contrast
+                                             )
+
+  contrasts <- lapply(seq_len(nrow(setup_coefficients)),
+                      function(i) variancePartition::getContrast(exprObj = voom_gene_expression,
+                                                                 formula = metadata_input$formula_non_intercept,
+                                                                 data = metadata_input$metadata,
+                                                                 coefficient = as.vector(setup_coefficients[i,])
+                                                                 )
+                      )
+
+  contrasts <- as.data.frame(contrasts)
+
+  df <- as.data.frame(setup_coefficients)
+
+  names(contrasts) <- stringr::str_glue_data(df, "{V1} - {V2}")
+
+  fit_contrasts = variancePartition::dream(exprObj = voom_gene_expression,
+                                           formula = metadata_input$formula_non_intercept,
+                                           data = metadata_input$metadata,
+                                           L = contrasts
+                                           )
+
+  de <- lapply(names(contrasts), function(i, fit){
+    genes <- limma::topTable(fit, coef = i, number = Inf, sort.by = "logFC")
+    genes <- tibble::rownames_to_column(genes, var = "ensembl_gene_id")
+  }, fit_contrasts)
+
+  names(de) <- names(contrasts)
+
+  de <- data.table::rbindlist(de, idcol = "Comparison") %>%
+    dplyr::mutate(Comparison = gsub(metadata_input$primary_variable, "", .data$Comparison),
+                  Direction = .data$logFC/abs(.data$logFC),
+                  Direction = factor(.data$Direction, c(-1,1), c("-1" = "down", "1" = "up")),
+                  Direction = ifelse(.data$`adj.P.Val` > 0.5 | abs(.data$logFC) < log2(1.2),
+                                     "none",
+                                     .data$Direction),
+                  Direction = as.character(.data$Direction)
+    )
+
+  # Join metadata from biomart to differential expression results
+  biomart_results <- tibble::rownames_to_column(biomart_results, var = "ensembl_gene_id")
+
+  de <- dplyr::left_join(de, biomart_results, by = c("ensembl_gene_id"))
+
+  object <- list(voom_object = voom_gene_expression,
+                 contrasts_to_plot = contrasts,
+                 fits = fit_contrasts,
+                 differential_expression = de,
+                 primary_variable = metadata_input$primary_variable,
+                 formula = metadata_input$formula_non_intercept)
+
+  object
+}
+#' Wrapper for Differential Expression Analysis
+#'
+#' This function will pass multiple conditions to test to \code{"sagseqr::differential_expression()"}.
+#'
+#' @param conditions A list of conditions to test as `primary_variable`
+#' in \code{"sagseqr::differential_expression()"}.
+#' @inheritParams differential_expression
+wrap_de <- function(conditions, filtered_counts, cqn_counts, md, model_variables, biomart_results) {
+  purrr::map(conditions,
+             function(x) differential_expression(filtered_counts, cqn_counts, md, model_variables,
+                                                 primary_variable = x, biomart_results))
+
+}
+#' @export
