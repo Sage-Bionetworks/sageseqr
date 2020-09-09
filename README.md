@@ -1,6 +1,9 @@
 <!-- badges: start -->
   [![R build status](https://github.com/kelshmo/sageseqr/workflows/R-CMD-check/badge.svg)](https://github.com/kelshmo/sageseqr/actions)
 <!-- badges: end -->
+# Installation 
+`remotes::install_github("Sage-Bionetworks/sageseqr")`
+
 # RNA-seq normalization workflow in R
 
 The `sageseqr` package integrates the [`drake` R package](https://github.com/ropensci/drake/), the [`config` package for R](https://cran.r-project.org/web/packages/config/vignettes/introduction.html), and [Synapse](https://www.synapse.org/). `drake` tracks dependency relationships in the workflow and only updates data when it has changed. A `config` file allows inputs and parameters to be explicitly defined in one location. Synapse is a data repository that allows sensitive data to be [stored and shared responsibly](https://docs.synapse.org/articles/article_index.html#governance). 
