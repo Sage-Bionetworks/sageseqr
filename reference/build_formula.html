@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Subset counts data frame — parse_counts • sageseqr</title>
+<title>Formula Builder — build_formula • sageseqr</title>
 
 
 <!-- jquery -->
@@ -39,10 +39,12 @@
 
 
 
-<meta property="og:title" content="Subset counts data frame — parse_counts" />
-<meta property="og:description" content="The biomaRt query requires only gene identifiers to be passed as input. Some alignment
-output combines additional metadata with the counts file. This function will remove
-extraneous rows and is especially meant to address output from the STAR aligner." />
+<meta property="og:title" content="Formula Builder — build_formula" />
+<meta property="og:description" content="If a linear mixed model is used, all categorical variables must be
+modeled as a random effect. This function identifies the variable class
+to scale numeric variables and model categorical variables as a random
+effect. Additionally, variables are scaled to account for
+multiple variables that might have an order of magnitude difference." />
 
 
 
@@ -120,25 +122,36 @@ extraneous rows and is especially meant to address output from the STAR aligner.
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Subset counts data frame</h1>
+    <h1>Formula Builder</h1>
     
-    <div class="hidden name"><code>parse_counts.Rd</code></div>
+    <div class="hidden name"><code>build_formula.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>The biomaRt query requires only gene identifiers to be passed as input. Some alignment
-output combines additional metadata with the counts file. This function will remove
-extraneous rows and is especially meant to address output from the STAR aligner.</p>
+    <p>If a linear mixed model is used, all categorical variables must be
+modeled as a random effect. This function identifies the variable class
+to scale numeric variables and model categorical variables as a random
+effect. Additionally, variables are scaled to account for
+multiple variables that might have an order of magnitude difference.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>parse_counts</span>(<span class='kw'>count_df</span>)</pre>
+    <pre class="usage"><span class='fu'>build_formula</span>(<span class='kw'>md</span>, <span class='kw'>model_variables</span>, <span class='kw'>primary_variable</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>count_df</th>
-      <td><p>A counts data frame with sample identifiers as rownames.</p></td>
+      <th>md</th>
+      <td><p>A data frame with sample identifiers in a column and relevant experimental covariates.</p></td>
+    </tr>
+    <tr>
+      <th>model_variables</th>
+      <td><p>Vector of variables to include in the linear (mixed) model.</p></td>
+    </tr>
+    <tr>
+      <th>primary_variable</th>
+      <td><p>Vector of variables that will be collapsed into a single
+fixed effect interaction term.</p></td>
     </tr>
     </table>
 

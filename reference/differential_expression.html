@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Subset counts data frame — parse_counts • sageseqr</title>
+<title>Differential Expression with Dream — differential_expression • sageseqr</title>
 
 
 <!-- jquery -->
@@ -39,10 +39,10 @@
 
 
 
-<meta property="og:title" content="Subset counts data frame — parse_counts" />
-<meta property="og:description" content="The biomaRt query requires only gene identifiers to be passed as input. Some alignment
-output combines additional metadata with the counts file. This function will remove
-extraneous rows and is especially meant to address output from the STAR aligner." />
+<meta property="og:title" content="Differential Expression with Dream — differential_expression" />
+<meta property="og:description" content="Differential expression testing is performed with &quot;variancePartition::dream()&quot; to increase power
+and decrease false positives for repeated measure designs. The `primary_variable` is modeled as a fixed
+effect. If you wish to test an interaction term, `primary_variable` can take multiple variable names." />
 
 
 
@@ -120,25 +120,53 @@ extraneous rows and is especially meant to address output from the STAR aligner.
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Subset counts data frame</h1>
+    <h1>Differential Expression with Dream</h1>
     
-    <div class="hidden name"><code>parse_counts.Rd</code></div>
+    <div class="hidden name"><code>differential_expression.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>The biomaRt query requires only gene identifiers to be passed as input. Some alignment
-output combines additional metadata with the counts file. This function will remove
-extraneous rows and is especially meant to address output from the STAR aligner.</p>
+    <p>Differential expression testing is performed with <code>"variancePartition::dream()"</code> to increase power
+and decrease false positives for repeated measure designs. The `primary_variable` is modeled as a fixed
+effect. If you wish to test an interaction term, `primary_variable` can take multiple variable names.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>parse_counts</span>(<span class='kw'>count_df</span>)</pre>
+    <pre class="usage"><span class='fu'>differential_expression</span>(
+  <span class='kw'>filtered_counts</span>,
+  <span class='kw'>cqn_counts</span>,
+  <span class='kw'>md</span>,
+  <span class='kw'>model_variables</span>,
+  <span class='kw'>primary_variable</span>,
+  <span class='kw'>biomart_results</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>count_df</th>
-      <td><p>A counts data frame with sample identifiers as rownames.</p></td>
+      <th>filtered_counts</th>
+      <td><p>A counts data frame with genes removed that have low expression.</p></td>
+    </tr>
+    <tr>
+      <th>cqn_counts</th>
+      <td><p>A counts data frame normalized by CQN.</p></td>
+    </tr>
+    <tr>
+      <th>md</th>
+      <td><p>A data frame with sample identifiers in a column and relevant experimental covariates.</p></td>
+    </tr>
+    <tr>
+      <th>model_variables</th>
+      <td><p>Vector of variables to include in the linear (mixed) model.</p></td>
+    </tr>
+    <tr>
+      <th>primary_variable</th>
+      <td><p>Vector of variables that will be collapsed into a single
+fixed effect interaction term.</p></td>
+    </tr>
+    <tr>
+      <th>biomart_results</th>
+      <td><p>Output of <code>"sageseqr::get_biomart()"</code>.</p></td>
     </tr>
     </table>
 
