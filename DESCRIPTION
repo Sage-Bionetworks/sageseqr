@@ -54,7 +54,7 @@ Additional_repositories:
     http://ran.synapse.org
 Remotes:
     th1vairam/CovariateAnalysis@dev,
-    Sage-Bionetworks/sagethemes@main
+    Sage-Bionetworks/sagethemes@main,
     GabrielHoffman/variancePartition
 VignetteBuilder:
     knitr
