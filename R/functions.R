@@ -257,6 +257,12 @@ collapse_duplicate_hgnc_symbol <- function(biomart_results){
 #' @export
 filter_genes <- function(clean_metadata, count_df, conditions,
                          cpm_threshold, conditions_threshold) {
+  if (class(conditions) == "list") {
+    conditions <- unique(unlist(conditions))
+  } else {
+    conditions <- unique(conditions)
+  }
+
   if (!any(conditions %in% colnames(clean_metadata))) {
     stop("Conditions are missing from the metadata.")
   }
