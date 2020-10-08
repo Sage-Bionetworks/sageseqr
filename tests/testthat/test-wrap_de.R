@@ -1,7 +1,7 @@
 metadata <- data.frame(
   batch = c("1", "2", "1", "2"),
   diagnosis = c("dx", "dx", "ct", "ct"),
-  sex = c("M", "M", "F", "F"),
+  sex = c("M", "F", "M", "F"),
   RIN = c(5, 5, 5, 5),
   samples = c("S1", "S2", "S3", "S4"),
   stringsAsFactors = FALSE
