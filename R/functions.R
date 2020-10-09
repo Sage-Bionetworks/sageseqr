@@ -102,6 +102,22 @@ boxplot_vars <- function(md, include_vars, x_var) {
     sagethemes::theme_sage()
   p
 }
+#' Explore metadata by gene expression on the sex chromosomes.
+#'
+#' This function plots expression of X and Y marker genes, XIST and UTY respectively, and colors each sample
+#' by the sex or gender specific labeling from the metadata. This is a handy check to determine if samples were
+#' swapped or mislabeled.
+#'
+#' @inheritParams collapse_duplicate_hgnc_symbol
+#' @inheritParams filter_genes
+#'
+#'
+plot_sexcheck <- function(clean_metadata, count_df, biomart_results) {
+  md <- tibble::rownames_to_column(clean_metadata, var = "geneId")
+  counts <- tibble::rownames_to_column(count_df, var = "geneId")
+  biomart <- dplyr::select(biomart_results, ensembl_gene_id, hgnc_symbol, chromosome_name) %>%
+    dplyr::filter(hgnc_symbol %in% c("XIST", "UTY"))
+}
 #'Get available Ensembl dataset
 #'
 #'Helper function to search relative Ensembl datasets by partial organism names.
