@@ -8,6 +8,23 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# Explore Metadata
+
+```{r sample_summary}
+loadd(clean_md)
+summary <- dplyr::group_by(clean_md, config::get("x_var")) %>%
+  dplyr::summarise(count = n())
+knitr::kable(summary)
+```
+
+Visualize the distribution of data.
+```{r boxplot}
+readd(boxplots)
+```
+
+Visualize gene expression patterns on sex chromosomes.
+
+
 # Outliers 
 ```{r plot_outliers}
 ```
