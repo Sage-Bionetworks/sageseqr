@@ -42,6 +42,7 @@ Imports:
     purrr,
     RColorBrewer,
     rlang,
+    rmarkdown,
     sagethemes,
     stringr,
     synapser,
