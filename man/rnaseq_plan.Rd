@@ -21,7 +21,8 @@ rnaseq_plan(
   organism,
   conditions,
   cpm_threshold = 1,
-  conditions_threshold = 0.5
+  conditions_threshold = 0.5,
+  x_var_for_plot
 )
 }
 \arguments{
@@ -67,6 +68,8 @@ takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".}
 \item{cpm_threshold}{The minimum number of CPM allowed.}
 
 \item{conditions_threshold}{Percentage of samples that should contain the minimum CPM.}
+
+\item{x_var_for_plot}{Variable to separate groups for boxplot.}
 }
 \description{
 This function wraps the \code{"drake::plan()"}.
