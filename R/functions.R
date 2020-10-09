@@ -406,6 +406,13 @@ build_formula <- function(md, model_variables, primary_variable) {
            "numeric" = glue::glue("scale(", col_type$variable[i], ")")
     )
   })
+
+  # List with multiple values can cause glue_collapse to fail. This step is conservative
+  # as it unlists all lists at this step.
+  if (class(primary_variable) == "list") {
+    primary_variable <- primary_variable[[1]]
+  }
+
   # A new categorical is created to model an interaction between two variables
   interaction_term <- glue::glue_collapse({primary_variable}, "_")
 
@@ -514,10 +521,11 @@ differential_expression <- function(filtered_counts, cqn_counts, md, model_varia
 #' @param conditions A list of conditions to test as `primary_variable`
 #' in \code{"sagseqr::differential_expression()"}.
 #' @inheritParams differential_expression
+#' @export
 wrap_de <- function(conditions, filtered_counts, cqn_counts, md, model_variables, biomart_results) {
   purrr::map(conditions,
              function(x) differential_expression(filtered_counts, cqn_counts, md, model_variables,
                                                  primary_variable = x, biomart_results))
 
 }
-#' @export
+#'
