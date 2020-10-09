@@ -1,16 +1,16 @@
 metadata <- data.frame(
-  batch = c("1", "2", "1", "2"),
-  diagnosis = c("dx", "dx", "ct", "ct"),
-  sex = c("M", "F", "M", "F"),
-  RIN = c(5, 5, 5, 5),
-  samples = c("S1", "S2", "S3", "S4"),
+  batch = c("1", "2", "1", "2", "1", "2", "1", "2"),
+  diagnosis = c("dx", "dx", "ct", "ct", "dx", "dx", "ct", "ct"),
+  sex = c("M", "F", "M", "F", "M", "F", "M", "F"),
+  RIN = c(5, 5, 5, 5, 5, 5, 5, 5),
+  samples = c("S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8"),
   stringsAsFactors = FALSE
 )
 
 counts <- matrix(
-  sample(0:100, size = 12),
-  ncol = 4,
-  dimnames = list(c("ENSG1", "ENSG2", "ENSG5"), c("S1", "S2", "S3", "S4"))
+  sample(0:100, size = 24),
+  ncol = 8,
+  dimnames = list(c("ENSG1", "ENSG2", "ENSG5"), c("S1", "S2", "S3", "S4",  "S5", "S6", "S7", "S8"))
 )
 
 conditions <- list(
