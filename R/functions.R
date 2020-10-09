@@ -258,7 +258,7 @@ collapse_duplicate_hgnc_symbol <- function(biomart_results){
 filter_genes <- function(clean_metadata, count_df, conditions,
                          cpm_threshold, conditions_threshold) {
   if (class(conditions) == "list") {
-    conditions <- unique(unlist(conditions))
+    conditions <- unique(conditions[[1]])
   } else {
     conditions <- unique(conditions)
   }
