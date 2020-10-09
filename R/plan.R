@@ -17,6 +17,7 @@
 #' present in the metadata as column names.
 #' @param biomart_id Synapse ID to biomart object.
 #' @param biomart_version Optionally, include Synapse file version number.
+#' @param x_var_for_plot Variable to separate groups for boxplot.
 #' @inheritParams get_biomart
 #' @inheritParams filter_genes
 #' @export
@@ -56,10 +57,10 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                             include_vars = !!continuous_input,
                             x_var = !!x_var_for_plot),
     report = rmarkdown::render(
-      knitr_in(
+      drake::knitr_in(
         !!system.file("markdown", "sageseqr-report.Rmd", package = "sageseqr")
         ),
-      output_file = file_out(
+      output_file = drake::file_out(
         !!glue::glue(getwd(), "/sageseqr-report.html")
         ),
       output_dir = ".",
