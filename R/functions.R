@@ -90,13 +90,16 @@ clean_covariates <- function(md, factors, continuous, sample_identifier) {
 #'@export
 #'@return A boxplot with mutiple groups defined by the include_vars argument.
 boxplot_vars <- function(md, include_vars, x_var) {
+  sagethemes::import_lato()
   df <- dplyr::select(md, !!include_vars, !!x_var) %>%
     tidyr::pivot_longer(-!!x_var, names_to = "key", values_to = "value")
   p <- ggplot2::ggplot(df, ggplot2::aes(x = .data[[x_var]],
                                         y = .data$value,
                                         group = .data[[x_var]])) +
     ggplot2::geom_boxplot(ggplot2::aes(fill = .data[[x_var]])) +
-    ggplot2::facet_wrap(key ~ ., scales = "free")
+    ggplot2::facet_wrap(key ~ ., scales = "free") +
+    sagethemes::scale_color_sage_d() +
+    sagethemes::theme_sage()
   p
 }
 #'Get available Ensembl dataset
