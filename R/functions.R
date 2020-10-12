@@ -115,19 +115,36 @@ boxplot_vars <- function(md, include_vars, x_var) {
 }
 #' Explore metadata by gene expression on the sex chromosomes.
 #'
-#' This function plots expression of X and Y marker genes, XIST and UTY respectively, and colors each sample
-#' by the sex or gender specific labeling from the metadata. This is a handy check to determine if samples were
-#' swapped or mislabeled.
+#' This function plots expression of X and Y marker genes, XIST and UTY respectively, and
+#' colors each sample by the sex or gender specific labeling from the metadata. This is a
+#' handy check to determine if samples were swapped or mislabeled.
 #'
 #' @inheritParams collapse_duplicate_hgnc_symbol
 #' @inheritParams filter_genes
-#'
-#'
-plot_sexcheck <- function(clean_metadata, count_df, biomart_results) {
-  md <- tibble::rownames_to_column(clean_metadata, var = "geneId")
+#' @sample_id Column name of the sample ids in the metadata file.
+#' @sex_var Column name of the sex or gender-specific metadata.
+plot_sexcheck <- function(clean_metadata, count_df, biomart_results, sex_var) {
+  md <- tibble::rownames_to_column(clean_metadata, var = "sampleId") %>%
+    select(sampleId, !!sex_var)
   counts <- tibble::rownames_to_column(count_df, var = "geneId")
-  biomart <- dplyr::select(biomart_results, ensembl_gene_id, hgnc_symbol, chromosome_name) %>%
-    dplyr::filter(hgnc_symbol %in% c("XIST", "UTY"))
+  results <- dplyr::select(biomart_results, hgnc_symbol, chromosome_name)
+  results <- dplyr::filter(results, hgnc_symbol %in% c("XIST", "UTY"))
+  results <- tibble::rownames_to_column(results, var = "geneId")
+  results <- dplyr::left_join(results, counts)
+  results <- tidyr::gather(results, key = sampleId,
+                           value = `counts(log)`,
+                           -c(geneId, chromosome_name, hgnc_symbol)) %>%
+    dplyr::mutate(`counts(log)` = log(.data$`counts(log)`),
+                  `counts(log)` = ifelse(`counts(log)` == -Inf, 0, `counts(log)`))
+  results <- dplyr::left_join(results, md, "sampleId")
+  results <- tidyr::spread(results, key = hgnc_symbol, value = `counts(log)`) %>%
+    dplyr::mutate(UTY = ifelse(is.na(UTY), 0, UTY),
+                  XIST = ifelse(is.na(XIST), 0, XIST))
+  p <- ggplot2::ggplot(results, aes(x = XIST, y = UTY)) +
+    ggplot2::geom_point(aes(color = .data[[sex_var]])) +
+    sagethemes::scale_color_sage_d() +
+    sagethemes::theme_sage()
+  p
 }
 #'Get available Ensembl dataset
 #'
