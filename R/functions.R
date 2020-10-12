@@ -128,13 +128,13 @@ biomart_obj <- function(organism, host) {
 #' output combines additional metadata with the counts file. This function will remove
 #' extraneous rows and is especially meant to address output from the STAR aligner.
 #' @inheritParams get_biomart
-parse_counts <- function(count_df){
-  if (any(grepl("N_", row.names(count_df)))) {
-    ind <- which(grepl("N_", row.names(count_df)))
-    df_parsed <- count_df[-ind,]
-    df_parsed
+parse_counts <- function(gene_list){
+  if (any(grepl("N_", gene_list))) {
+    ind <- which(grepl("N_", gene_list))
+    parsed <- gene_list[-ind,]
+    parsed
   } else {
-    count_df
+    gene_list
   }
 }
 #'Get Ensembl biomaRt object
@@ -143,7 +143,7 @@ parse_counts <- function(count_df){
 #'and other metadata from Ensembl BioMart. Object returned contains gene Ids
 #'as rownames.
 #'
-#'@param count_df A counts data frame with sample identifiers as rownames.
+#'@param gene_list A list of genes for BioMart query.
 #'@inheritParams get_data
 #'@param gene_id Column name of gene Ids
 #'@param filters A character vector listing biomaRt query filters.
@@ -155,16 +155,16 @@ parse_counts <- function(count_df){
 #'takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".
 #'@importFrom rlang .data
 #'@export
-get_biomart <- function(count_df, gene_id, synid, version, host, filters, organism) {
-  if (is.null(config::get("biomart")$synID)) {
+get_biomart <- function(gene_list, synid = NULL, version, host, filters, organism) {
+  if (is.null(synid)) {
     # Get available datset from Ensembl
     ensembl <- biomart_obj(organism, host)
 
     # Check for extraneous rows
-    count_df <- parse_counts(count_df)
+    gene_list <- parse_counts(gene_list)
 
     # Parse gene IDs to use in query
-    gene_ids <- convert_geneids(count_df)
+    gene_ids <- convert_geneids(gene_list)
 
     message(paste0("Downloading sequence",
                    ifelse(length(gene_ids) > 1, "s", ""), " ..."))
@@ -202,7 +202,7 @@ get_biomart <- function(count_df, gene_id, synid, version, host, filters, organi
     biomart_results <- collapse_duplicate_hgnc_symbol(biomart_results)
 
     # Biomart IDs as rownames
-    biomart_results <- tibble::column_to_rownames(biomart_results, var = gene_id)
+    biomart_results <- tibble::column_to_rownames(biomart_results, var = !!filters)
 
     biomart_results
   } else {
@@ -210,7 +210,7 @@ get_biomart <- function(count_df, gene_id, synid, version, host, filters, organi
     biomart_results <- get_data(synid, version)
 
     # Biomart IDs as rownames
-    biomart_results <- tibble::column_to_rownames(biomart_results, var = gene_id)
+    biomart_results <- tibble::column_to_rownames(biomart_results, var = !!filters)
 
     # Gene metadata required for count CQN
     required_variables <- c("gene_length", "percentage_gene_gc_content")
@@ -319,13 +319,13 @@ simple_filter <- function(count_df, cpm_threshold, conditions_threshold) {
 #'@importFrom rlang .data
 #'
 #'@export
-convert_geneids <- function(count_df) {
-  if (any(grepl("\\.", rownames(count_df)))) {
-    geneids <- tibble::tibble(ids = rownames(count_df)) %>%
+convert_geneids <- function(gene_list) {
+  if (any(grepl("\\.", gene_list))) {
+    geneids <- tibble::tibble(ids = gene_list) %>%
       tidyr::separate(.data$ids, c("ensembl_gene_id", "position"), sep = "\\.")
     geneids$ensembl_gene_id
   } else {
-    rownames(count_df)
+    gene_list
   }
 }
 #' Conditional Quantile Normalization (CQN)
