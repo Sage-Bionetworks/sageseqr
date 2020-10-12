@@ -4,12 +4,10 @@
 \alias{get_biomart}
 \title{Get Ensembl biomaRt object}
 \usage{
-get_biomart(count_df, gene_id, synid, version, host, filters, organism)
+get_biomart(gene_list, synid = NULL, version, host, filters, organism)
 }
 \arguments{
-\item{count_df}{A counts data frame with sample identifiers as rownames.}
-
-\item{gene_id}{Column name of gene Ids}
+\item{gene_list}{A list of genes for BioMart query.}
 
 \item{synid}{A character vector with a Synapse Id.}
 
@@ -25,6 +23,8 @@ This specification is highly recommended for a reproducible workflow.
 
 \item{organism}{A character vector of the organism name. This argument
 takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".}
+
+\item{gene_id}{Column name of gene Ids}
 }
 \description{
 Get GC content, gene Ids, gene symbols, gene biotypes, gene lengths

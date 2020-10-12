@@ -16,8 +16,6 @@ filter_genes(
 \item{clean_metadata}{A data frame with sample identifiers as rownames and variables as
 factors or numeric as determined by \code{"sageseqr::clean_covariates()"}.}
 
-\item{count_df}{A counts data frame with sample identifiers as rownames.}
-
 \item{conditions}{Conditions to bin gene counts that correspond to variables in `md`.}
 
 \item{cpm_threshold}{The minimum number of CPM allowed.}

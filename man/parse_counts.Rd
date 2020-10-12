@@ -4,10 +4,10 @@
 \alias{parse_counts}
 \title{Subset counts data frame}
 \usage{
-parse_counts(count_df)
+parse_counts(gene_list)
 }
 \arguments{
-\item{count_df}{A counts data frame with sample identifiers as rownames.}
+\item{gene_list}{A list of genes for BioMart query.}
 }
 \description{
 The biomaRt query requires only gene identifiers to be passed as input. Some alignment

@@ -4,10 +4,10 @@
 \alias{convert_geneids}
 \title{Get gene Ids}
 \usage{
-convert_geneids(count_df)
+convert_geneids(gene_list)
 }
 \arguments{
-\item{count_df}{A counts data frame with sample identifiers as rownames.}
+\item{gene_list}{A list of genes for BioMart query.}
 }
 \description{
 Get gene Ids
