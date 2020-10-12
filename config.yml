@@ -10,7 +10,6 @@ default:
   biomart:
     synID: syn21907998
     version:
-    gene id: ensembl_gene_id
     filters: ensembl_gene_id
     host: ensembl.org
     organism: hsa
