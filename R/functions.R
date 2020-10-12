@@ -19,6 +19,17 @@ get_data <- function(synid, version = NULL) {
                                                      )$path))
   df
 }
+#' Create complete URL to Synapse entity
+#'
+#' This function creates the url reference to entities in Synapse.
+#' @inheritParams get_data
+complete_path <- function(synid, version = NULL) {
+  if (is.null(version)) {
+    glue::glue("https://www.synapse.org/#!Synapse:{synid}")
+  } else {
+    glue::glue("https://www.synapse.org/#!Synapse:{synid}.{version}")
+  }
+}
 #'Coerce objects to type factors.
 #'
 #'@param md  A data frame with sample identifiers in a column and relevant experimental covariates.
