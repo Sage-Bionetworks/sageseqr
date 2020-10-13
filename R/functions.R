@@ -117,7 +117,7 @@ boxplot_vars <- function(md, include_vars, x_var) {
 #' Explore metadata by gene expression on the sex chromosomes.
 #'
 #' This function plots expression of X and Y marker genes, XIST and UTY respectively, and
-#' colors each sample by the sex or gender specific labeling from the metadata. This is a
+#' colors each sample by the sex- or gender-specific labeling from the metadata. This is a
 #' handy check to determine if samples were swapped or mislabeled.
 #'
 #' @inheritParams collapse_duplicate_hgnc_symbol
