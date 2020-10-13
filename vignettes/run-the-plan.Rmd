@@ -47,7 +47,8 @@ plan <- sageseqr::rnaseq_plan(metadata_id = config::get("metadata")$synID,
                     host = config::get("biomart")$host,
                     organism = config::get("biomart")$organism, 
                     conditions = config::get("conditions"), 
-                    x_var_for_plot = config::get("x_var")
+                    x_var_for_plot = config::get("x_var"), 
+                    sex_var = config::get("sex check")
 )
 
 drake::make(plan)

@@ -23,6 +23,7 @@ get_data <- function(synid, version = NULL) {
 #'
 #' This function creates the url reference to entities in Synapse.
 #' @inheritParams get_data
+#' @export
 complete_path <- function(synid, version = NULL) {
   if (is.null(version)) {
     glue::glue("https://www.synapse.org/#!Synapse:{synid}")
@@ -121,27 +122,26 @@ boxplot_vars <- function(md, include_vars, x_var) {
 #'
 #' @inheritParams collapse_duplicate_hgnc_symbol
 #' @inheritParams filter_genes
-#' @sample_id Column name of the sample ids in the metadata file.
-#' @sex_var Column name of the sex or gender-specific metadata.
+#' @param sex_var Column name of the sex or gender-specific metadata.
 plot_sexcheck <- function(clean_metadata, count_df, biomart_results, sex_var) {
   md <- tibble::rownames_to_column(clean_metadata, var = "sampleId") %>%
-    select(sampleId, !!sex_var)
+    dplyr::select(.data$sampleId, !!sex_var)
   counts <- tibble::rownames_to_column(count_df, var = "geneId")
-  results <- dplyr::select(biomart_results, hgnc_symbol, chromosome_name)
-  results <- dplyr::filter(results, hgnc_symbol %in% c("XIST", "UTY"))
+  results <- dplyr::select(biomart_results, .data$hgnc_symbol, .data$chromosome_name)
+  results <- dplyr::filter(results, .data$hgnc_symbol %in% c("XIST", "UTY"))
   results <- tibble::rownames_to_column(results, var = "geneId")
   results <- dplyr::left_join(results, counts)
-  results <- tidyr::gather(results, key = sampleId,
-                           value = `counts(log)`,
-                           -c(geneId, chromosome_name, hgnc_symbol)) %>%
+  results <- tidyr::gather(results, key = .data$sampleId,
+                           value = .data$`counts(log)`,
+                           -c(.data$geneId, .data$chromosome_name, .data$hgnc_symbol)) %>%
     dplyr::mutate(`counts(log)` = log(.data$`counts(log)`),
-                  `counts(log)` = ifelse(`counts(log)` == -Inf, 0, `counts(log)`))
+                  `counts(log)` = ifelse(.data$`counts(log)` == -Inf, 0, .data$`counts(log)`))
   results <- dplyr::left_join(results, md, "sampleId")
-  results <- tidyr::spread(results, key = hgnc_symbol, value = `counts(log)`) %>%
-    dplyr::mutate(UTY = ifelse(is.na(UTY), 0, UTY),
-                  XIST = ifelse(is.na(XIST), 0, XIST))
-  p <- ggplot2::ggplot(results, aes(x = XIST, y = UTY)) +
-    ggplot2::geom_point(aes(color = .data[[sex_var]])) +
+  results <- tidyr::spread(results, key = .data$hgnc_symbol, value = .data$`counts(log)`) %>%
+    dplyr::mutate(UTY = ifelse(is.na(.data$UTY), 0, .data$UTY),
+                  XIST = ifelse(is.na(.data$XIST), 0, .data$XIST))
+  p <- ggplot2::ggplot(results, ggplot2::aes(x = .data$XIST, y = .data$UTY)) +
+    ggplot2::geom_point(ggplot2::aes(color = .data[[sex_var]])) +
     sagethemes::scale_color_sage_d() +
     sagethemes::theme_sage()
   p

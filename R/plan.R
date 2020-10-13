@@ -18,6 +18,7 @@
 #' @param biomart_id Synapse ID to biomart object.
 #' @param biomart_version Optionally, include Synapse file version number.
 #' @param x_var_for_plot Variable to separate groups for boxplot.
+#' @inheritParams plot_sexcheck
 #' @inheritParams get_biomart
 #' @inheritParams filter_genes
 #' @export
@@ -27,7 +28,7 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                         biomart_id, biomart_version, host, filters,
                         organism, conditions, cpm_threshold = 1,
                         conditions_threshold = 0.5,
-                        x_var_for_plot){
+                        x_var_for_plot, sex_var){
   drake::drake_plan(
     import_metadata = get_data(!!metadata_id,
                                !!metadata_version),
@@ -56,6 +57,13 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
     boxplots = boxplot_vars(md = clean_md,
                             include_vars = !!continuous_input,
                             x_var = !!x_var_for_plot),
+    sex_plot = drake::target(
+      command = plot_sexcheck(clean_md,
+                              counts,
+                              biomart_results,
+                              !!sex_var),
+      condition = !is.null(!!sex_var)
+    ),
     report = rmarkdown::render(
       drake::knitr_in(
         !!system.file("markdown", "sageseqr-report.Rmd", package = "sageseqr")
