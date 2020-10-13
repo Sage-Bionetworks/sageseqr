@@ -110,7 +110,7 @@ boxplot_vars <- function(md, include_vars, x_var) {
                                         group = .data[[x_var]])) +
     ggplot2::geom_boxplot(ggplot2::aes(fill = .data[[x_var]])) +
     ggplot2::facet_wrap(key ~ ., scales = "free") +
-    sagethemes::scale_color_sage_d() +
+    sagethemes::scale_fill_sage_d() +
     sagethemes::theme_sage()
   p
 }
