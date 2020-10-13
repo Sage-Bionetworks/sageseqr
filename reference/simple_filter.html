@@ -131,7 +131,7 @@ the genes that meet the minimum CPM threshold in a percentage of samples. The mi
 threshold and percent threshold is user defined. The function returns a list of genes.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>simple_filter</span>(<span class='kw'>count_df</span>, <span class='kw'>cpm_threshold</span>, <span class='kw'>conditions_threshold</span>)</pre>
+    <pre class="usage"><span class='fu'>simple_filter</span><span class='op'>(</span><span class='va'>count_df</span>, <span class='va'>cpm_threshold</span>, <span class='va'>conditions_threshold</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -152,9 +152,9 @@ threshold and percent threshold is user defined. The function returns a list of 
 
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
-<span class='kw'>gene_list</span> <span class='op'>&lt;-</span> <span class='fu'>simple_filter</span>(count_df = <span class='kw'>counts</span>, cpm_threshold = <span class='fl'>1</span>, condition_threshold = <span class='fl'>0.5</span>)
-}
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='va'>gene_list</span> <span class='op'>&lt;-</span> <span class='fu'>simple_filter</span><span class='op'>(</span>count_df <span class='op'>=</span> <span class='va'>counts</span>, cpm_threshold <span class='op'>=</span> <span class='fl'>1</span>, condition_threshold <span class='op'>=</span> <span class='fl'>0.5</span><span class='op'>)</span>
+<span class='op'>}</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -171,7 +171,7 @@ threshold and percent threshold is user defined. The function returns a list of 
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>
