@@ -9,7 +9,7 @@ default:
     version: 1
     sample id: sampleID
   biomart:
-    synID:
+    synID: syn21907998
     version:
     gene id: ensembl_gene_id
     filters: ensembl_gene_id
