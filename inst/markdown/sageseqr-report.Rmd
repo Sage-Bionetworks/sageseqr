@@ -7,11 +7,13 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+# Data
+
 
 # Explore Metadata
 
 ```{r sample_summary}
-loadd(clean_md)
+drake::loadd(clean_md)
 summary <- dplyr::group_by(clean_md, config::get("x_var")) %>%
   dplyr::summarise(count = n())
 knitr::kable(summary)
@@ -19,11 +21,16 @@ knitr::kable(summary)
 
 Visualize the distribution of data.
 ```{r boxplot}
-readd(boxplots)
+drake::readd(boxplots)
 ```
 
-Visualize gene expression patterns on sex chromosomes.
-
+```{r boxplot_sex_chromosomes, results = "asis"}
+if (!is.null(config::get("sex check"))) {
+  cat("Visualize gene expression (log-transformed counts) of sex chromosomes using XIST 
+      as a X-chromosome marker and UTY as a Y-chromosome marker.")
+  drake::readd(sex_plot$plot)
+}
+```
 
 # Outliers 
 ```{r plot_outliers}
