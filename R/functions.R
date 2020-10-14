@@ -123,6 +123,7 @@ boxplot_vars <- function(md, include_vars, x_var) {
 #' @inheritParams collapse_duplicate_hgnc_symbol
 #' @inheritParams filter_genes
 #' @param sex_var Column name of the sex or gender-specific metadata.
+#' @export
 plot_sexcheck <- function(clean_metadata, count_df, biomart_results, sex_var) {
   md <- tibble::rownames_to_column(clean_metadata, var = "sampleId") %>%
     dplyr::select(.data$sampleId, !!sex_var)
@@ -131,9 +132,10 @@ plot_sexcheck <- function(clean_metadata, count_df, biomart_results, sex_var) {
   results <- dplyr::filter(results, .data$hgnc_symbol %in% c("XIST", "UTY"))
   results <- tibble::rownames_to_column(results, var = "geneId")
   results <- dplyr::left_join(results, counts)
-  results <- tidyr::gather(results, key = .data$sampleId,
-                           value = .data$`counts(log)`,
-                           -c(.data$geneId, .data$chromosome_name, .data$hgnc_symbol)) %>%
+  results <- tidyr::pivot_longer(results,
+                                 -dplyr::all_of(c("geneId", "chromosome_name", "hgnc_symbol")),
+                                 names_to = "sampleId",
+                                 values_to = "counts(log)") %>%
     dplyr::mutate(`counts(log)` = log(.data$`counts(log)`),
                   `counts(log)` = ifelse(.data$`counts(log)` == -Inf, 0, .data$`counts(log)`))
   results <- dplyr::left_join(results, md, "sampleId")
