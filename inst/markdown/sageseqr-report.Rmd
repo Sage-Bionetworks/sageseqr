@@ -6,6 +6,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(sageseqr)
 ```
 # Data
 
@@ -14,8 +15,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r sample_summary}
 drake::loadd(clean_md)
-summary <- dplyr::group_by(clean_md, config::get("x_var")) %>%
-  dplyr::summarise(count = n())
+summary <- dplyr::group_by(clean_md, config::get("x_var"))
+summary <- dplyr::summarise(summary, count = dplyr::n())
 knitr::kable(summary)
 ```
 
