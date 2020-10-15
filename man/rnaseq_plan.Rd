@@ -46,8 +46,6 @@ in the metadata as column names.}
 \item{continuous_input}{Vector of continuous variables. Variables must be
 present in the metadata as column names.}
 
-\item{gene_id}{Column name of gene Ids}
-
 \item{biomart_id}{Synapse ID to biomart object.}
 
 \item{biomart_version}{Optionally, include Synapse file version number.}

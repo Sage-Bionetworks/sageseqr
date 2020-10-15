@@ -145,7 +145,6 @@ parse_counts <- function(count_df){
 #'
 #'@param count_df A counts data frame with sample identifiers as rownames.
 #'@inheritParams get_data
-#'@param gene_id Column name of gene Ids
 #'@param filters A character vector listing biomaRt query filters.
 #'(For a list of filters see \code{"biomaRt::listFilters()"})
 #'@param host An optional character vector specifying the release version.
@@ -155,7 +154,7 @@ parse_counts <- function(count_df){
 #'takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".
 #'@importFrom rlang .data
 #'@export
-get_biomart <- function(count_df, gene_id, synid, version, host, filters, organism) {
+get_biomart <- function(count_df, synid, version, host, filters, organism) {
   if (is.null(synid)) {
     # Get available datset from Ensembl
     ensembl <- biomart_obj(organism, host)
@@ -210,7 +209,7 @@ get_biomart <- function(count_df, gene_id, synid, version, host, filters, organi
     biomart_results <- get_data(synid, version)
 
     # Biomart IDs as rownames
-    biomart_results <- tibble::column_to_rownames(biomart_results, var = gene_id)
+    biomart_results <- tibble::column_to_rownames(biomart_results, var = !!filters)
 
     # Gene metadata required for count CQN
     required_variables <- c("gene_length", "percentage_gene_gc_content")
