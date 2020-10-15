@@ -71,8 +71,7 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
       output_file = drake::file_out(
         !!glue::glue(getwd(), "/sageseqr-report.html")
         ),
-      output_dir = ".",
-      quiet = TRUE
+      output_dir = "."
       )
     )
 }
