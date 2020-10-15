@@ -156,7 +156,7 @@ parse_counts <- function(count_df){
 #'@importFrom rlang .data
 #'@export
 get_biomart <- function(count_df, gene_id, synid, version, host, filters, organism) {
-  if (is.null(config::get("biomart")$synID)) {
+  if (is.null(synid)) {
     # Get available datset from Ensembl
     ensembl <- biomart_obj(organism, host)
 
