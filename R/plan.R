@@ -66,7 +66,7 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
     ),
     report = rmarkdown::render(
       drake::knitr_in(
-        !!system.file("markdown", "sageseqr-report.Rmd", package = "sageseqr")
+        !!system.file("sageseqr-report.Rmd", package = "sageseqr")
         ),
       output_file = drake::file_out(
         !!glue::glue(getwd(), "/sageseqr-report.html")
