@@ -201,7 +201,7 @@ get_biomart <- function(count_df, synid, version, host, filters, organism) {
     biomart_results <- collapse_duplicate_hgnc_symbol(biomart_results)
 
     # Biomart IDs as rownames
-    biomart_results <- tibble::column_to_rownames(biomart_results, var = gene_id)
+    biomart_results <- tibble::column_to_rownames(biomart_results, var = !!filters)
 
     biomart_results
   } else {

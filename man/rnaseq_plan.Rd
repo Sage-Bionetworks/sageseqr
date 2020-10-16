@@ -13,7 +13,6 @@ rnaseq_plan(
   sample_id_input,
   factor_input,
   continuous_input,
-  gene_id,
   biomart_id,
   biomart_version,
   host,

@@ -22,10 +22,9 @@
 #' @export
 rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                         counts_version, gene_id_input, sample_id_input,
-                        factor_input, continuous_input, gene_id,
-                        biomart_id, biomart_version, host, filters,
-                        organism, conditions, cpm_threshold = 1,
-                        conditions_threshold = 0.5){
+                        factor_input, continuous_input, biomart_id,
+                        biomart_version, host, filters, organism,
+                        conditions, cpm_threshold = 1, conditions_threshold = 0.5) {
   drake::drake_plan(
     import_metadata = get_data(!!metadata_id,
                                !!metadata_version),
@@ -38,7 +37,6 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                                 continuous = !!continuous_input,
                                 sample_identifier = !!sample_id_input),
     biomart_results = get_biomart(count_df = counts,
-                                gene_id = !!gene_id,
                                 synid = !!biomart_id,
                                 version = !!biomart_version,
                                 filters = !!filters,
