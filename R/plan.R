@@ -65,13 +65,10 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
     boxplots = boxplot_vars(md = clean_md,
                             include_vars = !!continuous_input,
                             x_var = !!x_var_for_plot),
-    sex_plot = drake::target(
-      command = plot_sexcheck(clean_md,
-                              counts,
-                              biomart_results,
-                              !!sex_var),
-      condition = !is.null(!!sex_var)
-    ),
+    sex_plot = conditional_plot_sexcheck(clean_md,
+                                         counts,
+                                         biomart_results,
+                                         !!sex_var),
     report = rmarkdown::render(
       drake::knitr_in("sageseqr-report.Rmd"),
       output_file = drake::file_out(

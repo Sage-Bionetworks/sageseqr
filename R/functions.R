@@ -150,6 +150,16 @@ plot_sexcheck <- function(clean_metadata, count_df, biomart_results, sex_var) {
             sex_specific_counts = results)
   p
 }
+#' Conditionally wrap plot_sexcheck for drake
+#'
+#' Work around to expose plot_sexcheck to testing and export but also leverage
+#' drakes function for skipping targets conditionally (see \code{"drake::cancel_if()"}).
+#' @inheritParams plot_sexcheck
+#' @export
+conditional_plot_sexcheck <- function(clean_metadata, count_df, biomart_results, sex_var) {
+  drake::cancel_if(is.null(sex_var))
+  plot_sexcheck(clean_metadata, count_df, biomart_results, sex_var)
+}
 #'Get available Ensembl dataset
 #'
 #'Helper function to search relative Ensembl datasets by partial organism names.

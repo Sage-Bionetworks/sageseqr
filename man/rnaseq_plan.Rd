@@ -75,5 +75,6 @@ takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".}
 \item{sex_var}{Column name of the sex or gender-specific metadata.}
 }
 \description{
-This function wraps the \code{"drake::plan()"}.
+This function wraps the \code{"drake::plan()"} and copies the R markdown report to the
+user's working directory.
 }
