@@ -28,6 +28,7 @@ Imports:
     dplyr,
     edgeR,
     foreach,
+    fs,
     GenomicRanges,
     glue,
     ggplot2,

@@ -1,6 +1,7 @@
 #' Execute the drake RNA-seq plan
 #'
-#' This function wraps the \code{"drake::plan()"}.
+#' This function wraps the \code{"drake::plan()"} and copies the R markdown report to the
+#' user's working directory.
 #'
 #' @param metadata_id Synapse ID to clean metadata file with sample identifiers in a
 #' column and variables of interest as column names. There cannot be any missing values.
@@ -29,6 +30,13 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                         organism, conditions, cpm_threshold = 1,
                         conditions_threshold = 0.5,
                         x_var_for_plot, sex_var){
+
+  # Copies markdown to user's working directory
+  if (!file.exists("sageseqr-report.Rmd")) {
+    fs::file_copy(system.file("sageseqr-report.Rmd", package = "sageseqr"),
+                  new_path = getwd())
+  }
+
   drake::drake_plan(
     import_metadata = get_data(!!metadata_id,
                                !!metadata_version),
@@ -65,9 +73,7 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
       condition = !is.null(!!sex_var)
     ),
     report = rmarkdown::render(
-      drake::knitr_in(
-        !!system.file("sageseqr-report.Rmd", package = "sageseqr")
-        ),
+      drake::knitr_in("sageseqr-report.Rmd"),
       output_file = drake::file_out(
         !!glue::glue(getwd(), "/sageseqr-report.html")
         ),
