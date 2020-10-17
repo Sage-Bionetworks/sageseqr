@@ -1,0 +1,40 @@
+---
+title: "sageseqr-report"
+date: "`r date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(sageseqr)
+```
+# Data
+
+
+# Explore Metadata
+
+```{r sample_summary, message = FALSE}
+drake::loadd(clean_md)
+var <- config::get("x_var")
+summary <- dplyr::group_by_at(clean_md, var)
+summary <- dplyr::summarise(summary, count = dplyr::n())
+knitr::kable(summary)
+```
+
+Visualize the distribution of data.
+```{r boxplot}
+drake::readd(boxplots)
+```
+
+```{r boxplot_sex_chromosomes, results = "asis"}
+if (!is.null(config::get("sex check"))) {
+  cat("Visualize gene expression (log-transformed counts) of sex chromosomes using XIST 
+      as a X-chromosome marker and UTY as a Y-chromosome marker.")
+  drake::readd(sex_plot)$plot
+}
+```
+
+# Outliers 
+```{r plot_outliers}
+```
+
