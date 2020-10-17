@@ -40,7 +40,8 @@
 
 
 <meta property="og:title" content="Execute the drake RNA-seq plan — rnaseq_plan" />
-<meta property="og:description" content="This function wraps the &quot;drake::plan()&quot;." />
+<meta property="og:description" content="This function wraps the &quot;drake::plan()&quot; and copies the R markdown report to the
+user's working directory." />
 
 
 
@@ -124,7 +125,8 @@
     </div>
 
     <div class="ref-description">
-    <p>This function wraps the <code>"drake::plan()"</code>.</p>
+    <p>This function wraps the <code>"drake::plan()"</code> and copies the R markdown report to the
+user's working directory.</p>
     </div>
 
     <pre class="usage"><span class='fu'>rnaseq_plan</span><span class='op'>(</span>
@@ -144,7 +146,9 @@
   <span class='va'>organism</span>,
   <span class='va'>conditions</span>,
   cpm_threshold <span class='op'>=</span> <span class='fl'>1</span>,
-  conditions_threshold <span class='op'>=</span> <span class='fl'>0.5</span>
+  conditions_threshold <span class='op'>=</span> <span class='fl'>0.5</span>,
+  <span class='va'>x_var_for_plot</span>,
+  <span class='va'>sex_var</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -226,6 +230,14 @@ takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".</p>
     <tr>
       <th>conditions_threshold</th>
       <td><p>Percentage of samples that should contain the minimum CPM.</p></td>
+    </tr>
+    <tr>
+      <th>x_var_for_plot</th>
+      <td><p>Variable to separate groups for boxplot.</p></td>
+    </tr>
+    <tr>
+      <th>sex_var</th>
+      <td><p>Column name of the sex or gender-specific metadata.</p></td>
     </tr>
     </table>
 

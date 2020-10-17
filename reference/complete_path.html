@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function reference • sageseqr</title>
+<title>Create complete URL to Synapse entity — complete_path • sageseqr</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,8 @@
 
 
 
-<meta property="og:title" content="Function reference" />
+<meta property="og:title" content="Create complete URL to Synapse entity — complete_path" />
+<meta property="og:description" content="This function creates the url reference to entities in Synapse." />
 
 
 
@@ -58,7 +59,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-reference-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -115,156 +116,35 @@
       </header>
 
 <div class="row">
-  <div class="contents col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Reference</h1>
+    <h1>Create complete URL to Synapse entity</h1>
+    
+    <div class="hidden name"><code>complete_path.Rd</code></div>
     </div>
 
-    <table class="ref-index">
+    <div class="ref-description">
+    <p>This function creates the url reference to entities in Synapse.</p>
+    </div>
 
-    <colgroup>
-      
-      <col class="alias" />
-      <col class="title" />
-    </colgroup>
+    <pre class="usage"><span class='fu'>complete_path</span><span class='op'>(</span><span class='va'>synid</span>, version <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
-    <tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-          <p class="section-desc"></p>
-        </th>
-      </tr>
-      
-      
-    </tbody><tbody>
-      
-      
-      <tr>
-        
-        <td>
-          <p><code><a href="biomart_obj.html">biomart_obj()</a></code> </p>
-        </td>
-        <td><p>Get available Ensembl dataset</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="boxplot_vars.html">boxplot_vars()</a></code> </p>
-        </td>
-        <td><p>Explore metadata by variable.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="build_formula.html">build_formula()</a></code> </p>
-        </td>
-        <td><p>Formula Builder</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="clean_covariates.html">clean_covariates()</a></code> </p>
-        </td>
-        <td><p>Create covariate matrix from tidy metadata data frame.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="coerce_continuous.html">coerce_continuous()</a></code> </p>
-        </td>
-        <td><p>Coerce objects to type numeric.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="coerce_factors.html">coerce_factors()</a></code> </p>
-        </td>
-        <td><p>Coerce objects to type factors.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="collapse_duplicate_hgnc_symbol.html">collapse_duplicate_hgnc_symbol()</a></code> </p>
-        </td>
-        <td><p>Duplicate HGNC</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="complete_path.html">complete_path()</a></code> </p>
-        </td>
-        <td><p>Create complete URL to Synapse entity</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="conditional_plot_sexcheck.html">conditional_plot_sexcheck()</a></code> </p>
-        </td>
-        <td><p>Conditionally wrap plot_sexcheck for drake</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="convert_geneids.html">convert_geneids()</a></code> </p>
-        </td>
-        <td><p>Get gene Ids</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="cqn.html">cqn()</a></code> </p>
-        </td>
-        <td><p>Conditional Quantile Normalization (CQN)</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="differential_expression.html">differential_expression()</a></code> </p>
-        </td>
-        <td><p>Differential Expression with Dream</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="filter_genes.html">filter_genes()</a></code> </p>
-        </td>
-        <td><p>Filter genes</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_biomart.html">get_biomart()</a></code> </p>
-        </td>
-        <td><p>Get Ensembl biomaRt object</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_data.html">get_data()</a></code> </p>
-        </td>
-        <td><p>Detect file type and download data</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="parse_counts.html">parse_counts()</a></code> </p>
-        </td>
-        <td><p>Subset counts data frame</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="plot_sexcheck.html">plot_sexcheck()</a></code> </p>
-        </td>
-        <td><p>Explore metadata by gene expression on the sex chromosomes.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="rnaseq_plan.html">rnaseq_plan()</a></code> </p>
-        </td>
-        <td><p>Execute the drake RNA-seq plan</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="simple_filter.html">simple_filter()</a></code> </p>
-        </td>
-        <td><p>Filter genes with low expression</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="wrap_de.html">wrap_de()</a></code> </p>
-        </td>
-        <td><p>Wrapper for Differential Expression Analysis</p></td>
-      </tr>
-    </tbody>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>synid</th>
+      <td><p>A character vector with a Synapse Id.</p></td>
+    </tr>
+    <tr>
+      <th>version</th>
+      <td><p>Optional. A numeric vector with the Synapse file
+version number.</p></td>
+    </tr>
     </table>
-  </div>
 
+
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>
