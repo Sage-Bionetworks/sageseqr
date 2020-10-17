@@ -13,7 +13,6 @@ rnaseq_plan(
   sample_id_input,
   factor_input,
   continuous_input,
-  gene_id,
   biomart_id,
   biomart_version,
   host,
@@ -47,8 +46,6 @@ in the metadata as column names.}
 
 \item{continuous_input}{Vector of continuous variables. Variables must be
 present in the metadata as column names.}
-
-\item{gene_id}{Column name of gene Ids}
 
 \item{biomart_id}{Synapse ID to biomart object.}
 
