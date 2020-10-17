@@ -1,4 +1,5 @@
 default:
+  analysis title: openSci
   counts:
     synID: syn22084837
     version:
@@ -15,10 +16,12 @@ default:
     organism: hsa
   factors: ["sampleID", "study", "RIN", "batch", "sex", "diagnosis"]
   continuous: ["pmi", "ageofdeath"]
+  x_var: diagnosis
   conditions:
     sex-diagnosis interaction: ["diagnosis", "sex"]
     diagnosis: ["diagnosis"]
     sex: ["sex"]
+  sex check: sex
 mayo:
   counts:
     synID: syn21587392

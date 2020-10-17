@@ -20,7 +20,9 @@ rnaseq_plan(
   organism,
   conditions,
   cpm_threshold = 1,
-  conditions_threshold = 0.5
+  conditions_threshold = 0.5,
+  x_var_for_plot,
+  sex_var
 )
 }
 \arguments{
@@ -64,7 +66,12 @@ takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".}
 \item{cpm_threshold}{The minimum number of CPM allowed.}
 
 \item{conditions_threshold}{Percentage of samples that should contain the minimum CPM.}
+
+\item{x_var_for_plot}{Variable to separate groups for boxplot.}
+
+\item{sex_var}{Column name of the sex or gender-specific metadata.}
 }
 \description{
-This function wraps the \code{"drake::plan()"}.
+This function wraps the \code{"drake::plan()"} and copies the R markdown report to the
+user's working directory.
 }
