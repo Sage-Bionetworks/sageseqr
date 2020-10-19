@@ -589,4 +589,21 @@ wrap_de <- function(conditions, filtered_counts, cqn_counts, md, model_variables
                                                  primary_variable = x, biomart_results))
 
 }
+#' Stepwise Regression
 #'
+#' This function performs multivariate forward stepwise regression evaluated by multivariate Bayesian Information
+#' Critera (BIC) by wrapping \code{"mvIC::mvForwardStepwise()"}.
+#'
+#' @inheritParams differential_expression
+#' @inheritParams build_formula
+#' @export
+stepwise_regression <- function(md, model_variables = NULL, primary_variable, cqn_counts) {
+  metadata_input <- build_formula(md, model_variables, primary_variable)
+  vars <- colnames(metadata_input$metadata)[!(colnames(metadata_input$metadata) %in% metadata_input$primary_variable)]
+  model <- mvIC::mvForwardStepwise(exprObj = cqn_counts$E,
+                                   baseFormula = metadata_input$formula_non_intercept,
+                                   data = metadata_input$metadata,
+                                   variables = array(vars)
+  )
+  model
+}
