@@ -461,9 +461,9 @@ build_formula <- function(md, model_variables = NULL, primary_variable) {
     md <- dplyr::select(md, dplyr::all_of(vars))
   }
   # Variables of factor or numeric class are required
-    col_type <- dplyr::select(md, -primary_variable) %>%
-      dplyr::summarise_all(class) %>%
-      tidyr::pivot_longer(tidyr::everything(), names_to = "variable", values_to = "class")
+  col_type <- dplyr::select(md, -primary_variable) %>%
+    dplyr::summarise_all(class) %>%
+    tidyr::pivot_longer(tidyr::everything(), names_to = "variable", values_to = "class")
 
   # Categorical or factor variables are modeled as a random effect by (1|variable)
   # Numeric variables are scaled to account for when the spread of data values differs
