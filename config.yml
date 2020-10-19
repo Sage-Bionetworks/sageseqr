@@ -6,7 +6,7 @@ default:
     gene id: feature
   metadata:
     synID: syn22090070
-    version: 1
+    version: 2
     sample id: sampleID
   biomart:
     synID: syn21907998
@@ -15,7 +15,7 @@ default:
     filters: ensembl_gene_id
     host: ensembl.org
     organism: hsa
-  factors: ["sampleID", "study", "RIN", "batch", "sex", "diagnosis"]
+  factors: ["sampleID", "RIN", "batch", "sex", "diagnosis"]
   continuous: ["pmi", "ageofdeath"]
   x_var: diagnosis
   conditions:
