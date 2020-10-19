@@ -23,7 +23,8 @@ in \code{"sagseqr::differential_expression()"}.}
 
 \item{md}{A data frame with sample identifiers in a column and relevant experimental covariates.}
 
-\item{model_variables}{Vector of variables to include in the linear (mixed) model.}
+\item{model_variables}{Optional. Vector of variables to include in the linear (mixed) model.
+If not supplied, the model will include all variables in \code{md}.}
 
 \item{biomart_results}{Output of \code{"sageseqr::get_biomart()"}.}
 }
