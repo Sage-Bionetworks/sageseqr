@@ -38,6 +38,7 @@ Imports:
     limma,
     magrittr,
     mclust,
+    mvIC,
     plyr,
     psych,
     purrr,
@@ -56,6 +57,7 @@ Additional_repositories:
     http://ran.synapse.org
 Remotes:
     th1vairam/CovariateAnalysis@dev,
+    GabrielHoffman/mvIC@master,
     Sage-Bionetworks/sagethemes@main,
     GabrielHoffman/variancePartition
 VignetteBuilder:
