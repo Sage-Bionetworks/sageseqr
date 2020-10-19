@@ -614,7 +614,7 @@ wrap_de <- function(conditions, filtered_counts, cqn_counts, md, model_variables
 stepwise_regression <- function(md, model_variables = NULL, primary_variable, cqn_counts) {
   metadata_input <- build_formula(md, model_variables, primary_variable)
   model <- mvIC::mvForwardStepwise(exprObj = cqn_counts$E,
-                                   baseFormula = metadata_input$formula_non_intercept,
+                                   baseFormula = metadata_input$formula,
                                    data = metadata_input$metadata,
                                    variables = array(metadata_input$variables)
   )
