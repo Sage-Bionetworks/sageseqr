@@ -486,11 +486,18 @@ build_formula <- function(md, model_variables = NULL, primary_variable) {
 
   object <- list(metadata = md %>%
                    tidyr::unite(!!interaction_term, dplyr::all_of(primary_variable), sep = "_"),
-                formula = glue::glue("~ {interaction_term}+",
-                                     glue::glue_collapse(formula, sep = "+")),
-                formula_non_intercept = glue::glue("~ 0+{interaction_term}+",
-                                                   glue::glue_collapse(formula, sep = "+")),
-                primary_variable = interaction_term
+                formula = formula(
+                  glue::glue("~ {interaction_term}+",
+                             glue::glue_collapse(formula, sep = "+")
+                             )
+                  ),
+                formula_non_intercept = formula(
+                  glue::glue("~ 0+{interaction_term}+",
+                             glue::glue_collapse(formula, sep = "+")
+                             )
+                  ),
+                primary_variable = interaction_term,
+                variables = unlist(formula)
   )
 
   # Resolve dropped class type of factor without losing samples as rownames
@@ -606,11 +613,10 @@ wrap_de <- function(conditions, filtered_counts, cqn_counts, md, model_variables
 #' @export
 stepwise_regression <- function(md, model_variables = NULL, primary_variable, cqn_counts) {
   metadata_input <- build_formula(md, model_variables, primary_variable)
-  vars <- colnames(metadata_input$metadata)[!(colnames(metadata_input$metadata) %in% metadata_input$primary_variable)]
   model <- mvIC::mvForwardStepwise(exprObj = cqn_counts$E,
                                    baseFormula = metadata_input$formula_non_intercept,
                                    data = metadata_input$metadata,
-                                   variables = array(vars)
+                                   variables = array(metadata_input$variables)
   )
   model
 }
