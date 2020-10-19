@@ -69,6 +69,9 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                                          counts,
                                          biomart_results,
                                          !!sex_var),
+    model = stepwise_regression(clean_md,
+                                primary_variable = !!x_var_for_plot,
+                                cqn_counts = cqn_counts),
     report = rmarkdown::render(
       drake::knitr_in("sageseqr-report.Rmd"),
       output_file = drake::file_out(
