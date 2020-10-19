@@ -50,7 +50,7 @@ Imports:
     tidyr,
     tibble,
     utils,
-    variancePartition (== 1.19.17),
+    variancePartition (== 1.19.16),
     quantreg
 Additional_repositories:
     http://ran.synapse.org
