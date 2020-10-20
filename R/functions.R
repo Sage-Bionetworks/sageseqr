@@ -450,7 +450,7 @@ mclust::mclustBIC
 #' fixed effect interaction term.
 #' @inheritParams coerce_factors
 #' @export
-build_formula <- function(md, model_variables = NULL, primary_variable) {
+build_formula <- function(md, primary_variable, model_variables = NULL) {
 
   if (!(all(purrr::map_lgl(md, function(x) inherits(x, c("numeric", "factor")))))) {
     stop("Use sageseqr::clean_covariates() to coerce variables into factor and numeric types.")
@@ -510,8 +510,8 @@ build_formula <- function(md, model_variables = NULL, primary_variable) {
 #' @inheritParams build_formula
 #' @inheritParams cqn
 #' @export
-differential_expression <- function(filtered_counts, cqn_counts, md, model_variables = NULL,
-                                    primary_variable, biomart_results) {
+differential_expression <- function(filtered_counts, cqn_counts, md, primary_variable,
+                                    biomart_results, model_variables = NULL) {
   metadata_input <- build_formula(md, model_variables, primary_variable)
   gene_expression <- edgeR::DGEList(filtered_counts)
   gene_expression <- edgeR::calcNormFactors(gene_expression)
