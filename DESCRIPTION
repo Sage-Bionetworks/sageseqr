@@ -50,13 +50,13 @@ Imports:
     tidyr,
     tibble,
     utils,
-    variancePartition (>= 1.19.11),
+    variancePartition,
     quantreg
 Additional_repositories:
     http://ran.synapse.org
 Remotes:
     th1vairam/CovariateAnalysis@dev,
     Sage-Bionetworks/sagethemes@main,
-    GabrielHoffman/variancePartition
+    GabrielHoffman/variancePartition@da5003f
 VignetteBuilder:
     knitr

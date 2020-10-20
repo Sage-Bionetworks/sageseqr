@@ -443,20 +443,25 @@ mclust::mclustBIC
 #' effect. Additionally, variables are scaled to account for
 #' multiple variables that might have an order of magnitude difference.
 #'
-#' @param model_variables Vector of variables to include in the linear (mixed) model.
+#' @param model_variables Optional. Vector of variables to include in the linear (mixed) model.
+#' If not supplied, the model will include all variables in \code{md}.
 #' @param primary_variable Vector of variables that will be collapsed into a single
 #' fixed effect interaction term.
 #' @inheritParams coerce_factors
 #' @export
-build_formula <- function(md, model_variables, primary_variable) {
+build_formula <- function(md, primary_variable, model_variables = names(md)) {
 
   if (!(all(purrr::map_lgl(md, function(x) inherits(x, c("numeric", "factor")))))) {
     stop("Use sageseqr::clean_covariates() to coerce variables into factor and numeric types.")
   }
+  # Update metadata to reflect variable subset
+  md <- dplyr::select(md, dplyr::all_of(c(model_variables, primary_variable)))
+
   # Variables of factor or numeric class are required
-  col_type <- dplyr::select(md, dplyr::all_of(model_variables)) %>%
+  col_type <- dplyr::select(md, -primary_variable) %>%
     dplyr::summarise_all(class) %>%
     tidyr::pivot_longer(tidyr::everything(), names_to = "variable", values_to = "class")
+
   # Categorical or factor variables are modeled as a random effect by (1|variable)
   # Numeric variables are scaled to account for when the spread of data values differs
   # by an order of magnitude
@@ -502,9 +507,9 @@ build_formula <- function(md, model_variables, primary_variable) {
 #' @inheritParams build_formula
 #' @inheritParams cqn
 #' @export
-differential_expression <- function(filtered_counts, cqn_counts, md, model_variables,
-                                    primary_variable, biomart_results) {
-  metadata_input <- build_formula(md, model_variables, primary_variable)
+differential_expression <- function(filtered_counts, cqn_counts, md, primary_variable,
+                                    biomart_results, model_variables = NULL) {
+  metadata_input <- build_formula(md, primary_variable, model_variables)
   gene_expression <- edgeR::DGEList(filtered_counts)
   gene_expression <- edgeR::calcNormFactors(gene_expression)
   voom_gene_expression <- variancePartition::voomWithDreamWeights(counts = gene_expression,
@@ -581,11 +586,13 @@ differential_expression <- function(filtered_counts, cqn_counts, md, model_varia
 #' @param conditions A list of conditions to test as `primary_variable`
 #' in \code{"sagseqr::differential_expression()"}.
 #' @inheritParams differential_expression
+#' @inheritParams build_formula
 #' @export
-wrap_de <- function(conditions, filtered_counts, cqn_counts, md, model_variables, biomart_results) {
+wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
+                    biomart_results, model_variables = NULL) {
   purrr::map(conditions,
-             function(x) differential_expression(filtered_counts, cqn_counts, md, model_variables,
-                                                 primary_variable = x, biomart_results))
+             function(x) differential_expression(filtered_counts, cqn_counts, md, primary_variable = x,
+                                                 biomart_results, model_variables))
 
 }
 #'
