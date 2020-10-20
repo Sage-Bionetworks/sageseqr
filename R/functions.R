@@ -506,12 +506,11 @@ build_formula <- function(md, primary_variable, model_variables = names(md)) {
 #' @inheritParams cqn
 #' @inheritParams coerce_factors
 #' @inheritParams build_formula
-#' @inheritDotParams build_formula
 #' @inheritParams cqn
 #' @export
 differential_expression <- function(filtered_counts, cqn_counts, md, primary_variable,
-                                    biomart_results, ...) {
-  metadata_input <- build_formula(md, model_variables, primary_variable)
+                                    biomart_results, model_variables = NULL) {
+  metadata_input <- build_formula(md, primary_variable, model_variables)
   gene_expression <- edgeR::DGEList(filtered_counts)
   gene_expression <- edgeR::calcNormFactors(gene_expression)
   voom_gene_expression <- variancePartition::voomWithDreamWeights(counts = gene_expression,
