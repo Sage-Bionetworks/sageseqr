@@ -506,10 +506,11 @@ build_formula <- function(md, primary_variable, model_variables = names(md)) {
 #' @inheritParams cqn
 #' @inheritParams coerce_factors
 #' @inheritParams build_formula
+#' @inheritDotParams build_formula
 #' @inheritParams cqn
 #' @export
 differential_expression <- function(filtered_counts, cqn_counts, md, primary_variable,
-                                    biomart_results, model_variables = NULL) {
+                                    biomart_results, ...) {
   metadata_input <- build_formula(md, model_variables, primary_variable)
   gene_expression <- edgeR::DGEList(filtered_counts)
   gene_expression <- edgeR::calcNormFactors(gene_expression)
@@ -587,11 +588,13 @@ differential_expression <- function(filtered_counts, cqn_counts, md, primary_var
 #' @param conditions A list of conditions to test as `primary_variable`
 #' in \code{"sagseqr::differential_expression()"}.
 #' @inheritParams differential_expression
+#' @inheritParams build_formula
 #' @export
-wrap_de <- function(conditions, filtered_counts, cqn_counts, md, model_variables, biomart_results) {
+wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
+                    biomart_results, model_variables = NULL) {
   purrr::map(conditions,
-             function(x) differential_expression(filtered_counts, cqn_counts, md, model_variables,
-                                                 primary_variable = x, biomart_results))
+             function(x) differential_expression(filtered_counts, cqn_counts, md, primary_variable = x,
+                                                 biomart_results, model_variables))
 
 }
 #'
