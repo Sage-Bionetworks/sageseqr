@@ -4,7 +4,7 @@
 \alias{build_formula}
 \title{Formula Builder}
 \usage{
-build_formula(md, primary_variable, model_variables = NULL)
+build_formula(md, primary_variable, model_variables = names(md))
 }
 \arguments{
 \item{md}{A data frame with sample identifiers in a column and relevant experimental covariates.}

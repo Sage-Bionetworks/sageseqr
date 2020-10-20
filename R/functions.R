@@ -450,16 +450,14 @@ mclust::mclustBIC
 #' fixed effect interaction term.
 #' @inheritParams coerce_factors
 #' @export
-build_formula <- function(md, primary_variable, model_variables = NULL) {
+build_formula <- function(md, primary_variable, model_variables = names(md)) {
 
   if (!(all(purrr::map_lgl(md, function(x) inherits(x, c("numeric", "factor")))))) {
     stop("Use sageseqr::clean_covariates() to coerce variables into factor and numeric types.")
   }
   # Update metadata to reflect variable subset
-  if (!is.null(model_variables)) {
-    vars <- c(model_variables, primary_variable)
-    md <- dplyr::select(md, dplyr::all_of(vars))
-  }
+  md <- dplyr::select(md, dplyr::all_of(c(model_variables, primary_variable)))
+
   # Variables of factor or numeric class are required
   col_type <- dplyr::select(md, -primary_variable) %>%
     dplyr::summarise_all(class) %>%
