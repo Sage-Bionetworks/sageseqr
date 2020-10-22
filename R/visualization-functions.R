@@ -143,12 +143,8 @@ get_association_statistics <- function(md, p_value_cutoff = 0.05) {
   }
 
   # plot heatmap
-  tmp <- cor_estimate
-  tmp[cor_pval > p_value_cutoff] <- 0
-  col2 <- colorRampPalette(rev(c("#67001F", "#B2182B", "#D6604D", "#F4A582",
-                                 "#FDDBC7", "#FFFFFF", "#D1E5F0", "#92C5DE",
-                                 "#4393C3", "#2166AC", "#053061")))
-  p <- corrplot::corrplot(tmp, col = col2(200), tl.col = "#000000")
+  p <- cor_estimate
+  p[cor_pval > p_value_cutoff] <- 0
 
   return(
     list(estimate = cor_estimate, pval = cor_pval, plot = p))
@@ -198,4 +194,74 @@ association_statistics_for_both <- function(variables = names(md), md,
       Pval = pval
       )
     )
+}
+#'Explore metadata by variable.
+#'
+#'This function produces boxplots from the variables provided.
+#'
+#'@inheritParams coerce_factors
+#'@param include_vars A vector of variables to visualize
+#'@param x_var Variable to plot on the x-axis.
+#'@importFrom rlang .data
+#'
+#'@export
+#'@return A boxplot with mutiple groups defined by the include_vars argument.
+boxplot_vars <- function(md, include_vars, x_var) {
+  sagethemes::import_lato()
+  df <- dplyr::select(md, !!include_vars, !!x_var) %>%
+    tidyr::pivot_longer(-!!x_var, names_to = "key", values_to = "value")
+  p <- ggplot2::ggplot(df, ggplot2::aes(x = .data[[x_var]],
+                                        y = .data$value,
+                                        group = .data[[x_var]])) +
+    ggplot2::geom_boxplot(ggplot2::aes(fill = .data[[x_var]])) +
+    ggplot2::facet_wrap(key ~ ., scales = "free") +
+    sagethemes::scale_fill_sage_d() +
+    sagethemes::theme_sage()
+  p
+}
+#' Explore metadata by gene expression on the sex chromosomes.
+#'
+#' This function plots expression of X and Y marker genes, XIST and UTY respectively, and
+#' colors each sample by the sex- or gender-specific labeling from the metadata. This is a
+#' handy check to determine if samples were swapped or mislabeled.
+#'
+#' @inheritParams collapse_duplicate_hgnc_symbol
+#' @inheritParams filter_genes
+#' @param sex_var Column name of the sex or gender-specific metadata.
+#' @export
+plot_sexcheck <- function(clean_metadata, count_df, biomart_results, sex_var) {
+  md <- tibble::rownames_to_column(clean_metadata, var = "sampleId") %>%
+    dplyr::select(.data$sampleId, !!sex_var)
+  counts <- tibble::rownames_to_column(count_df, var = "geneId")
+  results <- dplyr::select(biomart_results, .data$hgnc_symbol, .data$chromosome_name)
+  results <- dplyr::filter(results, .data$hgnc_symbol %in% c("XIST", "UTY"))
+  results <- tibble::rownames_to_column(results, var = "geneId")
+  results <- dplyr::left_join(results, counts)
+  results <- tidyr::pivot_longer(results,
+                                 -dplyr::all_of(c("geneId", "chromosome_name", "hgnc_symbol")),
+                                 names_to = "sampleId",
+                                 values_to = "counts(log)") %>%
+    dplyr::mutate(`counts(log)` = log(.data$`counts(log)`),
+                  `counts(log)` = ifelse(.data$`counts(log)` == -Inf, 0, .data$`counts(log)`))
+  results <- dplyr::left_join(results, md, "sampleId")
+  results <- tidyr::spread(results, key = .data$hgnc_symbol, value = .data$`counts(log)`) %>%
+    dplyr::mutate(UTY = ifelse(is.na(.data$UTY), 0, .data$UTY),
+                  XIST = ifelse(is.na(.data$XIST), 0, .data$XIST))
+  p <- ggplot2::ggplot(results, ggplot2::aes(x = .data$XIST, y = .data$UTY)) +
+    ggplot2::geom_point(ggplot2::aes(color = .data[[sex_var]])) +
+    sagethemes::scale_color_sage_d() +
+    sagethemes::theme_sage()
+  p <- list(plot = p,
+            sex_specific_counts = results)
+  p
+}
+#' Conditionally wrap plot_sexcheck for drake
+#'
+#' Work around to expose plot_sexcheck to testing and export but also leverage
+#' drakes function for skipping targets conditionally (see \code{"drake::cancel_if()"}).
+#' @inheritParams plot_sexcheck
+#' @export
+conditional_plot_sexcheck <- function(clean_metadata, count_df, biomart_results, sex_var) {
+  drake::cancel_if(is.null(sex_var))
+  plot_sexcheck(clean_metadata, count_df, biomart_results, sex_var)
 }
