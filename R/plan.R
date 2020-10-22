@@ -69,6 +69,7 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                                          counts,
                                          biomart_results,
                                          !!sex_var),
+    correlation_plot = get_association_statistics(clean_md),
     report = rmarkdown::render(
       drake::knitr_in("sageseqr-report.Rmd"),
       output_file = drake::file_out(
