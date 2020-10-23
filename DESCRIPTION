@@ -50,7 +50,8 @@ Imports:
     tidyr,
     tibble,
     utils,
-    variancePartition,
+    variancePartition (>= 1.19.11),
+    vcd,
     quantreg
 Additional_repositories:
     http://ran.synapse.org
