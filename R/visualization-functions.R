@@ -1,3 +1,179 @@
+# Function to run principal component analysis and plot correlations
+runPCAandPlotCorrelations <- function(genesBySamples, samplesByCovariates, dataName, isKeyPlot=FALSE,
+                                      SCALE_DATA_FOR_PCA = TRUE, MIN_PVE_PCT_PC = 1.0, CORRELATION_TYPE = "pearson",
+                                      ALSO_PLOT_ALL_COVARS_VS_PCA = TRUE, MAX_NUM_LEVELS_PER_COVAR = 50) {
+
+  title = paste(ifelse(SCALE_DATA_FOR_PCA, "S", "Un-s"), "caled ", dataName, " ", " data in PCA; PVE >= ", MIN_PVE_PCT_PC, "%; ", CORRELATION_TYPE, " correlations ", sep="")
+  writeLines(paste("\nRunning PCA and calculating correlations for:\n", title, sep=""))
+
+  pcaRes <- runPCA(genesBySamples=genesBySamples,
+                   SCALE_DATA_FOR_PCA=SCALE_DATA_FOR_PCA,
+                   MIN_PVE_PCT_PC=MIN_PVE_PCT_PC)
+
+  samplePCvals <- pcaRes$samplePCvals
+  pve <- pcaRes$pve
+
+  npca <- ncol(samplePCvals)
+
+  colnames(samplePCvals) = paste(colnames(samplePCvals), " (", sprintf("%.2f", pve[1:npca]), "%)", sep="")
+
+  # Find covariates without any missing data
+  samplesByFullCovariates = samplesByCovariates[, which(apply(samplesByCovariates, 2,
+                                                              function(dat) all(!is.na(dat))))]
+  EXCLUDE_VARS_FROM_FDR = setdiff(colnames(samplesByCovariates), colnames(samplesByFullCovariates))
+
+  add_PC_res = list()
+  significantCovars = c()
+
+  LOOP_PLOT_ALL_COVARS = FALSE
+  if (ALSO_PLOT_ALL_COVARS_VS_PCA) { LOOP_PLOT_ALL_COVARS = unique(c(LOOP_PLOT_ALL_COVARS, TRUE)) }
+
+  for (PLOT_ALL_COVARS in LOOP_PLOT_ALL_COVARS) {
+    corrRes = calcCompleteCorAndPlot(samplePCvals,
+                                     samplesByCovariates,
+                                     CORRELATION_TYPE,
+                                     title,
+                                     WEIGHTS = pve[1:dim(samplePCvals)[2]],
+                                     PLOT_ALL_COVARS,
+                                     EXCLUDE_VARS_FROM_FDR)
+    add_PC_res[[length(add_PC_res)+1]] = list(plotData=corrRes$plot, isKeyPlot=(isKeyPlot && !PLOT_ALL_COVARS))
+    if (!PLOT_ALL_COVARS) {
+      significantCovars = corrRes$significantCovars
+      Effects.significantCovars = corrRes$Effects.significantCovars
+    }
+  }
+
+  return(list(significantCovars=significantCovars, PC_res=add_PC_res, Effects.significantCovars = Effects.significantCovars))
+}
+#'
+#'# Function to run principal component analysis
+runPCA <- function(genesBySamples, SCALE_DATA_FOR_PCA = TRUE, MIN_PVE_PCT_PC = 1.0) {
+
+  # estimate variance in data by PC:
+  pca.res <- prcomp(t(genesBySamples), center=TRUE, scale.=SCALE_DATA_FOR_PCA, retx=TRUE)
+
+  # examine how much variance is explained by PCs, and consider those with PVE >= (MIN_PVE_PCT_PC %):
+  pc.var <- pca.res$sdev^2
+  pve <- 100 * (pc.var / sum(pc.var))
+  npca <- max(1,length(which(pve >= MIN_PVE_PCT_PC)))
+
+  samplePCvals <- pca.res$x[, 1:npca, drop=FALSE]
+
+  list(samplePCvals=samplePCvals, pve=pve)
+}
+#'# Function to calculate correlation and plot
+calcCompleteCorAndPlot <- function(COMPARE_data, COVAR_data, correlationType, title,
+                                   WEIGHTS = NULL, PLOT_ALL_COVARS=FALSE, EXCLUDE_VARS_FROM_FDR=NULL, MAX_FDR = 0.1) {
+
+  # require(plyr)
+
+  # Get factor and continuous covariates
+  FactorCovariates <- colnames(COVAR_data)[sapply(COVAR_data,is.factor)]
+  ContCovariates <- setdiff(colnames(COVAR_data),FactorCovariates)
+
+  # Convert factor covariates to numeric vector
+  COVAR_data[,FactorCovariates] <- apply(COVAR_data[,FactorCovariates],2,
+                                         function(x){x <- unclass(x)})
+
+  # Calculate correlation between compare_data and factor covariates
+  if (length(FactorCovariates) > 0){
+    comb <- expand.grid(colnames(COMPARE_data),FactorCovariates)
+    factCont_cor <- apply(comb,1,
+                          getFactorContAssociationStatistics,
+                          cbind(COMPARE_data,COVAR_data[rownames(COMPARE_data),FactorCovariates]),
+                          alpha=MAX_FDR)
+    factCont_cor_vals <- matrix(factCont_cor['Estimate',],
+                                nrow = length(colnames(COMPARE_data)),
+                                ncol = length(FactorCovariates))
+    factCont_cor_p <- matrix(factCont_cor['Pval',],
+                             nrow = length(colnames(COMPARE_data)),
+                             ncol = length(FactorCovariates))
+
+    rownames(factCont_cor_vals) <- colnames(COMPARE_data)
+    colnames(factCont_cor_vals) <- FactorCovariates
+
+    rownames(factCont_cor_p) <- colnames(COMPARE_data)
+    colnames(factCont_cor_p) <- FactorCovariates
+  } else {
+    factCont_cor_vals <- NULL
+    factCont_cor_p <- NULL
+  }
+
+  # Calculate correlation between compare_data and factor covariates
+  if (length(ContCovariates) > 0){
+    cont_cor <- corr.test(COMPARE_data,
+                          COVAR_data[,ContCovariates],
+                          use='pairwise.complete.obs',
+                          method=correlationType,
+                          adjust="none")
+    cont_cor_vals <- cont_cor$r
+    cont_cor_p <- cont_cor$p
+
+    rownames(cont_cor_vals) <- colnames(COMPARE_data)
+    colnames(cont_cor_vals) <- ContCovariates
+
+    rownames(cont_cor_p) <- colnames(COMPARE_data)
+    colnames(cont_cor_p) <- ContCovariates
+  } else {
+    cont_cor_vals <- NULL
+    cont_cor_p <- NULL
+  }
+
+  all_cor_vals = cbind(factCont_cor_vals,cont_cor_vals)
+  all_cor_p = cbind(factCont_cor_p,cont_cor_p)
+
+  Effects.significantCovars = all_cor_vals
+  Effects.significantCovars[all_cor_p>MAX_FDR] = 0
+  Effects.significantCovars = colSums(abs(Effects.significantCovars)*replicate(dim(Effects.significantCovars)[2],WEIGHTS/sum(WEIGHTS)))
+  Effects.significantCovars = Effects.significantCovars[order(abs(Effects.significantCovars),decreasing=T)]
+
+  cor_mat = melt(all_cor_p, varnames=c("COMPARE", "COVAR"))
+  colnames(cor_mat)[colnames(cor_mat) == "value"] = "pvalue"
+
+  cor_mat$COMPARE = factor(cor_mat$COMPARE, levels=rownames(all_cor_p))
+  cor_mat$COVAR = factor(cor_mat$COVAR, levels=colnames(all_cor_p))
+
+  cor_mat$r = melt(all_cor_vals)$value
+
+  calcFDRrows = rep(TRUE, nrow(cor_mat))
+  markColumnsAsMissing = NULL
+  if (!is.null(EXCLUDE_VARS_FROM_FDR)) {
+    calcFDRrows = !(cor_mat$COVAR %in% EXCLUDE_VARS_FROM_FDR)
+    markColumnsAsMissing = intersect(colnames(COVAR_data), EXCLUDE_VARS_FROM_FDR)
+  }
+
+  # Entries that pass the threshold of "significance":
+  markSignificantCorrelations = corMatFDRthreshFunc(cor_mat, indicesMask=calcFDRrows, MAX_FDR = 0.1)
+  significantCorrelatedCovars = sort(unique(cor_mat$COVAR[markSignificantCorrelations]))
+
+  markPotentialSignificantCorrelations = corMatFDRthreshFunc(cor_mat)
+  # Specially mark only those incomplete covariates that would be significant in the context of all covariates:
+  markPotentialSignificantCorrelations = markPotentialSignificantCorrelations & !calcFDRrows
+
+  plotRows = 1:nrow(cor_mat)
+  if (!PLOT_ALL_COVARS) {
+    # Plot all correlations for:
+    # 1) Covariates with at least one significant correlation
+    # 2) Excluded covariates
+    plotRows = (cor_mat$COVAR %in% significantCorrelatedCovars) | !calcFDRrows
+  }
+  plotCor = na.omit(cor_mat[plotRows, ])
+
+  for (markCor in c("markSignificantCorrelations", "markPotentialSignificantCorrelations")) {
+    useMarkCor = get(markCor)[plotRows]
+    if (length(which(useMarkCor)) > 0) {
+      plotCor[, markCor] = useMarkCor[ setdiff(1:length(useMarkCor), as.numeric(attr(plotCor, "na.action"))) ]
+    }
+  }
+
+  if (!plyr::empty(plotCor)){
+    plot = plotCorWithCompare(plotCor, title, paste("FDR <= ", MAX_FDR, sep=""), markColumnsAsMissing)
+  } else{
+    plot = NULL
+  }
+
+  return(list(plot=plot, significantCovars=as.character(significantCorrelatedCovars), Effects.significantCovars = Effects.significantCovars))
+}
 #' Visualize relationship between variables
 #'
 #' Output a correlation matrix to visualize the relationship between
