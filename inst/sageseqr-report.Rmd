@@ -1,11 +1,16 @@
 ---
 title: "sageseqr-report"
 date: "`r date()`"
-output: html_document
+output: 
+  html_document:
+    css: style.css
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = FALSE, 
+                      fig.align = 'left',
+                      fig.width = 5, 
+                      fig.height = 5)
 library(sageseqr)
 ```
 # Data
@@ -32,6 +37,15 @@ if (!is.null(config::get("sex check"))) {
       as a X-chromosome marker and UTY as a Y-chromosome marker.")
   drake::readd(sex_plot)$plot
 }
+```
+
+# Covariate Relationships
+```{r heatmap_covariates}
+correlation_input <- drake::readd(correlation_plot)$plot
+col2 <- colorRampPalette(rev(c("#67001F", "#B2182B", "#D6604D", "#F4A582",
+                                 "#FDDBC7", "#FFFFFF", "#D1E5F0", "#92C5DE",
+                                 "#4393C3", "#2166AC", "#053061")))
+corrplot::corrplot(correlation_input, col = col2(200), tl.col = "#000000")
 ```
 
 # Outliers 
