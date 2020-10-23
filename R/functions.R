@@ -19,6 +19,18 @@ get_data <- function(synid, version = NULL) {
                                                      )$path))
   df
 }
+#' Create complete URL to Synapse entity
+#'
+#' This function creates the url reference to entities in Synapse.
+#' @inheritParams get_data
+#' @export
+complete_path <- function(synid, version = NULL) {
+  if (is.null(version)) {
+    glue::glue("https://www.synapse.org/#!Synapse:{synid}")
+  } else {
+    glue::glue("https://www.synapse.org/#!Synapse:{synid}.{version}")
+  }
+}
 #'Coerce objects to type factors.
 #'
 #'@param md  A data frame with sample identifiers in a column and relevant experimental covariates.
@@ -78,27 +90,6 @@ clean_covariates <- function(md, factors, continuous, sample_identifier) {
     md
   }
 }
-#'Explore metadata by variable.
-#'
-#'This function produces boxplots from the variables provided.
-#'
-#'@inheritParams coerce_factors
-#'@param include_vars A vector of variables to visualize
-#'@param x_var Variable to plot on the x-axis.
-#'@importFrom rlang .data
-#'
-#'@export
-#'@return A boxplot with mutiple groups defined by the include_vars argument.
-boxplot_vars <- function(md, include_vars, x_var) {
-  df <- dplyr::select(md, !!include_vars, !!x_var) %>%
-    tidyr::pivot_longer(-!!x_var, names_to = "key", values_to = "value")
-  p <- ggplot2::ggplot(df, ggplot2::aes(x = .data[[x_var]],
-                                        y = .data$value,
-                                        group = .data[[x_var]])) +
-    ggplot2::geom_boxplot(ggplot2::aes(fill = .data[[x_var]])) +
-    ggplot2::facet_wrap(key ~ ., scales = "free")
-  p
-}
 #'Get available Ensembl dataset
 #'
 #'Helper function to search relative Ensembl datasets by partial organism names.
@@ -145,7 +136,6 @@ parse_counts <- function(count_df){
 #'
 #'@param count_df A counts data frame with sample identifiers as rownames.
 #'@inheritParams get_data
-#'@param gene_id Column name of gene Ids
 #'@param filters A character vector listing biomaRt query filters.
 #'(For a list of filters see \code{"biomaRt::listFilters()"})
 #'@param host An optional character vector specifying the release version.
@@ -155,8 +145,8 @@ parse_counts <- function(count_df){
 #'takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".
 #'@importFrom rlang .data
 #'@export
-get_biomart <- function(count_df, gene_id, synid, version, host, filters, organism) {
-  if (is.null(config::get("biomart")$synID)) {
+get_biomart <- function(count_df, synid, version, host, filters, organism) {
+  if (is.null(synid)) {
     # Get available datset from Ensembl
     ensembl <- biomart_obj(organism, host)
 
@@ -202,7 +192,7 @@ get_biomart <- function(count_df, gene_id, synid, version, host, filters, organi
     biomart_results <- collapse_duplicate_hgnc_symbol(biomart_results)
 
     # Biomart IDs as rownames
-    biomart_results <- tibble::column_to_rownames(biomart_results, var = gene_id)
+    biomart_results <- tibble::column_to_rownames(biomart_results, var = !!filters)
 
     biomart_results
   } else {
@@ -210,7 +200,7 @@ get_biomart <- function(count_df, gene_id, synid, version, host, filters, organi
     biomart_results <- get_data(synid, version)
 
     # Biomart IDs as rownames
-    biomart_results <- tibble::column_to_rownames(biomart_results, var = gene_id)
+    biomart_results <- tibble::column_to_rownames(biomart_results, var = !!filters)
 
     # Gene metadata required for count CQN
     required_variables <- c("gene_length", "percentage_gene_gc_content")
@@ -257,6 +247,12 @@ collapse_duplicate_hgnc_symbol <- function(biomart_results){
 #' @export
 filter_genes <- function(clean_metadata, count_df, conditions,
                          cpm_threshold, conditions_threshold) {
+  if (class(conditions) == "list") {
+    conditions <- unique(conditions[[1]])
+  } else {
+    conditions <- unique(conditions)
+  }
+
   if (!any(conditions %in% colnames(clean_metadata))) {
     stop("Conditions are missing from the metadata.")
   }
@@ -564,3 +560,164 @@ getFactorContAssociationStatistics <- function(factorContNames,COVARIATES, na.ac
   return(c(Estimate = stats$results['Single_raters_absolute','ICC'],
            Pval = Pval))
 }
+#' Formula Builder
+#'
+#' If a linear mixed model is used, all categorical variables must be
+#' modeled as a random effect. This function identifies the variable class
+#' to scale numeric variables and model categorical variables as a random
+#' effect. Additionally, variables are scaled to account for
+#' multiple variables that might have an order of magnitude difference.
+#'
+#' @param model_variables Optional. Vector of variables to include in the linear (mixed) model.
+#' If not supplied, the model will include all variables in \code{md}.
+#' @param primary_variable Vector of variables that will be collapsed into a single
+#' fixed effect interaction term.
+#' @inheritParams coerce_factors
+#' @export
+build_formula <- function(md, primary_variable, model_variables = names(md)) {
+
+  if (!(all(purrr::map_lgl(md, function(x) inherits(x, c("numeric", "factor")))))) {
+    stop("Use sageseqr::clean_covariates() to coerce variables into factor and numeric types.")
+  }
+  # Update metadata to reflect variable subset
+  md <- dplyr::select(md, dplyr::all_of(c(model_variables, primary_variable)))
+
+  # Variables of factor or numeric class are required
+  col_type <- dplyr::select(md, -primary_variable) %>%
+    dplyr::summarise_all(class) %>%
+    tidyr::pivot_longer(tidyr::everything(), names_to = "variable", values_to = "class")
+
+  # Categorical or factor variables are modeled as a random effect by (1|variable)
+  # Numeric variables are scaled to account for when the spread of data values differs
+  # by an order of magnitude
+  formula <- purrr::map(1:length(col_type$class), function(i){
+    switch(col_type$class[i],
+           "factor" = glue::glue("(1|", col_type$variable[i], ")"),
+           "numeric" = glue::glue("scale(", col_type$variable[i], ")")
+    )
+  })
+
+  # List with multiple values can cause glue_collapse to fail. This step is conservative
+  # as it unlists all lists at this step.
+  if (class(primary_variable) == "list") {
+    primary_variable <- primary_variable[[1]]
+  }
+
+  # A new categorical is created to model an interaction between two variables
+  interaction_term <- glue::glue_collapse({primary_variable}, "_")
+
+  object <- list(metadata = md %>%
+                   tidyr::unite(!!interaction_term, dplyr::all_of(primary_variable), sep = "_"),
+                formula = glue::glue("~ {interaction_term}+",
+                                     glue::glue_collapse(formula, sep = "+")),
+                formula_non_intercept = glue::glue("~ 0+{interaction_term}+",
+                                                   glue::glue_collapse(formula, sep = "+")),
+                primary_variable = interaction_term
+  )
+
+  # Resolve dropped class type of factor without losing samples as rownames
+  object$metadata[[interaction_term]] <- as.factor(object$metadata[[interaction_term]])
+
+  object
+}
+#' Differential Expression with Dream
+#'
+#' Differential expression testing is performed with \code{"variancePartition::dream()"} to increase power
+#' and decrease false positives for repeated measure designs. The `primary_variable` is modeled as a fixed
+#' effect. If you wish to test an interaction term, `primary_variable` can take multiple variable names.
+#'
+#' @param cqn_counts A counts data frame normalized by CQN.
+#' @inheritParams cqn
+#' @inheritParams coerce_factors
+#' @inheritParams build_formula
+#' @inheritParams cqn
+#' @export
+differential_expression <- function(filtered_counts, cqn_counts, md, primary_variable,
+                                    biomart_results, model_variables = NULL) {
+  metadata_input <- build_formula(md, primary_variable, model_variables)
+  gene_expression <- edgeR::DGEList(filtered_counts)
+  gene_expression <- edgeR::calcNormFactors(gene_expression)
+  voom_gene_expression <- variancePartition::voomWithDreamWeights(counts = gene_expression,
+                                                                  formula = metadata_input$formula,
+                                                                  data = metadata_input$metadata)
+  voom_gene_expression$E <- cqn_counts
+
+  de_conditions <- levels(metadata_input$metadata[[metadata_input$primary_variable]])
+
+  conditions_for_contrast <- purrr::map_chr(de_conditions,
+                                        function(x) glue::glue({metadata_input$primary_variable}, x)
+                                        )
+
+  setup_coefficients <- gtools::combinations(n = length(conditions_for_contrast),
+                                             r = 2,
+                                             v = conditions_for_contrast
+                                             )
+
+  contrasts <- lapply(seq_len(nrow(setup_coefficients)),
+                      function(i) variancePartition::getContrast(exprObj = voom_gene_expression,
+                                                                 formula = metadata_input$formula_non_intercept,
+                                                                 data = metadata_input$metadata,
+                                                                 coefficient = as.vector(setup_coefficients[i,])
+                                                                 )
+                      )
+
+  contrasts <- as.data.frame(contrasts)
+
+  df <- as.data.frame(setup_coefficients)
+
+  names(contrasts) <- stringr::str_glue_data(df, "{V1} - {V2}")
+
+  fit_contrasts = variancePartition::dream(exprObj = voom_gene_expression,
+                                           formula = metadata_input$formula_non_intercept,
+                                           data = metadata_input$metadata,
+                                           L = contrasts
+                                           )
+
+  de <- lapply(names(contrasts), function(i, fit){
+    genes <- limma::topTable(fit, coef = i, number = Inf, sort.by = "logFC")
+    genes <- tibble::rownames_to_column(genes, var = "ensembl_gene_id")
+  }, fit_contrasts)
+
+  names(de) <- names(contrasts)
+
+  de <- data.table::rbindlist(de, idcol = "Comparison") %>%
+    dplyr::mutate(Comparison = gsub(metadata_input$primary_variable, "", .data$Comparison),
+                  Direction = .data$logFC/abs(.data$logFC),
+                  Direction = factor(.data$Direction, c(-1,1), c("-1" = "down", "1" = "up")),
+                  Direction = ifelse(.data$`adj.P.Val` > 0.5 | abs(.data$logFC) < log2(1.2),
+                                     "none",
+                                     .data$Direction),
+                  Direction = as.character(.data$Direction)
+    )
+
+  # Join metadata from biomart to differential expression results
+  biomart_results <- tibble::rownames_to_column(biomart_results, var = "ensembl_gene_id")
+
+  de <- dplyr::left_join(de, biomart_results, by = c("ensembl_gene_id"))
+
+  object <- list(voom_object = voom_gene_expression,
+                 contrasts_to_plot = contrasts,
+                 fits = fit_contrasts,
+                 differential_expression = de,
+                 primary_variable = metadata_input$primary_variable,
+                 formula = metadata_input$formula_non_intercept)
+
+  object
+}
+#' Wrapper for Differential Expression Analysis
+#'
+#' This function will pass multiple conditions to test to \code{"sagseqr::differential_expression()"}.
+#'
+#' @param conditions A list of conditions to test as `primary_variable`
+#' in \code{"sagseqr::differential_expression()"}.
+#' @inheritParams differential_expression
+#' @inheritParams build_formula
+#' @export
+wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
+                    biomart_results, model_variables = NULL) {
+  purrr::map(conditions,
+             function(x) differential_expression(filtered_counts, cqn_counts, md, primary_variable = x,
+                                                 biomart_results, model_variables))
+
+}
+#'

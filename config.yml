@@ -1,78 +1,24 @@
 default:
+  analysis title: openSci
   counts:
     synID: syn22084837
     version:
     gene id: feature
   metadata:
     synID: syn22090070
-    version: 1
+    version: 2
     sample id: sampleID
   biomart:
     synID: syn21907998
     version:
-    gene id: ensembl_gene_id
     filters: ensembl_gene_id
     host: ensembl.org
     organism: hsa
-  factors:
-  continuous:
-  conditions: ["diagnosis", "sex"]
-mayo:
-  counts:
-    synID: syn21587392
-    version: 2
-    gene id: feature
-  metadata:
-    synID: syn21587404
-    version: 4
-    sample id: sampleid
-  biomart:
-    synID:
-    version:
-    gene id: ensembl_gene_id
-    filters: ensembl_gene_id
-    host: ensembl.org # Ensembl Release 99 (January 2020)
-    organism: hsa
-  factors: [ "donorid", "sampleid", "source", "sex", "flowcell", "diagnosis", "source_tissue_diagnosis", "tissue_diagnosis", "tissue_APOE4" ]
-  continuous: [ "rin", "rin2", "age_death", "pct_pf_reads_aligned",
-                "pct_coding_bases", "pct_intergenic_bases", "pct_intronic_bases",
-                "pct_ribosomal_bases" ] #pmi missing at the moment
-ihab:
-  counts:
-    synID: syn21969017
-    version: 1
-    gene id: feature
-  metadata:
-    synID: syn21822937
-    version: 1
-    sample id: individualID
-  biomart:
-    synID:
-    version:
-    gene id:
-  factors: [ "species",	"sex", "race", "yearsEducation", "diagnosis", "visit",
-  "bpmed",	"diabeticmed",	"cholesterolmed",	"heartmed",	"antideprmed",	"hxmi",	"afib",
-  "pacemaker",	"angina",	"hxchf",	"hxbp",	"hxhighchol",	"hxdiabetes",	"hxulcer",
-  "hxkidneydisease",	"hxliverdisease",	"hxanemia", "cdrtotal", "smoker",	"drinker",
-  "fhxdementia",	"fhxalzheimer", "Scan_Date", "AlignmentSummaryMetrics__CATEGORY" ]
-  continuous: [ "age",	"weight",	"height", "sit1_sbp1", "sit1_dbp1", "sit1_pulse1",	"sit2_sbp1",
-  "sit2_dbp1", "sit2_pulse1",	"sd1_sbp1",	"sd1_dbp1",	"sd1_pulse1",	"sd2_sbp1",	"sd2_dbp1",
-  "sd2_pulse1",	"mocatotal", "story_b_score1", "story_b_score2", "walk1", "walk2", "partaerrors",	"partberrors",
-  "hvltrtrial4",	"drttotalrecalltscore",	"drtboston",	"partatest",	"partbtest",	"cesd",	"faqtotal",
-  "pwv",	"rc_mean",	"lc_mean", "Frontal_CBF",	"Occipital_CBF",	"Parietal_CBF",	"Temporal_CBF",
-  "Left_Cerebellum_White_Matter",	"Left_Cerebellum_Cortex",	"Left_Thalamus_Proper",	"Left_Caudate",
-  "Left_Putamen",	"Left_Pallidum",	"_3rd_Ventricle",	"_4th_Ventricle",	"Brain_Stem",
-  "Left_Hippocampus",	"Left_Amygdala",	"CSF",	"Left_Accumbens_area",	"Left_VentralDC",
-  "Left_vessel",	"Left_choroid_plexus",	"Right_Lateral_Ventricle",	"Right_Inf_Lat_Vent",
-  "Right_Cerebellum_White_Matter",	"Right_Cerebellum_Cortex",	"Right_Thalamus_Proper",
-  "Right_Caudate",	"Right_Putamen",	"Right_Pallidum",	"Right_Hippocampus",	"Right_Amygdala",
-  "Right_Accumbens_area",	"Right_VentralDC",	"Right_vessel",	"Right_choroid_plexus",
-  "EstimatedTotalIntraCranialVol",
-  "AlignmentSummaryMetrics__PF_READS_ALIGNED",
-  "AlignmentSummaryMetrics__TOTAL_READS",	"RnaSeqMetrics__INTERGENIC_BASES",
-  "RnaSeqMetrics__INTRONIC_BASES", "RnaSeqMetrics__PCT_CODING_BASES",
-  "RnaSeqMetrics__PCT_INTERGENIC_BASES", "RnaSeqMetrics__PCT_INTRONIC_BASES",
-  "RnaSeqMetrics__PCT_RIBOSOMAL_BASES" ]
-
-
-
+  factors: ["sampleID", "RIN", "batch", "sex", "diagnosis"]
+  continuous: ["pmi", "ageofdeath"]
+  x_var: diagnosis
+  conditions:
+    sex-diagnosis interaction: ["diagnosis", "sex"]
+    diagnosis: ["diagnosis"]
+    sex: ["sex"]
+  sex check: sex
