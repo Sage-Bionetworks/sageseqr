@@ -58,6 +58,6 @@ Additional_repositories:
 Remotes:
     th1vairam/CovariateAnalysis@dev,
     Sage-Bionetworks/sagethemes@main,
-    GabrielHoffman/variancePartition
+    GabrielHoffman/variancePartition@da5003f
 VignetteBuilder:
     knitr

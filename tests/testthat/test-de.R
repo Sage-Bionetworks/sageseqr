@@ -26,9 +26,9 @@ biomart_results <- tibble::column_to_rownames(
 de <- differential_expression(counts,
                               counts,
                               md = metadata,
-                              model_variables = c("batch"),
                               primary_variable = c("sex", "diagnosis"),
-                              biomart_results = biomart_results)
+                              biomart_results = biomart_results,
+                              model_variables = c("batch"))
 
 test_that("output is a list of 6", {
   expect_equal(length(de), 6)

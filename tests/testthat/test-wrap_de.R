@@ -34,8 +34,8 @@ all_de <- wrap_de(conditions,
                   counts,
                   counts,
                   metadata,
-                  model_variables = c("batch"),
-                  biomart_results)
+                  biomart_results,
+                  model_variables = c("batch"))
 
 test_that("conditions match differential expression output", {
   expect_equal(names(conditions), names(all_de))
