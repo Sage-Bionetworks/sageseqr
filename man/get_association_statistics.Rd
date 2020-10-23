@@ -12,6 +12,8 @@ get_association_statistics(md, p_value_cutoff = 0.05)
 \item{p_value_cutoff}{Set the p-value threshold.}
 }
 \description{
-Outputs a correlation matrix to visualize the relationship between
-continuous and factor variables.
+Output a correlation matrix to visualize the relationship between
+continuous and factor variables. For factor variables, the Cramer's
+V estimate and the P-value is computed from the Pearson chi-square
+score between two variables.
 }

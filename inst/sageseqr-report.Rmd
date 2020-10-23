@@ -39,16 +39,23 @@ if (!is.null(config::get("sex check"))) {
 }
 ```
 
-# Covariate Relationships
+Visualize the relationships between covariates.
 ```{r heatmap_covariates}
 correlation_input <- drake::readd(correlation_plot)$plot
-col2 <- colorRampPalette(rev(c("#67001F", "#B2182B", "#D6604D", "#F4A582",
+col2 <- grDevices::colorRampPalette(rev(c("#67001F", "#B2182B", "#D6604D", "#F4A582",
                                  "#FDDBC7", "#FFFFFF", "#D1E5F0", "#92C5DE",
                                  "#4393C3", "#2166AC", "#053061")))
 corrplot::corrplot(correlation_input, col = col2(200), tl.col = "#000000")
 ```
+# Filter Genes
+```{r filter_genes}
+`r dim(PROCESSED_COUNTS$filteredExprMatrix$genes)[1]` genes are used for the analysis. 
 
-# Outliers 
+Following is the distribution of biotypes
+`r kable(pct.pc)`
+```
+
+# Identify Outliers
 ```{r plot_outliers}
 ```
 

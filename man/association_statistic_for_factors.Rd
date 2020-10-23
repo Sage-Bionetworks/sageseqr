@@ -4,12 +4,14 @@
 \alias{association_statistic_for_factors}
 \title{Compute the association statistic for factor variables}
 \usage{
-association_statistic_for_factors(factors, md, na.action = "remove")
+association_statistic_for_factors(factors, md, na_action = "remove")
 }
 \arguments{
 \item{factors}{A vector of factor variables.}
 
 \item{md}{A data frame with sample identifiers in a column and relevant experimental covariates.}
+
+\item{na_action}{Defaults to removing rows with missing values.}
 }
 \description{
 Returns the Cramer's V estimate and the P-value from the Pearson

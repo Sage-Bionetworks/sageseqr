@@ -155,16 +155,17 @@ get_association_statistics <- function(md, p_value_cutoff = 0.05) {
 #' chi-square score between two variables.
 #'
 #' @inheritParams coerce_factors
+#' @param na_action Defaults to removing rows with missing values.
 #' @export
 #'
-association_statistic_for_factors <- function(factors, md, na.action = "remove") {
-  if (na.action == "remove")
-    md <- na.omit(md[, factors])
+association_statistic_for_factors <- function(factors, md, na_action = "remove") {
+  if (na_action == "remove")
+    md <- stats::na.omit(md[, factors])
 
-  fac1 = as.factor(md[,1])
-  fac2 = as.factor(md[,2])
+  fac1 <- as.factor(md[,1])
+  fac2 <- as.factor(md[,2])
 
-  stats = vcd::assocstats(stats::xtabs(~ fac1 + fac2))
+  stats <- vcd::assocstats(x = stats::xtabs(~ fac1 + fac2))
 
   return(
     c(
@@ -176,17 +177,20 @@ association_statistic_for_factors <- function(factors, md, na.action = "remove")
 #' Find intraclass correlation (ICC) between factor and continuous covariates
 #'
 #' Fit a one-way ANOVA fixed effects model.
-#'
+#' @param variables Variables to for ICC computation.Defaults to the column names
+#' of \code{"md"}.
 #' @inheritParams coerce_factors
+#' @inheritParams association_statistic_for_factors
+#' @inheritParams get_association_statistics
 #' @export
 association_statistics_for_both <- function(variables = names(md), md,
-                                            na.action = "remove", alpha = 0.05) {
-  if (na.action == "remove")
-    md = na.omit(md[, variables])
+                                            p_value_cutoff = 0.05, na_action = "remove") {
+  if (na_action == "remove")
+    md <- stats::na.omit(md[, variables])
 
-  stats = psych::ICC(md[, variables], alpha = alpha)
+  stats <- psych::ICC(md[, variables], alpha = p_value_cutoff)
 
-  pval = summary(aov(md[, variables[1]] ~md[, variables[2]]))[[1]][["Pr(>F)"]][1]
+  pval <- summary(stats::aov(md[, variables[1]] ~ md[, variables[2]]))[[1]][["Pr(>F)"]][1]
 
   return(
     c(

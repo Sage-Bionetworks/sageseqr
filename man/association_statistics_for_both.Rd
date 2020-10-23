@@ -7,12 +7,19 @@
 association_statistics_for_both(
   variables = names(md),
   md,
-  na.action = "remove",
-  alpha = 0.05
+  p_value_cutoff = 0.05,
+  na_action = "remove"
 )
 }
 \arguments{
+\item{variables}{Variables to for ICC computation.Defaults to the column names
+of \code{"md"}.}
+
 \item{md}{A data frame with sample identifiers in a column and relevant experimental covariates.}
+
+\item{p_value_cutoff}{Set the p-value threshold.}
+
+\item{na_action}{Defaults to removing rows with missing values.}
 }
 \description{
 Fit a one-way ANOVA fixed effects model.
