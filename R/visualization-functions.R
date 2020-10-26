@@ -79,19 +79,24 @@ run_pca <- function(normalized_counts, scaled = TRUE, percent_p_value_cutoff = 1
   list(samplePCvals=samplePCvals, pve=pve)
 }
 #'# Function to calculate correlation and plot
-calcCompleteCorAndPlot <- function(COMPARE_data, COVAR_data, correlation_type,
+calcCompleteCorAndPlot <- function(COMPARE_data, clean_metadata, correlation_type,
                                    title, WEIGHTS = NULL, PLOT_ALL_COVARS=FALSE,
                                    EXCLUDE_VARS_FROM_FDR=NULL, MAX_FDR = 0.1) {
 
   # require(plyr)
 
-  # Get factor and continuous covariates
-  FactorCovariates <- colnames(COVAR_data)[sapply(COVAR_data,is.factor)]
-  ContCovariates <- setdiff(colnames(COVAR_data),FactorCovariates)
+  # Identify factors and continuous variables
+  md <- clean_md
+  factors <- names(md)[sapply(md, is.factor)]
+  continuous <- setdiff(names(md), factors)
 
-  # Convert factor covariates to numeric vector
-  COVAR_data[,FactorCovariates] <- apply(COVAR_data[,FactorCovariates],2,
-                                         function(x){x <- unclass(x)})
+  # Convert factor variables to numeric vector
+  md[, factors] <- lapply(
+    md[, factors],
+    function(x) {
+      x <- as.numeric(unclass(x))
+    }
+  )
 
   # Calculate correlation between compare_data and factor covariates
   if (length(FactorCovariates) > 0){
