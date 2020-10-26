@@ -13,6 +13,7 @@ runPCAandPlotCorrelations <- function(normalized_counts, clean_metadata,
                                       percent_p_value_cutoff = 1.0,
                                       correlation_type = "pearson",
                                       ALSO_PLOT_ALL_COVARS_VS_PCA = TRUE) {
+  md <- clean_metadata
   writeLines(
     glue::glue(
     "\nRunning PCA and calculating {correlation_type} correlations at a minimum
@@ -32,9 +33,9 @@ runPCAandPlotCorrelations <- function(normalized_counts, clean_metadata,
   colnames(samplePCvals) = paste(colnames(samplePCvals), " (", sprintf("%.2f", pve[1:npca]), "%)", sep="")
 
   # Find covariates without any missing data
-  samplesByFullCovariates = clean_metadata[, which(apply(clean_metadata, 2,
+  samplesByFullCovariates = md[, which(apply(md, 2,
                                                               function(dat) all(!is.na(dat))))]
-  EXCLUDE_VARS_FROM_FDR = setdiff(colnames(clean_metadata), colnames(samplesByFullCovariates))
+  EXCLUDE_VARS_FROM_FDR = setdiff(colnames(md), colnames(samplesByFullCovariates))
 
   add_PC_res = list()
   significantCovars = c()
@@ -46,7 +47,7 @@ runPCAandPlotCorrelations <- function(normalized_counts, clean_metadata,
 
   for (PLOT_ALL_COVARS in LOOP_PLOT_ALL_COVARS) {
     corrRes = calcCompleteCorAndPlot(samplePCvals,
-                                     clean_metadata,
+                                     md,
                                      correlation_type,
                                      title,
                                      WEIGHTS = pve[1:dim(samplePCvals)[2]],
@@ -199,11 +200,12 @@ calcCompleteCorAndPlot <- function(COMPARE_data, COVAR_data, correlation_type,
 #' score between two variables.
 #'
 #' @param p_value_cutoff Set the p-value threshold.
-#' @inheritParams coerce_factors
+#' @inheritParams filter_genes
 #' @export
-get_association_statistics <- function(md, p_value_cutoff = 0.05) {
+get_association_statistics <- function(clean_metadata, p_value_cutoff = 0.05) {
 
   # Identify factors and continuous variables
+  md <- clean_md
   factors <- names(md)[sapply(md, is.factor)]
   continuous <- setdiff(names(md), factors)
 
@@ -347,11 +349,12 @@ get_association_statistics <- function(md, p_value_cutoff = 0.05) {
 #' Returns the Cramer's V estimate and the P-value from the Pearson
 #' chi-square score between two variables.
 #'
-#' @inheritParams coerce_factors
+#' @inheritParams filter_genes
 #' @param na_action Defaults to removing rows with missing values.
 #' @export
 #'
-association_statistic_for_factors <- function(factors, md, na_action = "remove") {
+association_statistic_for_factors <- function(factors, clean_metadata, na_action = "remove") {
+  md <- clean_md
   if (na_action == "remove")
     md <- stats::na.omit(md[, factors])
 
@@ -372,12 +375,13 @@ association_statistic_for_factors <- function(factors, md, na_action = "remove")
 #' Fit a one-way ANOVA fixed effects model.
 #' @param variables Variables to for ICC computation.Defaults to the column names
 #' of \code{"md"}.
-#' @inheritParams coerce_factors
+#' @inheritParams filter_genes
 #' @inheritParams association_statistic_for_factors
 #' @inheritParams get_association_statistics
 #' @export
-association_statistics_for_both <- function(variables = names(md), md,
+association_statistics_for_both <- function(variables = names(clean_metadata), clean_metadata,
                                             p_value_cutoff = 0.05, na_action = "remove") {
+  md <- clean_metadata
   if (na_action == "remove")
     md <- stats::na.omit(md[, variables])
 
