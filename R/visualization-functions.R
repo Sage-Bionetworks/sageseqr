@@ -1,14 +1,28 @@
 # Function to run principal component analysis and plot correlations
-runPCAandPlotCorrelations <- function(genesBySamples, samplesByCovariates, dataName, isKeyPlot=FALSE,
-                                      SCALE_DATA_FOR_PCA = TRUE, MIN_PVE_PCT_PC = 1.0, CORRELATION_TYPE = "pearson",
-                                      ALSO_PLOT_ALL_COVARS_VS_PCA = TRUE, MAX_NUM_LEVELS_PER_COVAR = 50) {
+#' Compute principal component analysis (PCA) and plot correlations
+#'
+#' some description
+#' @param percent_p_value_cutoff The p-value threshold in percent.
+#' @param scaled Defaults to TRUE. Variables scaled to have unit
+#' variance before the analysis takes place.
+#' @param normalized_counts A counts data frame normalized by CQN, TMM or
+#' another preferred method with genes as rownames.
+#' @inheritParams filter_genes
+runPCAandPlotCorrelations <- function(normalized_counts, clean_metadata,
+                                      isKeyPlot=FALSE, scaled = TRUE,
+                                      percent_p_value_cutoff = 1.0,
+                                      correlation_type = "pearson",
+                                      ALSO_PLOT_ALL_COVARS_VS_PCA = TRUE) {
+  writeLines(
+    glue::glue(
+    "\nRunning PCA and calculating {correlation_type} correlations at a minimum
+    p-value of {percent_p_value_cutoff}%."
+    )
+  )
 
-  title = paste(ifelse(SCALE_DATA_FOR_PCA, "S", "Un-s"), "caled ", dataName, " ", " data in PCA; PVE >= ", MIN_PVE_PCT_PC, "%; ", CORRELATION_TYPE, " correlations ", sep="")
-  writeLines(paste("\nRunning PCA and calculating correlations for:\n", title, sep=""))
-
-  pcaRes <- runPCA(genesBySamples=genesBySamples,
-                   SCALE_DATA_FOR_PCA=SCALE_DATA_FOR_PCA,
-                   MIN_PVE_PCT_PC=MIN_PVE_PCT_PC)
+  pcaRes <- run_pca(normalized_counts=normalized_counts,
+                   scaled=scaled,
+                   percent_p_value_cutoff=percent_p_value_cutoff)
 
   samplePCvals <- pcaRes$samplePCvals
   pve <- pcaRes$pve
@@ -18,20 +32,22 @@ runPCAandPlotCorrelations <- function(genesBySamples, samplesByCovariates, dataN
   colnames(samplePCvals) = paste(colnames(samplePCvals), " (", sprintf("%.2f", pve[1:npca]), "%)", sep="")
 
   # Find covariates without any missing data
-  samplesByFullCovariates = samplesByCovariates[, which(apply(samplesByCovariates, 2,
+  samplesByFullCovariates = clean_metadata[, which(apply(clean_metadata, 2,
                                                               function(dat) all(!is.na(dat))))]
-  EXCLUDE_VARS_FROM_FDR = setdiff(colnames(samplesByCovariates), colnames(samplesByFullCovariates))
+  EXCLUDE_VARS_FROM_FDR = setdiff(colnames(clean_metadata), colnames(samplesByFullCovariates))
 
   add_PC_res = list()
   significantCovars = c()
 
   LOOP_PLOT_ALL_COVARS = FALSE
-  if (ALSO_PLOT_ALL_COVARS_VS_PCA) { LOOP_PLOT_ALL_COVARS = unique(c(LOOP_PLOT_ALL_COVARS, TRUE)) }
+  if (ALSO_PLOT_ALL_COVARS_VS_PCA) {
+    LOOP_PLOT_ALL_COVARS = unique(c(LOOP_PLOT_ALL_COVARS, TRUE))
+    }
 
   for (PLOT_ALL_COVARS in LOOP_PLOT_ALL_COVARS) {
     corrRes = calcCompleteCorAndPlot(samplePCvals,
-                                     samplesByCovariates,
-                                     CORRELATION_TYPE,
+                                     clean_metadata,
+                                     correlation_type,
                                      title,
                                      WEIGHTS = pve[1:dim(samplePCvals)[2]],
                                      PLOT_ALL_COVARS,
@@ -47,23 +63,24 @@ runPCAandPlotCorrelations <- function(genesBySamples, samplesByCovariates, dataN
 }
 #'
 #'# Function to run principal component analysis
-runPCA <- function(genesBySamples, SCALE_DATA_FOR_PCA = TRUE, MIN_PVE_PCT_PC = 1.0) {
+run_pca <- function(normalized_counts, scaled = TRUE, percent_p_value_cutoff = 1.0) {
 
   # estimate variance in data by PC:
-  pca.res <- prcomp(t(genesBySamples), center=TRUE, scale.=SCALE_DATA_FOR_PCA, retx=TRUE)
+  pca.res <- prcomp(t(normalized_counts), center=TRUE, scale.=scaled, retx=TRUE)
 
-  # examine how much variance is explained by PCs, and consider those with PVE >= (MIN_PVE_PCT_PC %):
+  # examine how much variance is explained by PCs, and consider those with PVE >= (percent_p_value_cutoff %):
   pc.var <- pca.res$sdev^2
   pve <- 100 * (pc.var / sum(pc.var))
-  npca <- max(1,length(which(pve >= MIN_PVE_PCT_PC)))
+  npca <- max(1,length(which(pve >= percent_p_value_cutoff)))
 
   samplePCvals <- pca.res$x[, 1:npca, drop=FALSE]
 
   list(samplePCvals=samplePCvals, pve=pve)
 }
 #'# Function to calculate correlation and plot
-calcCompleteCorAndPlot <- function(COMPARE_data, COVAR_data, correlationType, title,
-                                   WEIGHTS = NULL, PLOT_ALL_COVARS=FALSE, EXCLUDE_VARS_FROM_FDR=NULL, MAX_FDR = 0.1) {
+calcCompleteCorAndPlot <- function(COMPARE_data, COVAR_data, correlation_type,
+                                   title, WEIGHTS = NULL, PLOT_ALL_COVARS=FALSE,
+                                   EXCLUDE_VARS_FROM_FDR=NULL, MAX_FDR = 0.1) {
 
   # require(plyr)
 
@@ -104,7 +121,7 @@ calcCompleteCorAndPlot <- function(COMPARE_data, COVAR_data, correlationType, ti
     cont_cor <- corr.test(COMPARE_data,
                           COVAR_data[,ContCovariates],
                           use='pairwise.complete.obs',
-                          method=correlationType,
+                          method=correlation_type,
                           adjust="none")
     cont_cor_vals <- cont_cor$r
     cont_cor_p <- cont_cor$p
