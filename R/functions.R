@@ -192,7 +192,7 @@ get_biomart <- function(count_df, synid, version, host, filters, organism) {
     biomart_results <- collapse_duplicate_hgnc_symbol(biomart_results)
 
     # Biomart IDs as rownames
-    biomart_results <- tibble::column_to_rownames(biomart_results, var = !!filters)
+    biomart_results <- tibble::column_to_rownames(biomart_results, var = filters)
 
     biomart_results
   } else {
@@ -200,7 +200,7 @@ get_biomart <- function(count_df, synid, version, host, filters, organism) {
     biomart_results <- get_data(synid, version)
 
     # Biomart IDs as rownames
-    biomart_results <- tibble::column_to_rownames(biomart_results, var = !!filters)
+    biomart_results <- tibble::column_to_rownames(biomart_results, var = filters)
 
     # Gene metadata required for count CQN
     required_variables <- c("gene_length", "percentage_gene_gc_content")
