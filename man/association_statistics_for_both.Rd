@@ -5,8 +5,8 @@
 \title{Find intraclass correlation (ICC) between factor and continuous covariates}
 \usage{
 association_statistics_for_both(
-  variables = names(md),
-  md,
+  variables = names(clean_metadata),
+  clean_metadata,
   p_value_cutoff = 0.05,
   na_action = "remove"
 )
@@ -15,7 +15,8 @@ association_statistics_for_both(
 \item{variables}{Variables to for ICC computation.Defaults to the column names
 of \code{"md"}.}
 
-\item{md}{A data frame with sample identifiers in a column and relevant experimental covariates.}
+\item{clean_metadata}{A data frame with sample identifiers as rownames and variables as
+factors or numeric as determined by \code{"sageseqr::clean_covariates()"}.}
 
 \item{p_value_cutoff}{Set the p-value threshold.}
 

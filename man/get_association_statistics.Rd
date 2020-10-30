@@ -4,10 +4,11 @@
 \alias{get_association_statistics}
 \title{Visualize relationship between variables}
 \usage{
-get_association_statistics(md, p_value_cutoff = 0.05)
+get_association_statistics(clean_metadata, p_value_cutoff = 0.05)
 }
 \arguments{
-\item{md}{A data frame with sample identifiers in a column and relevant experimental covariates.}
+\item{clean_metadata}{A data frame with sample identifiers as rownames and variables as
+factors or numeric as determined by \code{"sageseqr::clean_covariates()"}.}
 
 \item{p_value_cutoff}{Set the p-value threshold.}
 }

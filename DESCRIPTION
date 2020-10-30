@@ -42,6 +42,7 @@ Imports:
     psych,
     purrr,
     RColorBrewer,
+    reshape2,
     rlang,
     rmarkdown,
     sagethemes,

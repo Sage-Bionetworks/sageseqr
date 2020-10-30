@@ -7,7 +7,7 @@
 get_biomart(count_df, synid, version, host, filters, organism)
 }
 \arguments{
-\item{count_df}{A counts data frame with sample identifiers as rownames.}
+\item{count_df}{A counts data frame with sample identifiers as column names.}
 
 \item{synid}{A character vector with a Synapse Id.}
 
