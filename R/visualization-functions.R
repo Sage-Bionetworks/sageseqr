@@ -25,7 +25,7 @@
 #' }
 #' @export
 run_pca_and_plot_correlations <- function(normalized_counts, clean_metadata,
-                                      isKeyPlot = FALSE, scaled = TRUE,
+                                      scaled = TRUE,
                                       percent_p_value_cutoff = 1.0,
                                       correlation_type = "pearson",
                                       plot_covariates_vs_pca = TRUE,
@@ -60,9 +60,6 @@ run_pca_and_plot_correlations <- function(normalized_counts, clean_metadata,
           ))]
   exclude_missing_data <- setdiff(colnames(md), colnames(complete))
 
-  add_pc_results <- list()
-  significant_covariates <- c()
-
   loop <- FALSE
   if (plot_covariates_vs_pca) {
     loop <- unique(c(loop, TRUE))
@@ -78,22 +75,12 @@ run_pca_and_plot_correlations <- function(normalized_counts, clean_metadata,
       exclude_missing_data,
       maximum_fdr = 0.1
       )
-
-    add_pc_results[[length(add_pc_results)+1]] <- list(
-      plotData <- p$plot,
-      isKeyPlot <- (isKeyPlot && !plot_all)
-      )
-    if (!plot_all) {
-      significant_covariates = p$significant_covariates
-      effects_significant_vars = p$effects_significant_vars
-    }
   }
-
   return(
     list(
-      significant_covariates = significant_covariates,
-      pc_results = add_pc_results,
-      effects_significant_vars = effects_significant_vars
+      significant_covariates = p$significant_covariates,
+      pc_results = p$plot,
+      effects_significant_vars = p$effects_significant_vars
       )
     )
 }
@@ -343,7 +330,7 @@ correlate_and_plot <- function(principal_components, clean_metadata,
   if (!plyr::empty(plot)) {
     plot <- plot_pcs_with_covariates(
       plot,
-      glue::glue("FDR <= {maximum_fdr}")
+      glue::glue("*FDR <= {maximum_fdr}")
       )
   } else {
     plot <- NULL
@@ -399,9 +386,21 @@ plot_pcs_with_covariates <- function(correlation_values,
   plot$significant_correlations[plot$significant_correlations == FALSE] <- ""
 
   # Plot correlation
-  p <- ggplot2::ggplot(plot, ggplot2::aes(.data$covariates, .data$compare))
-  p <- p + ggplot2::geom_tile(ggplot2::aes(fill = .data$r), colour = "white")
-  p <- p + ggplot2::geom_text(ggplot2::aes(label = significant_correlations))
+  p <- ggplot2::ggplot(
+    plot,
+    ggplot2::aes(
+      .data$covariates,
+      .data$compare)
+    ) +
+    ggplot2::geom_tile(
+      ggplot2::aes(fill = .data$r),
+      colour = "white"
+      )
+  p <- p + ggplot2::geom_text(
+    ggplot2::aes(
+      label = .data$significant_correlations
+      )
+    )
   p <- p + ggplot2::scale_fill_gradientn(
     limits = c(-1,1),
     colours = rev(c("#67001F", "#B2182B", "#D6604D", "#F4A582",

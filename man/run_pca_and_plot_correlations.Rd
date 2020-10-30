@@ -7,7 +7,6 @@
 run_pca_and_plot_correlations(
   normalized_counts,
   clean_metadata,
-  isKeyPlot = FALSE,
   scaled = TRUE,
   percent_p_value_cutoff = 1,
   correlation_type = "pearson",
