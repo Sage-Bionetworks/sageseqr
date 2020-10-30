@@ -8,7 +8,6 @@ correlate_and_plot(
   principal_components,
   clean_metadata,
   correlation_type,
-  title,
   weights = NULL,
   to_plot = FALSE,
   exclude_missing_data = NULL,
@@ -24,8 +23,6 @@ factors or numeric as determined by \code{"sageseqr::clean_covariates()"}.}
 
 \item{correlation_type}{Allowed values are "pearson", "spearman" and
 "kendall". See \code{"psych::corr.test(method)"}.}
-
-\item{title}{A string to describe the plot.}
 
 \item{weights}{A numeric vector of the proportion of variance explained
 (PVE). Defaults to NULL.}

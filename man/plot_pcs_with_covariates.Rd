@@ -4,12 +4,7 @@
 \alias{plot_pcs_with_covariates}
 \title{Explore relationship between principal components (PCs) and covariates}
 \usage{
-plot_pcs_with_covariates(
-  correlation_values,
-  title = NULL,
-  note_threshold = NULL,
-  mark_missing = NULL
-)
+plot_pcs_with_covariates(correlation_values, note_threshold = NULL)
 }
 \arguments{
 \item{correlation_values}{A data frame that includes the p-value of the
@@ -17,13 +12,8 @@ correlation of a covariate to a PC as `pvalue`. Additionally, the data frame
 should include a logical column `significant_correlations` to indicate
 whether the FDR threshold is met for that variable.}
 
-\item{title}{A string to describe the plot.}
-
 \item{note_threshold}{A customized string to note method used to adjust
 p-values for multiple comparisons. Defaults to NULL.}
-
-\item{mark_missing}{A vector of variables to exclude from the plot due to
-missing data. Defaults to NULL.}
 }
 \description{
 Explore relationship between principal components (PCs) and covariates

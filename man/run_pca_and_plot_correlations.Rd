@@ -11,7 +11,8 @@ run_pca_and_plot_correlations(
   scaled = TRUE,
   percent_p_value_cutoff = 1,
   correlation_type = "pearson",
-  plot_covariates_vs_pca = TRUE
+  plot_covariates_vs_pca = TRUE,
+  maximum_fdr = 0.1
 )
 }
 \arguments{
@@ -31,6 +32,9 @@ variance before the analysis takes place.}
 
 \item{plot_covariates_vs_pca}{Defaults to TRUE. If false, no plot is
 returned.}
+
+\item{maximum_fdr}{Maximum allowable false discovery rate (FDR). Defaults to
+0.1.}
 }
 \value{
 A list.

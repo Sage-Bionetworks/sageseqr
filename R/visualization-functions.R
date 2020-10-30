@@ -343,8 +343,7 @@ correlate_and_plot <- function(principal_components, clean_metadata,
   if (!plyr::empty(plot)) {
     plot <- plot_pcs_with_covariates(
       plot,
-      glue::glue("FDR <= {maximum_fdr}"),
-      mark_missing
+      glue::glue("FDR <= {maximum_fdr}")
       )
   } else {
     plot <- NULL
@@ -365,9 +364,6 @@ correlate_and_plot <- function(principal_components, clean_metadata,
 #' correlation of a covariate to a PC as `pvalue`. Additionally, the data frame
 #' should include a logical column `significant_correlations` to indicate
 #' whether the FDR threshold is met for that variable.
-#' @inheritParams correlate_and_plot
-#' @param mark_missing A vector of variables to exclude from the plot due to
-#' missing data. Defaults to NULL.
 #' @param note_threshold A customized string to note method used to adjust
 #' p-values for multiple comparisons. Defaults to NULL.
 #' @examples
@@ -383,150 +379,47 @@ correlate_and_plot <- function(principal_components, clean_metadata,
 #'}
 #'@export
 plot_pcs_with_covariates <- function(correlation_values,
-                               note_threshold = NULL,
-                               mark_missing = NULL) {
+                               note_threshold = NULL) {
 
-  # Mark the X-axis labels based on user-defined pattern:
-  missing <- rep(FALSE, nrow(correlation_values))
-
-  x_missing_values <- FALSE
-  if (!is.null(mark_missing)) {
-    names <- as.character(unique(levels(correlation_values$covariates)))
-    x <- rep(FALSE, length(names))
-    names(x) <- names
-    x[mark_missing] <- TRUE
-
-    x_labels <- levels(correlation_values$covariates)[
-      levels(correlation_values$covariates) %in% correlation_values$covariates
-      ]
-    x_missing_values <- as.character(x[x_labels])
-    x_missing_values[is.na(x_missing_values)] <- FALSE
-
-    missing[correlation_values$covariates %in% mark_missing] <- TRUE
-  }
-  correlation_values$missing <- missing
-
-  plain <- ifelse(x_missing_values, "bold.italic", "plain")
-  color <- ifelse(x_missing_values, "darkgray", "black")
-
-  single_plot <- FALSE
-  plot_aes <- ggplot2::aes(
-    .data$covariates,
-    .data$compare,
-    fill = .data$r,
-    alpha = as.factor(missing)
-    )
-  if (length(unique(correlation_values$r)) <= 1) {
-    plot_aes <- ggplot2::aes(
-      .data$covariates,
-      .data$compare,
-      fill = factor(.data$r)
-      )
-    single_plot <- TRUE
-  }
-
-  # Reverse the Y-axis:
+  # Reverse the Y-axis
   correlation_values$compare <- factor(correlation_values$compare,
-                                      levels = rev(
-                                        levels(
-                                          correlation_values$compare
-                                          )
-                                        )
-                                      )
+                                       levels = rev(
+                                         levels(
+                                           correlation_values$compare
+                                           )
+                                         )
+                                       )
 
-  alpha <- c("TRUE" = 0.85, "FALSE" = 1)
-  p = ggplot2::ggplot(correlation_values, plot_aes) + ggplot2::geom_tile()
-  p = p + ggplot2::scale_alpha_manual(values = alpha, guide = "none")
-  p = p + ggplot2::xlab("") + ggplot2::ylab("")
-  p = p + ggplot2::theme(
-    axis.text.x = ggplot2::element_text(
-      angle = 90,
-      hjust = 1,
-      vjust = 0.5,
-      size = 14,
-      face = plain,
-      color = color
-      ),
-    axis.text.y = ggplot2::element_text(
-      size = 14,
-      color = "black",
-      hjust = 0
-      )
-    )
-  p = p + ggplot2::theme(
-    panel.grid.major.x = ggplot2::element_line(
-      color = "black",
-      linetype = "dashed"
-      )
-    ) + ggplot2::theme(
-      panel.grid.minor.x = ggplot2::element_blank()
-      )
-  p = p + ggplot2::theme(
-    panel.grid.major.y = ggplot2::element_blank()
-    ) + ggplot2::theme(
-      panel.grid.minor.y = ggplot2::element_blank()
-      )
-  p = p + ggplot2::theme(
-    panel.background = ggplot2::element_rect(fill = "white")
+  # Set threshold from -1 to 1
+  plot <- correlation_values
+  b <- c(-1,0,1)
+
+  # Add * notation for p-values that meet the FDR
+  plot$significant_correlations[plot$significant_correlations == TRUE] <- "*"
+  plot$significant_correlations[plot$significant_correlations == FALSE] <- ""
+
+  # Plot correlation
+  p <- ggplot2::ggplot(plot, ggplot2::aes(.data$covariates, .data$compare))
+  p <- p + ggplot2::geom_tile(ggplot2::aes(fill = .data$r), colour = "white")
+  p <- p + ggplot2::geom_text(ggplot2::aes(label = significant_correlations))
+  p <- p + ggplot2::scale_fill_gradientn(
+    limits = c(-1,1),
+    colours = rev(c("#67001F", "#B2182B", "#D6604D", "#F4A582",
+    "#FDDBC7", "#FFFFFF", "#D1E5F0", "#92C5DE",
+    "#4393C3", "#2166AC", "#053061")),
+    breaks = b,
+    labels = format(b)) +
+    ggplot2::labs(
+      x = "",
+      y = "",
+      caption = note_threshold) +
+    sagethemes::theme_sage() +
+    ggplot2::theme(
+      legend.title = ggplot2::element_blank(),
+      axis.text.x = ggplot2::element_text(angle = 30, hjust = 1, vjust = 1),
+      axis.text.y = ggplot2::element_text(size = 12)
     )
 
-  if (!single_plot) {
-    p = p + ggplot2::scale_fill_gradient2(low = "blue", high = "red")
-  }
-
-  conditions <-
-  if (!is.null(correlation_values$significant_correlations) || !is.null(correlation_values$psg)) {
-    sizes = c()
-    shapes = c()
-
-    if (!is.null(correlation_values$significant_correlations)) {
-      name = note_threshold
-
-      useAES = utils::modifyList(
-        ggplot2::aes(
-          size = ifelse(
-            .data$significant_correlations,
-            "mark_significant",
-            "not_significant"
-            )
-          ),
-        ggplot2::aes_string(shape = paste("as.factor('", name, "')", sep=""))
-        )
-      p = p + ggplot2::geom_point(useAES, na.rm = TRUE)
-      sizes["mark_significant"] <- 6
-      sizes["not_significant"] <- NA
-
-      shapes[name] <- utf8ToInt("*")
-    }
-    if (!is.null(correlation_values$psg)) {
-      incomplete <- paste(note_threshold, " (incomplete)", sep="")
-
-      useAES <- utils::modifyList(
-        ggplot2::aes(
-          size = ifelse(
-            .data$psg,
-            "incomplete_mark_significant",
-            "incomplete_not_significant")),
-        ggplot2::aes_string(
-          shape = paste("as.factor('", incomplete, "')", sep="")
-          )
-        )
-      p = p + ggplot2::geom_point(useAES, na.rm = TRUE)
-      sizes["incomplete_mark_significant"] <- 3
-      sizes["incomplete_not_significant"] <- NA
-
-      shapes[incomplete] <- 21 # open circles
-    }
-    p = p + ggplot2::scale_size_manual(values = sizes, guide = "none")
-    p = p + ggplot2::scale_shape_manual(
-      values = shapes,
-      guide = "legend",
-      name = ""
-      )
-    p = p + ggplot2::guides(
-      shape = ggplot2::guide_legend(override.aes = list(size = 6))
-      )
-  }
 
   return(p)
 }
