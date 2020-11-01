@@ -26,3 +26,4 @@ default:
     color: "diagnosis"
     shape: "batch"
     size: "ageofdeath"
+  report: "output-report"

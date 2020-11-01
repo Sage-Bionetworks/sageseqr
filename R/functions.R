@@ -532,7 +532,7 @@ wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
 #'
 #' @inheritParams collapse_duplicate_hgnc_symbol
 #' @inheritParams cqn
-#'
+#' @export
 summarize_biotypes <- function(filtered_counts, biomart_results) {
   biomart_results[rownames(filtered_counts),] %>%
     dplyr::group_by(.data$gene_biotype) %>%

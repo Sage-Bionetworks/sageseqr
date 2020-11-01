@@ -19,6 +19,7 @@
 #' @param biomart_id Synapse ID to biomart object.
 #' @param biomart_version Optionally, include Synapse file version number.
 #' @param x_var_for_plot Variable to separate groups for boxplot.
+#' @param report_name Name of output markdown file.
 #' @inheritParams plot_sexcheck
 #' @inheritParams get_biomart
 #' @inheritParams filter_genes
@@ -30,7 +31,8 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                         biomart_id, biomart_version, host, filters,
                         organism, conditions, cpm_threshold = 1,
                         conditions_threshold = 0.5,
-                        x_var_for_plot, sex_var, color, shape, size) {
+                        x_var_for_plot, sex_var, color, shape, size,
+                        report_name) {
 
   # Copies markdown to user's working directory
   if (!file.exists("sageseqr-report.Rmd")) {
@@ -80,7 +82,7 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
     report = rmarkdown::render(
       drake::knitr_in("sageseqr-report.Rmd"),
       output_file = drake::file_out(
-        !!glue::glue(getwd(), "/sageseqr-report.html")
+        !!glue::glue("{getwd()}/{report_name}.html")
         ),
       output_dir = "."
       )

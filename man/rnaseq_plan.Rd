@@ -25,7 +25,8 @@ rnaseq_plan(
   sex_var,
   color,
   shape,
-  size
+  size,
+  report_name
 )
 }
 \arguments{
@@ -82,6 +83,8 @@ by shape.}
 
 \item{size}{Continuous variable in `clean_metadata` differentiated
 by size.}
+
+\item{report_name}{Name of output markdown file.}
 }
 \description{
 This function wraps the \code{"drake::plan()"} and copies the R markdown report to the
