@@ -525,4 +525,18 @@ wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
                                                  biomart_results, model_variables))
 
 }
+#' Summarize Biotypes
 #'
+#' Computes the fraction of genes of a particular biotype. The number of genes
+#' must be above 100 to be summarized.
+#'
+#' @inheritParams collapse_duplicate_hgnc_symbol
+#' @inheritParams cqn
+#'
+summarize_biotypes <- function(filtered_counts, biomart_results) {
+  biomart_results[rownames(filtered_counts),] %>%
+    dplyr::group_by(gene_biotype) %>%
+    dplyr::summarise(fraction = dplyr::n()) %>%
+    dplyr::filter(fraction > 100) %>%
+    dplyr::mutate(fraction = fraction/dim(filtered_counts)[1])
+}

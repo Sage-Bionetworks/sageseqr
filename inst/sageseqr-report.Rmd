@@ -49,15 +49,27 @@ col2 <- grDevices::colorRampPalette(rev(c("#67001F", "#B2182B", "#D6604D", "#F4A
                                  "#4393C3", "#2166AC", "#053061")))
 corrplot::corrplot(correlation_input, col = col2(200), tl.col = "#000000")
 ```
-# Filter Genes
-```{r filter_genes}
-`r dim(PROCESSED_COUNTS$filteredExprMatrix$genes)[1]` genes are used for the analysis. 
 
-Following is the distribution of biotypes
-`r kable(pct.pc)`
+# Filter Genes
+
+Remove genes that have less than 1 counts per million (CPM) in at least 50% of samples per specified condition.
+
+`r dim(drake::readd(filtered_counts))[1]` genes are used in this analysis.
+```{r filter_genes}
+knitr::kable(drake::readd(biotypes))
 ```
 
 # Identify Outliers
+
+Detect outliers based on logCPM expression.
 ```{r plot_outliers}
+```
+
+# Significant Covariates
+
+Significant covariates are identified by the pearson correlation (p-value of 1%) between principal component analysis (PCA) of normalized transcripts and variables that meet a 0.1 false discovery rate (FDR) threshold. Significant covariates to adjust for are `r glue::glue_collapse(foo$significant_covariates, ", ", last = " and ")`.
+
+```{r pca_and_significant_covariates}
+drake::readd(significant_covariates_plot)$plot
 ```
 

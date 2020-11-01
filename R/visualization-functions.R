@@ -31,12 +31,6 @@ run_pca_and_plot_correlations <- function(normalized_counts, clean_metadata,
                                       plot_covariates_vs_pca = TRUE,
                                       maximum_fdr = 0.1) {
   md <- clean_metadata
-  writeLines(
-    glue::glue(
-    "\nRunning PCA and calculating {correlation_type} correlations at a minimum
-    p-value of {percent_p_value_cutoff}%."
-    )
-  )
 
   pca_results <- run_pca(normalized_counts = normalized_counts,
                    scaled = scaled,
