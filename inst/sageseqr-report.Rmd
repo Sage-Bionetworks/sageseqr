@@ -59,17 +59,22 @@ Remove genes that have less than 1 counts per million (CPM) in at least 50% of s
 knitr::kable(drake::readd(biotypes))
 ```
 
+Check distribution of correlation between genes.
+```{r histogram}
+drake::readd(gene_coexpression)
+```
+
 # Identify Outliers
 
-Detect outliers based on logCPM expression.
 ```{r plot_outliers}
+drake::readd(outliers)$plot
 ```
+Outliers, based on logCPM expression, are `r glue::glue_collapse(drake::readd(outliers)$outliers, ", ", last = " and ")`.
 
 # Significant Covariates
 
-Significant covariates are identified by the pearson correlation (p-value of 1%) between principal component analysis (PCA) of normalized transcripts and variables that meet a 0.1 false discovery rate (FDR) threshold. Significant covariates to adjust for are `r glue::glue_collapse(foo$significant_covariates, ", ", last = " and ")`.
+Significant covariates are identified by the pearson correlation (p-value of 1%) between principal component analysis (PCA) of normalized transcripts and variables that meet a 0.1 false discovery rate (FDR) threshold. Significant covariates to adjust for are `r glue::glue_collapse(drake::readd(significant_covariates_plot)$significant_covariates, ", ", last = " and ")`.
 
 ```{r pca_and_significant_covariates}
 drake::readd(significant_covariates_plot)$plot
 ```
-

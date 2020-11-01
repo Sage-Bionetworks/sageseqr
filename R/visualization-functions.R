@@ -566,7 +566,8 @@ get_association_statistics <- function(clean_metadata, p_value_cutoff = 0.05) {
   p[cor_pval > p_value_cutoff] <- 0
 
   return(
-    list(estimate = cor_estimate, pval = cor_pval, plot = p))
+    list(estimate = cor_estimate, pval = cor_pval, plot = p)
+    )
 }
 #' Compute the association statistic for factor variables
 #'
@@ -690,4 +691,92 @@ plot_sexcheck <- function(clean_metadata, count_df, biomart_results, sex_var) {
 conditional_plot_sexcheck <- function(clean_metadata, count_df, biomart_results, sex_var) {
   drake::cancel_if(is.null(sex_var))
   plot_sexcheck(clean_metadata, count_df, biomart_results, sex_var)
+}
+#' Explore samples that are outliers
+#'
+#' Samples that are z standard deviations (SDs) from the mean of principal
+#' components (PC) 1 and 2 are identified as outliers.
+#'
+#' @param z Allowable number of standard deviations (SDs) from the mean.
+#' Defaults to 4.
+#' @inheritParams cqn
+#' @inheritParams filter_genes
+#' @param color Discrete variable in `clean_metadata` differentiated
+#' by color.
+#' @param shape Discrete variable in `clean_metadata` differentiated
+#' by shape.
+#' @param size Continuous variable in `clean_metadata` differentiated
+#' by size.
+#' @export
+identify_outliers <- function(filtered_counts, clean_metadata,
+                              color, shape, size, z = 4) {
+  PC <- stats::prcomp(limma::voom(
+    filtered_counts),
+    scale. = TRUE,
+    center = TRUE)
+
+  # Plot first 2 PCs
+  data <- data.frame(SampleID = rownames(PC$rotation),
+                         PC1 = PC$rotation[,1],
+                         PC2 = PC$rotation[,2])
+
+  # Percentage from each PC
+  eigen <- PC$sdev^2
+  pc1 <- eigen[1]/sum(eigen)
+  pc2 <- eigen[2]/sum(eigen)
+
+  # Identify outliers - samples 4SDs from the mean
+  outliers <- as.character(
+    data$SampleID[
+      c(
+        which(data$PC1 < mean(data$PC1) - z*stats::sd(data$PC1)),
+        which(data$PC1 > mean(data$PC1) + z*stats::sd(data$PC1))
+        ),
+      drop = TRUE
+      ]
+    )
+  outliers <- c(outliers,
+                as.character(
+                  data$SampleID[
+                    c(
+                      which(data$PC2 < mean(data$PC2) - z*stats::sd(data$PC2)),
+                      which(data$PC2 > mean(data$PC2) + z*stats::sd(data$PC2))
+                      ),
+                    drop = TRUE
+                    ]
+                  )
+                )
+
+  plotdata <- dplyr::left_join(
+    data,
+    tibble::rownames_to_column(clean_metadata, "SampleID")
+    ) %>%
+    dplyr::mutate(label = .data$SampleID) %>%
+    dplyr::mutate(label = ifelse((.data$label %in% outliers), .data$label, NA))
+
+  p <- ggplot2::ggplot(plotdata, ggplot2::aes(x = .data$PC1, y = .data$PC2))
+
+  p <- p + ggplot2::geom_point(ggplot2::aes(
+    color = .data[[color]],
+    size = .data[[size]],
+    shape = .data[[shape]]
+    )
+  )
+
+  p <- p + sagethemes::scale_color_sage_d() +
+    sagethemes::theme_sage() +
+    ggplot2::theme(legend.position = "right") +
+    ggplot2::geom_text(
+      ggplot2::aes(label = .data$label),
+      family = "Lato",
+      size = 4,
+      hjust = 0
+      )
+
+  return(
+    list(
+      plot = p,
+      outliers = outliers
+      )
+  )
 }

@@ -535,8 +535,8 @@ wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
 #'
 summarize_biotypes <- function(filtered_counts, biomart_results) {
   biomart_results[rownames(filtered_counts),] %>%
-    dplyr::group_by(gene_biotype) %>%
+    dplyr::group_by(.data$gene_biotype) %>%
     dplyr::summarise(fraction = dplyr::n()) %>%
-    dplyr::filter(fraction > 100) %>%
-    dplyr::mutate(fraction = fraction/dim(filtered_counts)[1])
+    dplyr::filter(.data$fraction > 100) %>%
+    dplyr::mutate(fraction = .data$fraction/dim(filtered_counts)[1])
 }

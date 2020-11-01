@@ -22,6 +22,7 @@
 #' @inheritParams plot_sexcheck
 #' @inheritParams get_biomart
 #' @inheritParams filter_genes
+#' @inheritParams identify_outliers
 #' @export
 rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                         counts_version, gene_id_input, sample_id_input,
@@ -29,7 +30,7 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                         biomart_id, biomart_version, host, filters,
                         organism, conditions, cpm_threshold = 1,
                         conditions_threshold = 0.5,
-                        x_var_for_plot, sex_var){
+                        x_var_for_plot, sex_var, color, shape, size) {
 
   # Copies markdown to user's working directory
   if (!file.exists("sageseqr-report.Rmd")) {
@@ -62,6 +63,8 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
     biotypes = summarize_biotypes(filtered_counts, biomart_results),
     cqn_counts = cqn(filtered_counts,
                      biomart_results),
+    gene_coexpression = stats::hist(stats::cor(t(cqn_counts$E)),
+                                    xlab = "Correlation"),
     boxplots = boxplot_vars(md = clean_md,
                             include_vars = !!continuous_input,
                             x_var = !!x_var_for_plot),
@@ -72,6 +75,8 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
     correlation_plot = get_association_statistics(clean_md),
     significant_covariates_plot = run_pca_and_plot_correlations(cqn_counts$E,
                                                                 clean_md),
+    outliers = identify_outliers(filtered_counts, clean_md, !!color, !!shape,
+                                 !!size),
     report = rmarkdown::render(
       drake::knitr_in("sageseqr-report.Rmd"),
       output_file = drake::file_out(

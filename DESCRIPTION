@@ -46,6 +46,7 @@ Imports:
     rlang,
     rmarkdown,
     sagethemes,
+    stats,
     stringr,
     synapser,
     tidyr,
