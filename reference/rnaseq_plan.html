@@ -147,7 +147,11 @@ user's working directory.</p>
   cpm_threshold <span class='op'>=</span> <span class='fl'>1</span>,
   conditions_threshold <span class='op'>=</span> <span class='fl'>0.5</span>,
   <span class='va'>x_var_for_plot</span>,
-  <span class='va'>sex_var</span>
+  <span class='va'>sex_var</span>,
+  <span class='va'>color</span>,
+  <span class='va'>shape</span>,
+  <span class='va'>size</span>,
+  <span class='va'>report_name</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -233,6 +237,25 @@ takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".</p>
     <tr>
       <th>sex_var</th>
       <td><p>Column name of the sex or gender-specific metadata.</p></td>
+    </tr>
+    <tr>
+      <th>color</th>
+      <td><p>Discrete variable in `clean_metadata` differentiated
+by color.</p></td>
+    </tr>
+    <tr>
+      <th>shape</th>
+      <td><p>Discrete variable in `clean_metadata` differentiated
+by shape.</p></td>
+    </tr>
+    <tr>
+      <th>size</th>
+      <td><p>Continuous variable in `clean_metadata` differentiated
+by size.</p></td>
+    </tr>
+    <tr>
+      <th>report_name</th>
+      <td><p>Name of output markdown file.</p></td>
     </tr>
     </table>
 

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Visualize relationship between variables — get_association_statistics • sageseqr</title>
+<title>Explore samples that are outliers — identify_outliers • sageseqr</title>
 
 
 <!-- jquery -->
@@ -39,11 +39,9 @@
 
 
 
-<meta property="og:title" content="Visualize relationship between variables — get_association_statistics" />
-<meta property="og:description" content="Output a correlation matrix to visualize the relationship between
-continuous and factor variables. For factor variables, the Cramer's
-V estimate and the P-value is computed from the Pearson chi-square
-score between two variables." />
+<meta property="og:title" content="Explore samples that are outliers — identify_outliers" />
+<meta property="og:description" content="Samples that are z standard deviations (SDs) from the mean of principal
+components (PC) 1 and 2 are identified as outliers." />
 
 
 
@@ -121,31 +119,49 @@ score between two variables." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Visualize relationship between variables</h1>
+    <h1>Explore samples that are outliers</h1>
     
-    <div class="hidden name"><code>get_association_statistics.Rd</code></div>
+    <div class="hidden name"><code>identify_outliers.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Output a correlation matrix to visualize the relationship between
-continuous and factor variables. For factor variables, the Cramer's
-V estimate and the P-value is computed from the Pearson chi-square
-score between two variables.</p>
+    <p>Samples that are z standard deviations (SDs) from the mean of principal
+components (PC) 1 and 2 are identified as outliers.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_association_statistics</span><span class='op'>(</span><span class='va'>clean_metadata</span>, p_value_cutoff <span class='op'>=</span> <span class='fl'>0.05</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>identify_outliers</span><span class='op'>(</span><span class='va'>filtered_counts</span>, <span class='va'>clean_metadata</span>, <span class='va'>color</span>, <span class='va'>shape</span>, <span class='va'>size</span>, z <span class='op'>=</span> <span class='fl'>4</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>filtered_counts</th>
+      <td><p>A counts data frame with genes removed that have low expression.</p></td>
+    </tr>
     <tr>
       <th>clean_metadata</th>
       <td><p>A data frame with sample identifiers as rownames and variables as
 factors or numeric as determined by <code>"sageseqr::clean_covariates()"</code>.</p></td>
     </tr>
     <tr>
-      <th>p_value_cutoff</th>
-      <td><p>Set the p-value threshold.</p></td>
+      <th>color</th>
+      <td><p>Discrete variable in `clean_metadata` differentiated
+by color.</p></td>
+    </tr>
+    <tr>
+      <th>shape</th>
+      <td><p>Discrete variable in `clean_metadata` differentiated
+by shape.</p></td>
+    </tr>
+    <tr>
+      <th>size</th>
+      <td><p>Continuous variable in `clean_metadata` differentiated
+by size.</p></td>
+    </tr>
+    <tr>
+      <th>z</th>
+      <td><p>Allowable number of standard deviations (SDs) from the mean.
+Defaults to 4.</p></td>
     </tr>
     </table>
 

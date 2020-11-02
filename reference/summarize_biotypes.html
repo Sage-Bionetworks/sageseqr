@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Visualize relationship between variables — get_association_statistics • sageseqr</title>
+<title>Summarize Biotypes — summarize_biotypes • sageseqr</title>
 
 
 <!-- jquery -->
@@ -39,11 +39,9 @@
 
 
 
-<meta property="og:title" content="Visualize relationship between variables — get_association_statistics" />
-<meta property="og:description" content="Output a correlation matrix to visualize the relationship between
-continuous and factor variables. For factor variables, the Cramer's
-V estimate and the P-value is computed from the Pearson chi-square
-score between two variables." />
+<meta property="og:title" content="Summarize Biotypes — summarize_biotypes" />
+<meta property="og:description" content="Computes the fraction of genes of a particular biotype. The number of genes
+must be above 100 to be summarized." />
 
 
 
@@ -121,31 +119,28 @@ score between two variables." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Visualize relationship between variables</h1>
+    <h1>Summarize Biotypes</h1>
     
-    <div class="hidden name"><code>get_association_statistics.Rd</code></div>
+    <div class="hidden name"><code>summarize_biotypes.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Output a correlation matrix to visualize the relationship between
-continuous and factor variables. For factor variables, the Cramer's
-V estimate and the P-value is computed from the Pearson chi-square
-score between two variables.</p>
+    <p>Computes the fraction of genes of a particular biotype. The number of genes
+must be above 100 to be summarized.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_association_statistics</span><span class='op'>(</span><span class='va'>clean_metadata</span>, p_value_cutoff <span class='op'>=</span> <span class='fl'>0.05</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>summarize_biotypes</span><span class='op'>(</span><span class='va'>filtered_counts</span>, <span class='va'>biomart_results</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>clean_metadata</th>
-      <td><p>A data frame with sample identifiers as rownames and variables as
-factors or numeric as determined by <code>"sageseqr::clean_covariates()"</code>.</p></td>
+      <th>filtered_counts</th>
+      <td><p>A counts data frame with genes removed that have low expression.</p></td>
     </tr>
     <tr>
-      <th>p_value_cutoff</th>
-      <td><p>Set the p-value threshold.</p></td>
+      <th>biomart_results</th>
+      <td><p>Output of <code>"sageseqr::get_biomart()"</code>.</p></td>
     </tr>
     </table>
 
