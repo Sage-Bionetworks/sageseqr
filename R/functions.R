@@ -618,5 +618,14 @@ stepwise_regression <- function(md, model_variables = NULL, primary_variable, cq
                                    data = metadata_input$metadata,
                                    variables = array(metadata_input$variables)
   )
+
+  to_visualize <- model %>%
+    dplyr::select(iter, variable, isAdded) %>%
+    dplyr::rename(iteration = iter,
+                  `added to model` = isAdded) %>%
+    dplyr::filter(`added to model` == "yes")
+
+  model["to_visualize"] <- to_visualize
+
   model
 }

@@ -38,3 +38,10 @@ if (!is.null(config::get("sex check"))) {
 ```{r plot_outliers}
 ```
 
+# Model Identification
+Covariates are added as fixed and random effects iteratively if model improvement by  Bayesian Information Criteria (BIC) was observed.
+```{r model}
+summary <- drake::readd(model)
+knitr::kable(summary$to_visualize)
+as.character(summary$formula)[2]
+```
