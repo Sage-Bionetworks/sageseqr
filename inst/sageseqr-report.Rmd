@@ -15,8 +15,8 @@ title: `r title_var`
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, 
                       fig.align = 'left',
-                      fig.width = 5, 
-                      fig.height = 5)
+                      fig.width = 10, 
+                      fig.height = 10)
 library(sageseqr)
 ```
 # Data
