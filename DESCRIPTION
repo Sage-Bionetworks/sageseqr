@@ -21,7 +21,6 @@ biocViews:
 Imports:
     biomaRt,
     config,
-    CovariateAnalysis,
     cqn,
     data.table,
     drake,
@@ -29,6 +28,7 @@ Imports:
     edgeR,
     foreach,
     fs,
+    graphics,
     GenomicRanges,
     glue,
     ggplot2,
