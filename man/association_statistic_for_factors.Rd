@@ -4,12 +4,17 @@
 \alias{association_statistic_for_factors}
 \title{Compute the association statistic for factor variables}
 \usage{
-association_statistic_for_factors(factors, md, na_action = "remove")
+association_statistic_for_factors(
+  factors,
+  clean_metadata,
+  na_action = "remove"
+)
 }
 \arguments{
 \item{factors}{A vector of factor variables.}
 
-\item{md}{A data frame with sample identifiers in a column and relevant experimental covariates.}
+\item{clean_metadata}{A data frame with sample identifiers as rownames and variables as
+factors or numeric as determined by \code{"sageseqr::clean_covariates()"}.}
 
 \item{na_action}{Defaults to removing rows with missing values.}
 }

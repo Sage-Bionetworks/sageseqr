@@ -10,7 +10,7 @@ plot_sexcheck(clean_metadata, count_df, biomart_results, sex_var)
 \item{clean_metadata}{A data frame with sample identifiers as rownames and variables as
 factors or numeric as determined by \code{"sageseqr::clean_covariates()"}.}
 
-\item{count_df}{A counts data frame with sample identifiers as rownames.}
+\item{count_df}{A counts data frame with sample identifiers as column names.}
 
 \item{biomart_results}{Output of \code{"sageseqr::get_biomart()"}.}
 

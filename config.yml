@@ -14,11 +14,16 @@ default:
     filters: ensembl_gene_id
     host: ensembl.org
     organism: hsa
-  factors: ["sampleID", "RIN", "batch", "sex", "diagnosis"]
-  continuous: ["pmi", "ageofdeath"]
+  factors: ["sampleID", "batch", "sex", "diagnosis"]
+  continuous: ["RIN", "pmi", "ageofdeath"]
   x_var: diagnosis
   conditions:
     sex-diagnosis interaction: ["diagnosis", "sex"]
     diagnosis: ["diagnosis"]
     sex: ["sex"]
   sex check: sex
+  dimensions:
+    color: "diagnosis"
+    shape: "batch"
+    size: "ageofdeath"
+  report: "output-report"

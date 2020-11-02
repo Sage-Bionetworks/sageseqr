@@ -134,7 +134,7 @@ parse_counts <- function(count_df){
 #'and other metadata from Ensembl BioMart. Object returned contains gene Ids
 #'as rownames.
 #'
-#'@param count_df A counts data frame with sample identifiers as rownames.
+#'@param count_df A counts data frame with sample identifiers as column names.
 #'@inheritParams get_data
 #'@param filters A character vector listing biomaRt query filters.
 #'(For a list of filters see \code{"biomaRt::listFilters()"})
@@ -192,7 +192,7 @@ get_biomart <- function(count_df, synid, version, host, filters, organism) {
     biomart_results <- collapse_duplicate_hgnc_symbol(biomart_results)
 
     # Biomart IDs as rownames
-    biomart_results <- tibble::column_to_rownames(biomart_results, var = !!filters)
+    biomart_results <- tibble::column_to_rownames(biomart_results, var = filters)
 
     biomart_results
   } else {
@@ -200,7 +200,7 @@ get_biomart <- function(count_df, synid, version, host, filters, organism) {
     biomart_results <- get_data(synid, version)
 
     # Biomart IDs as rownames
-    biomart_results <- tibble::column_to_rownames(biomart_results, var = !!filters)
+    biomart_results <- tibble::column_to_rownames(biomart_results, var = filters)
 
     # Gene metadata required for count CQN
     required_variables <- c("gene_length", "percentage_gene_gc_content")
@@ -525,4 +525,18 @@ wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
                                                  biomart_results, model_variables))
 
 }
+#' Summarize Biotypes
 #'
+#' Computes the fraction of genes of a particular biotype. The number of genes
+#' must be above 100 to be summarized.
+#'
+#' @inheritParams collapse_duplicate_hgnc_symbol
+#' @inheritParams cqn
+#' @export
+summarize_biotypes <- function(filtered_counts, biomart_results) {
+  biomart_results[rownames(filtered_counts),] %>%
+    dplyr::group_by(.data$gene_biotype) %>%
+    dplyr::summarise(fraction = dplyr::n()) %>%
+    dplyr::filter(.data$fraction > 100) %>%
+    dplyr::mutate(fraction = .data$fraction/dim(filtered_counts)[1])
+}
