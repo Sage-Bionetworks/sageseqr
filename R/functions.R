@@ -240,39 +240,50 @@ collapse_duplicate_hgnc_symbol <- function(biomart_results){
 #' @inheritParams coerce_factors
 #' @inheritParams get_biomart
 #' @inheritParams simple_filter
-#' @param conditions Conditions to bin gene counts that correspond to variables in `md`.
+#' @param conditions Optional. Conditions to bin gene counts that correspond to
+#' variables in `md`.
 #' @param clean_metadata A data frame with sample identifiers as rownames and variables as
 #' factors or numeric as determined by \code{"sageseqr::clean_covariates()"}.
 #' @importFrom magrittr %>%
 #' @export
-filter_genes <- function(clean_metadata, count_df, conditions,
-                         cpm_threshold, conditions_threshold) {
+filter_genes <- function(clean_metadata, count_df,
+                         cpm_threshold, conditions_threshold,
+                         conditions = NULL) {
+
   if (class(conditions) == "list") {
     conditions <- unique(conditions[[1]])
   } else {
     conditions <- unique(conditions)
   }
 
-  if (!any(conditions %in% colnames(clean_metadata))) {
-    stop("Conditions are missing from the metadata.")
-  }
-
   # Check for extraneous rows
   count_df <- parse_counts(count_df)
 
-  split_data <- split(clean_metadata,
-                      f = as.list(clean_metadata[, conditions, drop = F]),
-                      drop = T)
+  if (!is.null(conditions)) {
+    if (!any(conditions %in% colnames(clean_metadata))) {
+      stop("Conditions are missing from the metadata.")
+    }
 
-  map_genes <- purrr::map(split_data, function(x) {
-    simple_filter(count_df[, rownames(x), drop = F],
-                  cpm_threshold,
-                  conditions_threshold)
+    split_data <- split(clean_metadata,
+                        f = as.list(clean_metadata[, conditions, drop = F]),
+                        drop = T)
+
+    map_genes <- purrr::map(split_data, function(x) {
+      simple_filter(count_df[, rownames(x), drop = F],
+                    cpm_threshold,
+                    conditions_threshold)
     })
 
-  genes_to_analyze <- unlist(map_genes) %>%
-    unique() %>%
-    sort()
+    genes_to_analyze <- unlist(map_genes) %>%
+      unique() %>%
+      sort()
+  } else {
+    genes_to_analyze <- simple_filter(
+      count_df,
+      cpm_threshold,
+      conditions_threshold
+    )
+  }
 
   processed_counts <- count_df[genes_to_analyze,]
 
@@ -413,11 +424,18 @@ build_formula <- function(md, primary_variable, model_variables = names(md)) {
 
   object <- list(metadata = md %>%
                    tidyr::unite(!!interaction_term, dplyr::all_of(primary_variable), sep = "_"),
-                formula = glue::glue("~ {interaction_term}+",
-                                     glue::glue_collapse(formula, sep = "+")),
-                formula_non_intercept = glue::glue("~ 0+{interaction_term}+",
-                                                   glue::glue_collapse(formula, sep = "+")),
-                primary_variable = interaction_term
+                formula = formula(
+                  glue::glue("~ {interaction_term}+",
+                             glue::glue_collapse(formula, sep = "+")
+                             )
+                  ),
+                formula_non_intercept = formula(
+                  glue::glue("~ 0+{interaction_term}+",
+                             glue::glue_collapse(formula, sep = "+")
+                             )
+                  ),
+                primary_variable = interaction_term,
+                variables = unlist(formula)
   )
 
   # Resolve dropped class type of factor without losing samples as rownames
@@ -524,6 +542,32 @@ wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
              function(x) differential_expression(filtered_counts, cqn_counts, md, primary_variable = x,
                                                  biomart_results, model_variables))
 
+}
+#' Stepwise Regression
+#'
+#' This function performs multivariate forward stepwise regression evaluated by multivariate Bayesian Information
+#' Critera (BIC) by wrapping \code{"mvIC::mvForwardStepwise()"}.
+#'
+#' @inheritParams differential_expression
+#' @inheritParams build_formula
+#' @export
+stepwise_regression <- function(md, model_variables = NULL, primary_variable, cqn_counts) {
+  metadata_input <- build_formula(md, model_variables, primary_variable)
+  model <- mvIC::mvForwardStepwise(exprObj = cqn_counts$E,
+                                   baseFormula = metadata_input$formula,
+                                   data = metadata_input$metadata,
+                                   variables = array(metadata_input$variables)
+  )
+
+  to_visualize <- model %>%
+    dplyr::select(.data$iter, .data$variable, .data$isAdded) %>%
+    dplyr::rename(iteration = .data$iter,
+                  `added to model` = .data$isAdded) %>%
+    dplyr::filter(.data$`added to model` == "yes")
+
+  model["to_visualize"] <- to_visualize
+
+  model
 }
 #' Summarize Biotypes
 #'
