@@ -43,15 +43,18 @@ Imports:
     psych,
     purrr,
     RColorBrewer,
+    reshape2,
     rlang,
     rmarkdown,
     sagethemes,
+    stats,
     stringr,
     synapser,
     tidyr,
     tibble,
     utils,
-    variancePartition (== 1.19.17),
+    variancePartition (>= 1.19.11),
+    vcd,
     quantreg
 Additional_repositories:
     http://ran.synapse.org
@@ -59,6 +62,6 @@ Remotes:
     th1vairam/CovariateAnalysis@dev,
     GabrielHoffman/mvIC@master,
     Sage-Bionetworks/sagethemes@main,
-    GabrielHoffman/variancePartition
+    GabrielHoffman/variancePartition@da5003f
 VignetteBuilder:
     knitr

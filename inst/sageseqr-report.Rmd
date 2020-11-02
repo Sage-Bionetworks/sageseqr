@@ -1,11 +1,18 @@
 ---
 title: "sageseqr-report"
 date: "`r date()`"
-output: html_document
+output: 
+  html_document:
+    css: style.css
+    toc: true
+    toc_float: true
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = FALSE, 
+                      fig.align = 'left',
+                      fig.width = 5, 
+                      fig.height = 5)
 library(sageseqr)
 ```
 # Data
@@ -34,10 +41,43 @@ if (!is.null(config::get("sex check"))) {
 }
 ```
 
-# Outliers 
-```{r plot_outliers}
+Visualize the relationships between covariates.
+```{r heatmap_covariates}
+correlation_input <- drake::readd(correlation_plot)$plot
+col2 <- grDevices::colorRampPalette(rev(c("#67001F", "#B2182B", "#D6604D", "#F4A582",
+                                 "#FDDBC7", "#FFFFFF", "#D1E5F0", "#92C5DE",
+                                 "#4393C3", "#2166AC", "#053061")))
+corrplot::corrplot(correlation_input, col = col2(200), tl.col = "#000000")
 ```
 
+# Filter Genes
+
+Remove genes that have less than 1 counts per million (CPM) in at least 50% of samples per specified condition.
+
+`r dim(drake::readd(filtered_counts))[1]` genes are used in this analysis.
+```{r filter_genes}
+knitr::kable(drake::readd(biotypes))
+```
+
+Check distribution of correlation between genes.
+```{r histogram}
+drake::readd(gene_coexpression)
+```
+
+# Identify Outliers
+
+```{r plot_outliers}
+drake::readd(outliers)$plot
+```
+Outliers, based on logCPM expression, are `r glue::glue_collapse(drake::readd(outliers)$outliers, ", ", last = " and ")`.
+
+# Significant Covariates
+
+Significant covariates are identified by the pearson correlation (p-value of 1%) between principal component analysis (PCA) of normalized transcripts and variables that meet a 0.1 false discovery rate (FDR) threshold. Significant covariates to adjust for are `r glue::glue_collapse(drake::readd(significant_covariates_plot)$significant_covariates, ", ", last = " and ")`.
+
+```{r pca_and_significant_covariates}
+drake::readd(significant_covariates_plot)$plot
+```
 # Model Identification
 Covariates are added as fixed and random effects iteratively if model improvement by  Bayesian Information Criteria (BIC) was observed.
 ```{r model}

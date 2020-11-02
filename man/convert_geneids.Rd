@@ -7,7 +7,7 @@
 convert_geneids(count_df)
 }
 \arguments{
-\item{count_df}{A counts data frame with sample identifiers as rownames.}
+\item{count_df}{A counts data frame with sample identifiers as column names.}
 }
 \description{
 Get gene Ids

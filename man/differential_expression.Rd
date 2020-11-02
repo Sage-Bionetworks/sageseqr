@@ -8,9 +8,9 @@ differential_expression(
   filtered_counts,
   cqn_counts,
   md,
-  model_variables = NULL,
   primary_variable,
-  biomart_results
+  biomart_results,
+  model_variables = NULL
 )
 }
 \arguments{
@@ -20,13 +20,13 @@ differential_expression(
 
 \item{md}{A data frame with sample identifiers in a column and relevant experimental covariates.}
 
-\item{model_variables}{Optional. Vector of variables to include in the linear (mixed) model.
-If not supplied, the model will include all variables in \code{md}.}
-
 \item{primary_variable}{Vector of variables that will be collapsed into a single
 fixed effect interaction term.}
 
 \item{biomart_results}{Output of \code{"sageseqr::get_biomart()"}.}
+
+\item{model_variables}{Optional. Vector of variables to include in the linear (mixed) model.
+If not supplied, the model will include all variables in \code{md}.}
 }
 \description{
 Differential expression testing is performed with \code{"variancePartition::dream()"} to increase power
