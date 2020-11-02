@@ -1,5 +1,4 @@
 ---
-title: "sageseqr-report"
 date: "`r date()`"
 output: 
   html_document:
@@ -7,7 +6,12 @@ output:
     toc: true
     toc_float: true
 ---
-
+```{r title}
+title_var <- config::get("analysis title")
+```
+---
+title: `r title_var`
+---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, 
                       fig.align = 'left',
