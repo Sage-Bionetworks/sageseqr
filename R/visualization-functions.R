@@ -659,11 +659,13 @@ boxplot_vars <- function(md, include_vars, x_var) {
 plot_sexcheck <- function(clean_metadata, count_df, biomart_results, sex_var) {
   md <- tibble::rownames_to_column(clean_metadata, var = "sampleId") %>%
     dplyr::select(.data$sampleId, !!sex_var)
-  counts <- tibble::rownames_to_column(count_df, var = "geneId")
+  sex_specific <- count_df[grepl(paste0(rownames(biomart_results[biomart_results$hgnc_symbol %in% c("UTY", "XIST"),]), collapse = "|"), rownames(count_df)),]
+  rownames(sex_specific) <- convert_geneids(sex_specific)
+  sex_specific <- tibble::rownames_to_column(sex_specific, var = "geneId")
   results <- dplyr::select(biomart_results, .data$hgnc_symbol, .data$chromosome_name)
   results <- dplyr::filter(results, .data$hgnc_symbol %in% c("XIST", "UTY"))
   results <- tibble::rownames_to_column(results, var = "geneId")
-  results <- dplyr::left_join(results, counts)
+  results <- dplyr::left_join(results, sex_specific)
   results <- tidyr::pivot_longer(results,
                                  -dplyr::all_of(c("geneId", "chromosome_name", "hgnc_symbol")),
                                  names_to = "sampleId",
