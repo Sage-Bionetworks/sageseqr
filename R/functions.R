@@ -413,11 +413,18 @@ build_formula <- function(md, primary_variable, model_variables = names(md)) {
 
   object <- list(metadata = md %>%
                    tidyr::unite(!!interaction_term, dplyr::all_of(primary_variable), sep = "_"),
-                formula = glue::glue("~ {interaction_term}+",
-                                     glue::glue_collapse(formula, sep = "+")),
-                formula_non_intercept = glue::glue("~ 0+{interaction_term}+",
-                                                   glue::glue_collapse(formula, sep = "+")),
-                primary_variable = interaction_term
+                formula = formula(
+                  glue::glue("~ {interaction_term}+",
+                             glue::glue_collapse(formula, sep = "+")
+                             )
+                  ),
+                formula_non_intercept = formula(
+                  glue::glue("~ 0+{interaction_term}+",
+                             glue::glue_collapse(formula, sep = "+")
+                             )
+                  ),
+                primary_variable = interaction_term,
+                variables = unlist(formula)
   )
 
   # Resolve dropped class type of factor without losing samples as rownames
@@ -524,6 +531,32 @@ wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
              function(x) differential_expression(filtered_counts, cqn_counts, md, primary_variable = x,
                                                  biomart_results, model_variables))
 
+}
+#' Stepwise Regression
+#'
+#' This function performs multivariate forward stepwise regression evaluated by multivariate Bayesian Information
+#' Critera (BIC) by wrapping \code{"mvIC::mvForwardStepwise()"}.
+#'
+#' @inheritParams differential_expression
+#' @inheritParams build_formula
+#' @export
+stepwise_regression <- function(md, model_variables = NULL, primary_variable, cqn_counts) {
+  metadata_input <- build_formula(md, model_variables, primary_variable)
+  model <- mvIC::mvForwardStepwise(exprObj = cqn_counts$E,
+                                   baseFormula = metadata_input$formula,
+                                   data = metadata_input$metadata,
+                                   variables = array(metadata_input$variables)
+  )
+
+  to_visualize <- model %>%
+    dplyr::select(.data$iter, .data$variable, .data$isAdded) %>%
+    dplyr::rename(iteration = .data$iter,
+                  `added to model` = .data$isAdded) %>%
+    dplyr::filter(.data$`added to model` == "yes")
+
+  model["to_visualize"] <- to_visualize
+
+  model
 }
 #' Summarize Biotypes
 #'
