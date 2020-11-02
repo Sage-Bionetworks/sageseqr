@@ -24,6 +24,7 @@
 #' @inheritParams get_biomart
 #' @inheritParams filter_genes
 #' @inheritParams identify_outliers
+#' @param skip_model If TRUE, does not run regression model.
 #' @export
 rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                         counts_version, gene_id_input, sample_id_input,
@@ -32,7 +33,7 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                         organism, conditions, cpm_threshold = 1,
                         conditions_threshold = 0.5,
                         x_var_for_plot, sex_var, color, shape, size,
-                        report_name) {
+                        report_name, skip_model) {
 
   # Copies markdown to user's working directory
   if (!file.exists("sageseqr-report.Rmd")) {
@@ -71,7 +72,7 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                             include_vars = !!continuous_input,
                             x_var = !!x_var_for_plot),
     sex_plot = conditional_plot_sexcheck(clean_md,
-                                         counts,
+                                         filtered_counts,
                                          biomart_results,
                                          !!sex_var),
     correlation_plot = get_association_statistics(clean_md),
@@ -79,9 +80,12 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                                                                 clean_md),
     outliers = identify_outliers(filtered_counts, clean_md, !!color, !!shape,
                                  !!size),
-     model = stepwise_regression(clean_md,
-                                primary_variable = !!x_var_for_plot,
-                                cqn_counts = cqn_counts),
+     model = drake::cancel_if(isTRUE(!!skip_model)),
+      stepwise_regression(
+        clean_md,
+        primary_variable = !!x_var_for_plot,
+        cqn_counts = cqn_counts
+        ),
     report = rmarkdown::render(
       drake::knitr_in("sageseqr-report.Rmd"),
       output_file = drake::file_out(

@@ -51,7 +51,8 @@ plan <- sageseqr::rnaseq_plan(metadata_id = config::get("metadata")$synID,
                     color = config::get("dimensions")$color, 
                     shape = config::get("dimensions")$shape,
                     size = config::get("dimensions")$size,
-                    report_name = config::get("report")
+                    report_name = config::get("report"),
+                    skip_model = config::get("skip model")
 )
 
 drake::make(plan)

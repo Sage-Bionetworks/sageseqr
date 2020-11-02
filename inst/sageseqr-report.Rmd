@@ -15,8 +15,8 @@ title: `r title_var`
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, 
                       fig.align = 'left',
-                      fig.width = 5, 
-                      fig.height = 5)
+                      fig.width = 10, 
+                      fig.height = 10)
 library(sageseqr)
 ```
 # Data
@@ -82,10 +82,14 @@ Significant covariates are identified by the pearson correlation (p-value of 1%)
 ```{r pca_and_significant_covariates}
 drake::readd(significant_covariates_plot)$plot
 ```
-# Model Identification
-Covariates are added as fixed and random effects iteratively if model improvement by  Bayesian Information Criteria (BIC) was observed.
+
 ```{r model}
+if (!isTRUE(config::get("skip model"))) {
+  cat("# Model Identification
+Covariates are added as fixed and random effects iteratively if model improvement by  Bayesian Information Criteria (BIC) was observed.")
+
 summary <- drake::readd(model)
 knitr::kable(summary$to_visualize)
 as.character(summary$formula)[2]
+}
 ```
