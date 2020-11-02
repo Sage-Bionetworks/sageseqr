@@ -249,20 +249,21 @@ collapse_duplicate_hgnc_symbol <- function(biomart_results){
 filter_genes <- function(clean_metadata, count_df,
                          cpm_threshold, conditions_threshold,
                          conditions = NULL) {
-  if (!is.null(conditions) & class(conditions) == "list") {
-    conditions <- unique(conditions[[1]])
-  } else {
-    conditions <- unique(conditions)
-  }
-
-  if (!any(conditions %in% colnames(clean_metadata))) {
-    stop("Conditions are missing from the metadata.")
-  }
 
   # Check for extraneous rows
   count_df <- parse_counts(count_df)
 
   if (!is.null(conditions)) {
+    if (!is.null(conditions) & class(conditions) == "list") {
+      conditions <- unique(conditions[[1]])
+    } else {
+      conditions <- unique(conditions)
+    }
+
+    if (!any(conditions %in% colnames(clean_metadata))) {
+      stop("Conditions are missing from the metadata.")
+    }
+
     split_data <- split(clean_metadata,
                         f = as.list(clean_metadata[, conditions, drop = F]),
                         drop = T)
