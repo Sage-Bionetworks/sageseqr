@@ -26,7 +26,8 @@ rnaseq_plan(
   color,
   shape,
   size,
-  report_name
+  report_name,
+  skip_model
 )
 }
 \arguments{
@@ -86,6 +87,8 @@ by shape.}
 by size.}
 
 \item{report_name}{Name of output markdown file.}
+
+\item{skip_model}{If TRUE, does not run regression model.}
 }
 \description{
 This function wraps the \code{"drake::plan()"} and copies the R markdown report to the

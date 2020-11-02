@@ -26,4 +26,5 @@ default:
     color: "diagnosis"
     shape: "batch"
     size: "ageofdeath"
+  skip model: TRUE
   report: "output-report"
