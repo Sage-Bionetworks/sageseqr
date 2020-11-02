@@ -65,7 +65,8 @@ This specification is highly recommended for a reproducible workflow.
 \item{organism}{A character vector of the organism name. This argument
 takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".}
 
-\item{conditions}{Conditions to bin gene counts that correspond to variables in `md`.}
+\item{conditions}{Optional. Conditions to bin gene counts that correspond to
+variables in `md`.}
 
 \item{cpm_threshold}{The minimum number of CPM allowed.}
 
