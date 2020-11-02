@@ -16,7 +16,7 @@ filter_genes(
 \item{clean_metadata}{A data frame with sample identifiers as rownames and variables as
 factors or numeric as determined by \code{"sageseqr::clean_covariates()"}.}
 
-\item{count_df}{A counts data frame with sample identifiers as rownames.}
+\item{count_df}{A counts data frame with sample identifiers as column names.}
 
 \item{conditions}{Conditions to bin gene counts that correspond to variables in `md`.}
 

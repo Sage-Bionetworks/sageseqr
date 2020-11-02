@@ -40,7 +40,6 @@ plan <- sageseqr::rnaseq_plan(metadata_id = config::get("metadata")$synID,
                     sample_id_input = config::get("metadata")$`sample id`,
                     factor_input = config::get("factors"),
                     continuous_input = config::get("continuous"),
-                    gene_id = config::get("biomart")$`gene id`,
                     biomart_id = config::get("biomart")$synID,
                     biomart_version = config::get("biomart")$version,
                     filters = config::get("biomart")$filters,
@@ -48,7 +47,11 @@ plan <- sageseqr::rnaseq_plan(metadata_id = config::get("metadata")$synID,
                     organism = config::get("biomart")$organism, 
                     conditions = config::get("conditions"), 
                     x_var_for_plot = config::get("x_var"), 
-                    sex_var = config::get("sex check")
+                    sex_var = config::get("sex check"), 
+                    color = config::get("dimensions")$color, 
+                    shape = config::get("dimensions")$shape,
+                    size = config::get("dimensions")$size,
+                    report_name = config::get("report")
 )
 
 drake::make(plan)

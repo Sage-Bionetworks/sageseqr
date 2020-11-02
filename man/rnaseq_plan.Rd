@@ -13,7 +13,6 @@ rnaseq_plan(
   sample_id_input,
   factor_input,
   continuous_input,
-  gene_id,
   biomart_id,
   biomart_version,
   host,
@@ -23,7 +22,11 @@ rnaseq_plan(
   cpm_threshold = 1,
   conditions_threshold = 0.5,
   x_var_for_plot,
-  sex_var
+  sex_var,
+  color,
+  shape,
+  size,
+  report_name
 )
 }
 \arguments{
@@ -48,8 +51,6 @@ in the metadata as column names.}
 \item{continuous_input}{Vector of continuous variables. Variables must be
 present in the metadata as column names.}
 
-\item{gene_id}{Column name of gene Ids}
-
 \item{biomart_id}{Synapse ID to biomart object.}
 
 \item{biomart_version}{Optionally, include Synapse file version number.}
@@ -73,6 +74,17 @@ takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".}
 \item{x_var_for_plot}{Variable to separate groups for boxplot.}
 
 \item{sex_var}{Column name of the sex or gender-specific metadata.}
+
+\item{color}{Discrete variable in `clean_metadata` differentiated
+by color.}
+
+\item{shape}{Discrete variable in `clean_metadata` differentiated
+by shape.}
+
+\item{size}{Continuous variable in `clean_metadata` differentiated
+by size.}
+
+\item{report_name}{Name of output markdown file.}
 }
 \description{
 This function wraps the \code{"drake::plan()"} and copies the R markdown report to the

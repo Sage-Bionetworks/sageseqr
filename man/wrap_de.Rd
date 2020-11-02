@@ -9,8 +9,8 @@ wrap_de(
   filtered_counts,
   cqn_counts,
   md,
-  model_variables,
-  biomart_results
+  biomart_results,
+  model_variables = NULL
 )
 }
 \arguments{
@@ -23,10 +23,10 @@ in \code{"sagseqr::differential_expression()"}.}
 
 \item{md}{A data frame with sample identifiers in a column and relevant experimental covariates.}
 
+\item{biomart_results}{Output of \code{"sageseqr::get_biomart()"}.}
+
 \item{model_variables}{Optional. Vector of variables to include in the linear (mixed) model.
 If not supplied, the model will include all variables in \code{md}.}
-
-\item{biomart_results}{Output of \code{"sageseqr::get_biomart()"}.}
 }
 \description{
 This function will pass multiple conditions to test to \code{"sagseqr::differential_expression()"}.

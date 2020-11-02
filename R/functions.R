@@ -90,76 +90,6 @@ clean_covariates <- function(md, factors, continuous, sample_identifier) {
     md
   }
 }
-#'Explore metadata by variable.
-#'
-#'This function produces boxplots from the variables provided.
-#'
-#'@inheritParams coerce_factors
-#'@param include_vars A vector of variables to visualize
-#'@param x_var Variable to plot on the x-axis.
-#'@importFrom rlang .data
-#'
-#'@export
-#'@return A boxplot with mutiple groups defined by the include_vars argument.
-boxplot_vars <- function(md, include_vars, x_var) {
-  sagethemes::import_lato()
-  df <- dplyr::select(md, !!include_vars, !!x_var) %>%
-    tidyr::pivot_longer(-!!x_var, names_to = "key", values_to = "value")
-  p <- ggplot2::ggplot(df, ggplot2::aes(x = .data[[x_var]],
-                                        y = .data$value,
-                                        group = .data[[x_var]])) +
-    ggplot2::geom_boxplot(ggplot2::aes(fill = .data[[x_var]])) +
-    ggplot2::facet_wrap(key ~ ., scales = "free") +
-    sagethemes::scale_fill_sage_d() +
-    sagethemes::theme_sage()
-  p
-}
-#' Explore metadata by gene expression on the sex chromosomes.
-#'
-#' This function plots expression of X and Y marker genes, XIST and UTY respectively, and
-#' colors each sample by the sex- or gender-specific labeling from the metadata. This is a
-#' handy check to determine if samples were swapped or mislabeled.
-#'
-#' @inheritParams collapse_duplicate_hgnc_symbol
-#' @inheritParams filter_genes
-#' @param sex_var Column name of the sex or gender-specific metadata.
-#' @export
-plot_sexcheck <- function(clean_metadata, count_df, biomart_results, sex_var) {
-  md <- tibble::rownames_to_column(clean_metadata, var = "sampleId") %>%
-    dplyr::select(.data$sampleId, !!sex_var)
-  counts <- tibble::rownames_to_column(count_df, var = "geneId")
-  results <- dplyr::select(biomart_results, .data$hgnc_symbol, .data$chromosome_name)
-  results <- dplyr::filter(results, .data$hgnc_symbol %in% c("XIST", "UTY"))
-  results <- tibble::rownames_to_column(results, var = "geneId")
-  results <- dplyr::left_join(results, counts)
-  results <- tidyr::pivot_longer(results,
-                                 -dplyr::all_of(c("geneId", "chromosome_name", "hgnc_symbol")),
-                                 names_to = "sampleId",
-                                 values_to = "counts(log)") %>%
-    dplyr::mutate(`counts(log)` = log(.data$`counts(log)`),
-                  `counts(log)` = ifelse(.data$`counts(log)` == -Inf, 0, .data$`counts(log)`))
-  results <- dplyr::left_join(results, md, "sampleId")
-  results <- tidyr::spread(results, key = .data$hgnc_symbol, value = .data$`counts(log)`) %>%
-    dplyr::mutate(UTY = ifelse(is.na(.data$UTY), 0, .data$UTY),
-                  XIST = ifelse(is.na(.data$XIST), 0, .data$XIST))
-  p <- ggplot2::ggplot(results, ggplot2::aes(x = .data$XIST, y = .data$UTY)) +
-    ggplot2::geom_point(ggplot2::aes(color = .data[[sex_var]])) +
-    sagethemes::scale_color_sage_d() +
-    sagethemes::theme_sage()
-  p <- list(plot = p,
-            sex_specific_counts = results)
-  p
-}
-#' Conditionally wrap plot_sexcheck for drake
-#'
-#' Work around to expose plot_sexcheck to testing and export but also leverage
-#' drakes function for skipping targets conditionally (see \code{"drake::cancel_if()"}).
-#' @inheritParams plot_sexcheck
-#' @export
-conditional_plot_sexcheck <- function(clean_metadata, count_df, biomart_results, sex_var) {
-  drake::cancel_if(is.null(sex_var))
-  plot_sexcheck(clean_metadata, count_df, biomart_results, sex_var)
-}
 #'Get available Ensembl dataset
 #'
 #'Helper function to search relative Ensembl datasets by partial organism names.
@@ -204,9 +134,8 @@ parse_counts <- function(count_df){
 #'and other metadata from Ensembl BioMart. Object returned contains gene Ids
 #'as rownames.
 #'
-#'@param count_df A counts data frame with sample identifiers as rownames.
+#'@param count_df A counts data frame with sample identifiers as column names.
 #'@inheritParams get_data
-#'@param gene_id Column name of gene Ids
 #'@param filters A character vector listing biomaRt query filters.
 #'(For a list of filters see \code{"biomaRt::listFilters()"})
 #'@param host An optional character vector specifying the release version.
@@ -216,8 +145,8 @@ parse_counts <- function(count_df){
 #'takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".
 #'@importFrom rlang .data
 #'@export
-get_biomart <- function(count_df, gene_id, synid, version, host, filters, organism) {
-  if (is.null(config::get("biomart")$synID)) {
+get_biomart <- function(count_df, synid, version, host, filters, organism) {
+  if (is.null(synid)) {
     # Get available datset from Ensembl
     ensembl <- biomart_obj(organism, host)
 
@@ -263,7 +192,7 @@ get_biomart <- function(count_df, gene_id, synid, version, host, filters, organi
     biomart_results <- collapse_duplicate_hgnc_symbol(biomart_results)
 
     # Biomart IDs as rownames
-    biomart_results <- tibble::column_to_rownames(biomart_results, var = gene_id)
+    biomart_results <- tibble::column_to_rownames(biomart_results, var = filters)
 
     biomart_results
   } else {
@@ -271,7 +200,7 @@ get_biomart <- function(count_df, gene_id, synid, version, host, filters, organi
     biomart_results <- get_data(synid, version)
 
     # Biomart IDs as rownames
-    biomart_results <- tibble::column_to_rownames(biomart_results, var = gene_id)
+    biomart_results <- tibble::column_to_rownames(biomart_results, var = filters)
 
     # Gene metadata required for count CQN
     required_variables <- c("gene_length", "percentage_gene_gc_content")
@@ -450,20 +379,18 @@ mclust::mclustBIC
 #' fixed effect interaction term.
 #' @inheritParams coerce_factors
 #' @export
-build_formula <- function(md, model_variables = NULL, primary_variable) {
+build_formula <- function(md, primary_variable, model_variables = names(md)) {
 
   if (!(all(purrr::map_lgl(md, function(x) inherits(x, c("numeric", "factor")))))) {
     stop("Use sageseqr::clean_covariates() to coerce variables into factor and numeric types.")
   }
   # Update metadata to reflect variable subset
-  if (!is.null(model_variables)) {
-    vars <- c(model_variables, primary_variable)
-    md <- dplyr::select(md, dplyr::all_of(vars))
-  }
+  md <- dplyr::select(md, dplyr::all_of(c(model_variables, primary_variable)))
+
   # Variables of factor or numeric class are required
-    col_type <- dplyr::select(md, -primary_variable) %>%
-      dplyr::summarise_all(class) %>%
-      tidyr::pivot_longer(tidyr::everything(), names_to = "variable", values_to = "class")
+  col_type <- dplyr::select(md, -primary_variable) %>%
+    dplyr::summarise_all(class) %>%
+    tidyr::pivot_longer(tidyr::everything(), names_to = "variable", values_to = "class")
 
   # Categorical or factor variables are modeled as a random effect by (1|variable)
   # Numeric variables are scaled to account for when the spread of data values differs
@@ -517,9 +444,9 @@ build_formula <- function(md, model_variables = NULL, primary_variable) {
 #' @inheritParams build_formula
 #' @inheritParams cqn
 #' @export
-differential_expression <- function(filtered_counts, cqn_counts, md, model_variables = NULL,
-                                    primary_variable, biomart_results) {
-  metadata_input <- build_formula(md, model_variables, primary_variable)
+differential_expression <- function(filtered_counts, cqn_counts, md, primary_variable,
+                                    biomart_results, model_variables = NULL) {
+  metadata_input <- build_formula(md, primary_variable, model_variables)
   gene_expression <- edgeR::DGEList(filtered_counts)
   gene_expression <- edgeR::calcNormFactors(gene_expression)
   voom_gene_expression <- variancePartition::voomWithDreamWeights(counts = gene_expression,
@@ -596,11 +523,13 @@ differential_expression <- function(filtered_counts, cqn_counts, md, model_varia
 #' @param conditions A list of conditions to test as `primary_variable`
 #' in \code{"sagseqr::differential_expression()"}.
 #' @inheritParams differential_expression
+#' @inheritParams build_formula
 #' @export
-wrap_de <- function(conditions, filtered_counts, cqn_counts, md, model_variables, biomart_results) {
+wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
+                    biomart_results, model_variables = NULL) {
   purrr::map(conditions,
-             function(x) differential_expression(filtered_counts, cqn_counts, md, model_variables,
-                                                 primary_variable = x, biomart_results))
+             function(x) differential_expression(filtered_counts, cqn_counts, md, primary_variable = x,
+                                                 biomart_results, model_variables))
 
 }
 #' Stepwise Regression
@@ -628,4 +557,19 @@ stepwise_regression <- function(md, model_variables = NULL, primary_variable, cq
   model["to_visualize"] <- to_visualize
 
   model
+}
+#' Summarize Biotypes
+#'
+#' Computes the fraction of genes of a particular biotype. The number of genes
+#' must be above 100 to be summarized.
+#'
+#' @inheritParams collapse_duplicate_hgnc_symbol
+#' @inheritParams cqn
+#' @export
+summarize_biotypes <- function(filtered_counts, biomart_results) {
+  biomart_results[rownames(filtered_counts),] %>%
+    dplyr::group_by(.data$gene_biotype) %>%
+    dplyr::summarise(fraction = dplyr::n()) %>%
+    dplyr::filter(.data$fraction > 100) %>%
+    dplyr::mutate(fraction = .data$fraction/dim(filtered_counts)[1])
 }

@@ -7,7 +7,7 @@
 simple_filter(count_df, cpm_threshold, conditions_threshold)
 }
 \arguments{
-\item{count_df}{A counts data frame with sample identifiers as rownames.}
+\item{count_df}{A counts data frame with sample identifiers as column names.}
 
 \item{cpm_threshold}{The minimum number of CPM allowed.}
 

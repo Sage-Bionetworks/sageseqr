@@ -4,16 +4,16 @@
 \alias{build_formula}
 \title{Formula Builder}
 \usage{
-build_formula(md, model_variables = NULL, primary_variable)
+build_formula(md, primary_variable, model_variables = names(md))
 }
 \arguments{
 \item{md}{A data frame with sample identifiers in a column and relevant experimental covariates.}
 
-\item{model_variables}{Optional. Vector of variables to include in the linear (mixed) model.
-If not supplied, the model will include all variables in \code{md}.}
-
 \item{primary_variable}{Vector of variables that will be collapsed into a single
 fixed effect interaction term.}
+
+\item{model_variables}{Optional. Vector of variables to include in the linear (mixed) model.
+If not supplied, the model will include all variables in \code{md}.}
 }
 \description{
 If a linear mixed model is used, all categorical variables must be
