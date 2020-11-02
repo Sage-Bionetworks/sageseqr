@@ -240,14 +240,16 @@ collapse_duplicate_hgnc_symbol <- function(biomart_results){
 #' @inheritParams coerce_factors
 #' @inheritParams get_biomart
 #' @inheritParams simple_filter
-#' @param conditions Conditions to bin gene counts that correspond to variables in `md`.
+#' @param conditions Optional. Conditions to bin gene counts that correspond to
+#' variables in `md`.
 #' @param clean_metadata A data frame with sample identifiers as rownames and variables as
 #' factors or numeric as determined by \code{"sageseqr::clean_covariates()"}.
 #' @importFrom magrittr %>%
 #' @export
-filter_genes <- function(clean_metadata, count_df, conditions,
-                         cpm_threshold, conditions_threshold) {
-  if (class(conditions) == "list") {
+filter_genes <- function(clean_metadata, count_df,
+                         cpm_threshold, conditions_threshold,
+                         conditions = NULL) {
+  if (!is.null(conditions) & class(conditions) == "list") {
     conditions <- unique(conditions[[1]])
   } else {
     conditions <- unique(conditions)
@@ -260,19 +262,27 @@ filter_genes <- function(clean_metadata, count_df, conditions,
   # Check for extraneous rows
   count_df <- parse_counts(count_df)
 
-  split_data <- split(clean_metadata,
-                      f = as.list(clean_metadata[, conditions, drop = F]),
-                      drop = T)
+  if (!is.null(conditions)) {
+    split_data <- split(clean_metadata,
+                        f = as.list(clean_metadata[, conditions, drop = F]),
+                        drop = T)
 
-  map_genes <- purrr::map(split_data, function(x) {
-    simple_filter(count_df[, rownames(x), drop = F],
-                  cpm_threshold,
-                  conditions_threshold)
+    map_genes <- purrr::map(split_data, function(x) {
+      simple_filter(count_df[, rownames(x), drop = F],
+                    cpm_threshold,
+                    conditions_threshold)
     })
 
-  genes_to_analyze <- unlist(map_genes) %>%
-    unique() %>%
-    sort()
+    genes_to_analyze <- unlist(map_genes) %>%
+      unique() %>%
+      sort()
+  } else {
+    genes_to_analyze <- simple_filter(
+      count_df,
+      cpm_threshold,
+      conditions_threshold
+    )
+  }
 
   processed_counts <- count_df[genes_to_analyze,]
 
