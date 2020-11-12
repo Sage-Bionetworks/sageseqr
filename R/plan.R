@@ -1,14 +1,15 @@
 #' Execute the drake RNA-seq plan
 #'
-#' This function wraps the \code{"drake::plan()"} and copies the R markdown report to the
-#' user's working directory.
+#' This function wraps the \code{"drake::plan()"} and copies the R markdown
+#' report to the user's working directory.
 #'
-#' @param metadata_id Synapse ID to clean metadata file with sample identifiers in a
-#' column and variables of interest as column names. There cannot be any missing values.
-#' @param metadata_version Optionally, include Synapse file version number. If omitted,
-#' current version will be downloaded.
-#' @param counts_id Synapse ID to counts data frame with identifiers to the metadata as
-#' column names and gene ids in a column.
+#' @param metadata_id Synapse ID to clean metadata file with sample identifiers
+#' in a column and variables of interest as column names. There cannot be any
+#' missing values.
+#' @param metadata_version Optionally, include Synapse file version number. If
+#' omitted, current version will be downloaded.
+#' @param counts_id Synapse ID to counts data frame with identifiers to the
+#' metadata as column names and gene ids in a column.
 #' @param counts_version Optionally, include Synapse file version number.
 #' @param gene_id_input Column name of the gene ids in the counts_id file.
 #' @param sample_id_input Column name of the sample ids in the metadata_id file.
