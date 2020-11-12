@@ -17,7 +17,7 @@ metadata <- data.frame(
 counts <- data.frame(matrix(
   sample(0:100, size = 16),
   ncol = 8,
-  dimnames = list(c("ENSG00000229807", "ENSG00000183878"),
+  dimnames = list(c("ENSG00000229807.12", "ENSG00000183878.12"),
                   c("S1", "S2", "S3", "S4",  "S5", "S6", "S7", "S8"))
 ))
 
