@@ -32,7 +32,8 @@ library(sageseqr)
 synapser::synLogin()
 
 # Run the analysis
-plan <- sageseqr::rnaseq_plan(metadata_id = config::get("metadata")$synID,
+plan <- sageseqr::rnaseq_plan(cache = config::get("analysis title"),
+                    metadata_id = config::get("metadata")$synID,
                     metadata_version = config::get("metadata")$version,
                     counts_id = config::get("counts")$synID,
                     counts_version = config::get("counts")$version,
@@ -55,7 +56,7 @@ plan <- sageseqr::rnaseq_plan(metadata_id = config::get("metadata")$synID,
                     skip_model = config::get("skip model")
 )
 
-drake::make(plan)
+drake::make(plan, cache = config::get("analysis title"))
 ```
 
 4. Visualize the results of your work. 

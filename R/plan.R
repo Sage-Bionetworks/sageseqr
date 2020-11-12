@@ -20,6 +20,9 @@
 #' @param biomart_version Optionally, include Synapse file version number.
 #' @param x_var_for_plot Variable to separate groups for boxplot.
 #' @param report_name Name of output markdown file.
+#' @param cache Explicitly specify the name of the cache created with
+#' \code{"drake::new_cache()"}. Required when multiple plans are executed in the
+#' same R session.
 #' @inheritParams plot_sexcheck
 #' @inheritParams get_biomart
 #' @inheritParams filter_genes
@@ -33,7 +36,10 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                         organism, conditions, cpm_threshold = 1,
                         conditions_threshold = 0.5,
                         x_var_for_plot, sex_var, color, shape, size,
-                        report_name, skip_model) {
+                        report_name, skip_model, cache) {
+
+  # Create cache to keep plans executed with distinct data siloed
+  drake::new_cache(path = cache)
 
   # Copies markdown to user's working directory
   if (!file.exists("sageseqr-report.Rmd")) {
