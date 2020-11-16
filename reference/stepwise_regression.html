@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Subset counts data frame — parse_counts • sageseqr</title>
+<title>Stepwise Regression — stepwise_regression • sageseqr</title>
 
 
 <!-- jquery -->
@@ -39,10 +39,9 @@
 
 
 
-<meta property="og:title" content="Subset counts data frame — parse_counts" />
-<meta property="og:description" content="The biomaRt query requires only gene identifiers to be passed as input. Some alignment
-output combines additional metadata with the counts file. This function will remove
-extraneous rows and is especially meant to address output from the STAR aligner." />
+<meta property="og:title" content="Stepwise Regression — stepwise_regression" />
+<meta property="og:description" content="This function performs multivariate forward stepwise regression evaluated by multivariate Bayesian Information
+Critera (BIC) by wrapping &quot;mvIC::mvForwardStepwise()&quot;." />
 
 
 
@@ -120,26 +119,38 @@ extraneous rows and is especially meant to address output from the STAR aligner.
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Subset counts data frame</h1>
+    <h1>Stepwise Regression</h1>
     
-    <div class="hidden name"><code>parse_counts.Rd</code></div>
+    <div class="hidden name"><code>stepwise_regression.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>The biomaRt query requires only gene identifiers to be passed as input. Some alignment
-output combines additional metadata with the counts file. This function will remove
-extraneous rows and is especially meant to address output from the STAR aligner.</p>
+    <p>This function performs multivariate forward stepwise regression evaluated by multivariate Bayesian Information
+Critera (BIC) by wrapping <code>"mvIC::mvForwardStepwise()"</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>parse_counts</span><span class='op'>(</span><span class='va'>count_df</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>stepwise_regression</span><span class='op'>(</span><span class='va'>md</span>, model_variables <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>primary_variable</span>, <span class='va'>cqn_counts</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>count_df</th>
-      <td><p>A counts data frame with sample identifiers as column names
-and transcript Ids removed with <code>"sageseqr::convert_geneids"</code>.</p></td>
+      <th>md</th>
+      <td><p>A data frame with sample identifiers in a column and relevant experimental covariates.</p></td>
+    </tr>
+    <tr>
+      <th>model_variables</th>
+      <td><p>Optional. Vector of variables to include in the linear (mixed) model.
+If not supplied, the model will include all variables in <code>md</code>.</p></td>
+    </tr>
+    <tr>
+      <th>primary_variable</th>
+      <td><p>Vector of variables that will be collapsed into a single
+fixed effect interaction term.</p></td>
+    </tr>
+    <tr>
+      <th>cqn_counts</th>
+      <td><p>A counts data frame normalized by CQN.</p></td>
     </tr>
     </table>
 

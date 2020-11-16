@@ -134,9 +134,9 @@ counts per million (CPM) for a given condition is computed by <code>"sageseqr::s
     <pre class="usage"><span class='fu'>filter_genes</span><span class='op'>(</span>
   <span class='va'>clean_metadata</span>,
   <span class='va'>count_df</span>,
-  <span class='va'>conditions</span>,
   <span class='va'>cpm_threshold</span>,
-  <span class='va'>conditions_threshold</span>
+  <span class='va'>conditions_threshold</span>,
+  conditions <span class='op'>=</span> <span class='cn'>NULL</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -149,11 +149,8 @@ factors or numeric as determined by <code>"sageseqr::clean_covariates()"</code>.
     </tr>
     <tr>
       <th>count_df</th>
-      <td><p>A counts data frame with sample identifiers as column names.</p></td>
-    </tr>
-    <tr>
-      <th>conditions</th>
-      <td><p>Conditions to bin gene counts that correspond to variables in `md`.</p></td>
+      <td><p>A counts data frame with sample identifiers as column names
+and transcript Ids removed with <code>"sageseqr::convert_geneids"</code>.</p></td>
     </tr>
     <tr>
       <th>cpm_threshold</th>
@@ -162,6 +159,11 @@ factors or numeric as determined by <code>"sageseqr::clean_covariates()"</code>.
     <tr>
       <th>conditions_threshold</th>
       <td><p>Percentage of samples that should contain the minimum CPM.</p></td>
+    </tr>
+    <tr>
+      <th>conditions</th>
+      <td><p>Optional. Conditions to bin gene counts that correspond to
+variables in `md`.</p></td>
     </tr>
     </table>
 

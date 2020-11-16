@@ -151,7 +151,8 @@ user's working directory.</p>
   <span class='va'>color</span>,
   <span class='va'>shape</span>,
   <span class='va'>size</span>,
-  <span class='va'>report_name</span>
+  <span class='va'>report_name</span>,
+  <span class='va'>skip_model</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -220,7 +221,8 @@ takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".</p>
     </tr>
     <tr>
       <th>conditions</th>
-      <td><p>Conditions to bin gene counts that correspond to variables in `md`.</p></td>
+      <td><p>Optional. Conditions to bin gene counts that correspond to
+variables in `md`.</p></td>
     </tr>
     <tr>
       <th>cpm_threshold</th>
@@ -256,6 +258,10 @@ by size.</p></td>
     <tr>
       <th>report_name</th>
       <td><p>Name of output markdown file.</p></td>
+    </tr>
+    <tr>
+      <th>skip_model</th>
+      <td><p>If TRUE, does not run regression model.</p></td>
     </tr>
     </table>
 
