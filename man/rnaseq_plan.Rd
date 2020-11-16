@@ -90,10 +90,6 @@ by size.}
 \item{report_name}{Name of output markdown file.}
 
 \item{skip_model}{If TRUE, does not run regression model.}
-
-\item{cache}{Explicitly specify the name of the cache created with
-\code{"drake::new_cache()"}. Required when multiple plans are executed in the
-same R session.}
 }
 \description{
 This function wraps the \code{"drake::plan()"} and copies the R markdown

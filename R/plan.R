@@ -21,9 +21,6 @@
 #' @param biomart_version Optionally, include Synapse file version number.
 #' @param x_var_for_plot Variable to separate groups for boxplot.
 #' @param report_name Name of output markdown file.
-#' @param cache Explicitly specify the name of the cache created with
-#' \code{"drake::new_cache()"}. Required when multiple plans are executed in the
-#' same R session.
 #' @inheritParams plot_sexcheck
 #' @inheritParams get_biomart
 #' @inheritParams filter_genes
