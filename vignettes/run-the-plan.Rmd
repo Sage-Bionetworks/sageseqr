@@ -23,7 +23,7 @@ knitr::opts_chunk$set(
 Sys.setenv(R_CONFIG_ACTIVE = "default")
 ```
 
-3. Load the `sageseqr` library and login to [Synapse](https://www.synapse.org/). `rnaseq_plan()` calls the arguments from the config file and creates the `drake` plan. Execute `drake::make(plan)` to compute. Run this code from your project root.
+3. Load the `sageseqr` library and login to [Synapse](https://www.synapse.org/). `rnaseq_plan()` calls the arguments from the config file and creates the `drake` plan. Execute `drake::make(plan)` to compute. It is required to explicitly specify the name of the cache created with `drake::new_cache()` when multiple plans are executed in the same R session. Run this code from your project root.
 
 ```{r run-plan}
 library(sageseqr)
@@ -33,7 +33,6 @@ synapser::synLogin()
 
 # Run the analysis
 plan <- sageseqr::rnaseq_plan(
-  cache = config::get("analysis title"),
   metadata_id = config::get("metadata")$synID,
   metadata_version = config::get("metadata")$version,
   counts_id = config::get("counts")$synID,
@@ -59,7 +58,11 @@ plan <- sageseqr::rnaseq_plan(
 
 drake::make(
   plan,
-  cache = config::get("analysis title")
+  cache = drake::new_cache(
+    config::get(
+      "analysis title"
+      )
+    )
   )
 ```
 

@@ -37,11 +37,7 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                         organism, conditions, cpm_threshold = 1,
                         conditions_threshold = 0.5,
                         x_var_for_plot, sex_var, color, shape, size,
-                        report_name, skip_model, cache) {
-
-  # Create cache to keep plans executed with distinct data siloed
-  drake::new_cache(path = cache)
-
+                        report_name, skip_model) {
   # Copies markdown to user's working directory
   if (!file.exists("sageseqr-report.Rmd")) {
     fs::file_copy(system.file("sageseqr-report.Rmd", package = "sageseqr"),

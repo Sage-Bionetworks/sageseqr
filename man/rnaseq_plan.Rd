@@ -27,19 +27,19 @@ rnaseq_plan(
   shape,
   size,
   report_name,
-  skip_model,
-  cache
+  skip_model
 )
 }
 \arguments{
-\item{metadata_id}{Synapse ID to clean metadata file with sample identifiers in a
-column and variables of interest as column names. There cannot be any missing values.}
+\item{metadata_id}{Synapse ID to clean metadata file with sample identifiers
+in a column and variables of interest as column names. There cannot be any
+missing values.}
 
-\item{metadata_version}{Optionally, include Synapse file version number. If omitted,
-current version will be downloaded.}
+\item{metadata_version}{Optionally, include Synapse file version number. If
+omitted, current version will be downloaded.}
 
-\item{counts_id}{Synapse ID to counts data frame with identifiers to the metadata as
-column names and gene ids in a column.}
+\item{counts_id}{Synapse ID to counts data frame with identifiers to the
+metadata as column names and gene ids in a column.}
 
 \item{counts_version}{Optionally, include Synapse file version number.}
 
@@ -96,6 +96,6 @@ by size.}
 same R session.}
 }
 \description{
-This function wraps the \code{"drake::plan()"} and copies the R markdown report to the
-user's working directory.
+This function wraps the \code{"drake::plan()"} and copies the R markdown
+report to the user's working directory.
 }
