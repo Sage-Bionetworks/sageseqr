@@ -17,6 +17,7 @@ knitr::opts_chunk$set(
 A [configuration file](https://github.com/kelshmo/sageseqr/blob/master/config.yml) defines the inputs for the RNA-seq workflow. Update the default parameters to the Synapse ID where your data is stored and to the factor and continuous variables you want to test in the covariate model selection. The full list of configurable options are:
 
 ```
+analysis title: Name for the html output file and analysis-specific drake cache.
 counts:
   synID: Synapse ID to counts data frame with identifiers to the metadata as column names and gene ids in a column.
   version: Optionally, include Synapse file version number (e.g. 3).
