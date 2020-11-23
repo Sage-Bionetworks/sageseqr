@@ -38,7 +38,8 @@ biomart:
   version: Optionally, include Synapse file version number (e.g. 3).
   filters: Column name that corresponds to the gene ids (e.g. ensembl_gene_id)
   host: An optional character vector specifying the BioMart database release
-        version. This specification is highly recommended for a reproducible           workflow. Defaults to ensembl.org.
+        version. This specification is highly recommended for a reproducible           
+        workflow. Defaults to ensembl.org.
   organism: A character vector of the organism name. This argument takes
             partial strings. For example,"hsa" will match       
             "hsapiens_gene_ensembl".
