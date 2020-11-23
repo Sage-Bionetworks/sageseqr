@@ -14,22 +14,53 @@ knitr::opts_chunk$set(
 )
 ```
 
-A [configuration file](https://github.com/kelshmo/sageseqr/blob/master/config.yml) defines the inputs for the RNA-seq workflow. Update the default parameters to the Synapse ID where your data is stored and to the factor and continuous variables you want to test in the covariate model selection. The full list of configurable options are:
+A [configuration file](https://github.com/kelshmo/sageseqr/blob/master/config.yml) defines the inputs for the RNA-seq workflow. Update the default parameters to include the Synapse ID where your data is stored and to the factor and continuous variables you want to test in the covariate model selection. The full list of configurable options are:
 
 ```
+analysis title: The name of your project. This will become the name of your
+                cache and the name of your output html file.
 counts:
-  synID: Synapse ID to counts data frame with identifiers to the metadata as column names and gene ids in a column.
+  synID: Synapse ID to counts data frame with identifiers to the metadata as
+         column names and gene ids in a column.
   version: Optionally, include Synapse file version number (e.g. 3).
   gene id: Column name that corresponds to the gene ids (e.g. feature).
 metadata:
-  synID: Synapse ID to cleaned metadata file with sample identifiers in a column and variables of interest as column names.
+  synID: Synapse ID to cleaned metadata file with sample identifiers in a
+         column and variables of interest as column names.
   version: Optionally, include Synapse file version number (e.g. 3).
   sample id: Column name that corresponds to the sample ids (e.g. donorid).
 biomart:
-  synID: This input is optional. If left blank, Ensembl will be queried with the gene ids provided in the counts. Otherwise, you may provide the Synapse ID to gene metadata from Ensembl. This must include gene length and GC content in order to implement Conditional Quantile Normalization. 
+  synID: This input is optional. If left blank, Ensembl will be queried with
+         the gene ids provided in the counts. Otherwise, you may provide the
+         Synapse ID to gene metadata from Ensembl. This must include gene
+         length and GC content in order to implement Conditional Quantile
+         Normalization. 
   version: Optionally, include Synapse file version number (e.g. 3).
-  gene id: Column name that corresponds to the gene ids (e.g. ensembl_gene_id)
-factors: List of factor variables in brackets. Variables must be present in the metadata as column names (e.g. [ "donorid", "source"]).
-continuous: List of continuous variables in brackets. Variables must be present in the metadata as column names (e.g. [ "rin", "rin2"]).
-conditions: Filtering low-expression genes is a common practice to improve sensitivity in detection of differentially expressed genes. Low count genes that have less than 1 counts per million (cpm) in 50% of the samples per the conditions provided here will be removed. (e.g. ["diagnosis", "sex"])
+  filters: Column name that corresponds to the gene ids (e.g. ensembl_gene_id)
+  host: An optional character vector specifying the BioMart database release
+        version. This specification is highly recommended for a reproducible           workflow. Defaults to ensembl.org.
+  organism: A character vector of the organism name. This argument takes
+            partial strings. For example,"hsa" will match       
+            "hsapiens_gene_ensembl".
+factors: List of factor variables in brackets. Variables must be present in the
+         metadata as column names (e.g. [ "donorid", "source"]).
+continuous: List of continuous variables in brackets. Variables must be present
+            in the metadata as column names (e.g. [ "rin", "rin2"]).
+x_var: A boxplot will visualize the distribution of continuous variables using
+       the x_var as a dimension.
+conditions: Filtering low-expression genes is a common practice to improve
+            sensitivity in detection of differentially expressed genes. Low
+            count genes that have less than 1 counts per million (cpm) in 50%
+            of the samples per the conditions provided here will be removed.
+            (e.g. ["diagnosis", "sex"])
+sex check: The exact variable name that corresponds to reported gender or sex
+           to check the distribution of x and y marker expression across
+           samples.
+dimensions: Specify the PCA dimensions by variable name. 
+  color:
+  shape:
+  size:
+skip model: If TRUE, the exploratory data report is run. Model selection and 
+            differential expression is not computed.
+report: The output html report. 
 ```
