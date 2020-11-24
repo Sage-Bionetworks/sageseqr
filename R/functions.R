@@ -585,3 +585,18 @@ summarize_biotypes <- function(filtered_counts, biomart_results) {
     dplyr::filter(.data$fraction > 100) %>%
     dplyr::mutate(fraction = .data$fraction/dim(filtered_counts)[1])
 }
+#' Prepare output
+#'
+#' Store data that will be uploaded to Synapse in temporary files.
+#' @param target The name of the object to be stored.
+#' @rowname Optional. If applicable, the name of the variable to store rownames.
+#' @export
+prepare_results <- function(target, rowname = NULL) {
+  df <- get(target)
+  if (!is.null(rowname)) {
+    df <- tibble::rownames_to_column(df, rowname)
+  }
+  tmp <- fs::file_temp(target, ext = ".tsv")
+  write.table(df, file = tmp, sep = "\t", row.names = FALSE, quote = FALSE)
+  tmp
+}
