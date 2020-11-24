@@ -7,10 +7,10 @@ output:
     toc_float: true
 ---
 ```{r title}
-title_var <- config::get("analysis title")
+project <- config::get("analysis title")
 ```
 ---
-title: `r title_var`
+title: `r project`
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, 
@@ -25,7 +25,7 @@ library(sageseqr)
 # Explore Metadata
 
 ```{r sample_summary, message = FALSE}
-drake::loadd(clean_md)
+drake::loadd(clean_md, cache = drake::drake_cache(project))
 var <- config::get("x_var")
 summary <- dplyr::group_by_at(clean_md, var)
 summary <- dplyr::summarise(summary, count = dplyr::n())
@@ -34,20 +34,22 @@ knitr::kable(summary)
 
 Visualize the distribution of data.
 ```{r boxplot}
-drake::readd(boxplots)
+drake::readd(boxplots, cache = drake::drake_cache(project))
 ```
 
 ```{r boxplot_sex_chromosomes, results = "asis"}
 if (!is.null(config::get("sex check"))) {
   cat("Visualize gene expression (log-transformed counts) of sex chromosomes using XIST 
       as a X-chromosome marker and UTY as a Y-chromosome marker.")
-  drake::readd(sex_plot)$plot
+  drake::readd(sex_plot, cache = drake::drake_cache(project))$plot
 }
 ```
 
 Visualize the relationships between covariates.
 ```{r heatmap_covariates}
-correlation_input <- drake::readd(correlation_plot)$plot
+correlation_input <- drake::readd(
+  correlation_plot,
+  cache = drake::drake_cache(project))$plot
 col2 <- grDevices::colorRampPalette(rev(c("#67001F", "#B2182B", "#D6604D", "#F4A582",
                                  "#FDDBC7", "#FFFFFF", "#D1E5F0", "#92C5DE",
                                  "#4393C3", "#2166AC", "#053061")))
@@ -60,18 +62,18 @@ Remove genes that have less than 1 counts per million (CPM) in at least 50% of s
 
 `r dim(drake::readd(filtered_counts))[1]` genes are used in this analysis.
 ```{r filter_genes}
-knitr::kable(drake::readd(biotypes))
+knitr::kable(drake::readd(biotypes, cache = drake::drake_cache(project)))
 ```
 
 Check distribution of correlation between genes.
 ```{r histogram}
-drake::readd(gene_coexpression)
+drake::readd(gene_coexpression, cache = drake::drake_cache(project))
 ```
 
 # Identify Outliers
 
 ```{r plot_outliers}
-drake::readd(outliers)$plot
+drake::readd(outliers, cache = drake::drake_cache(project))$plot
 ```
 Outliers, based on logCPM expression, are `r glue::glue_collapse(drake::readd(outliers)$outliers, ", ", last = " and ")`.
 
@@ -80,7 +82,10 @@ Outliers, based on logCPM expression, are `r glue::glue_collapse(drake::readd(ou
 Significant covariates are identified by the pearson correlation (p-value of 1%) between principal component analysis (PCA) of normalized transcripts and variables that meet a 0.1 false discovery rate (FDR) threshold. Significant covariates to adjust for are `r glue::glue_collapse(drake::readd(significant_covariates_plot)$significant_covariates, ", ", last = " and ")`.
 
 ```{r pca_and_significant_covariates}
-drake::readd(significant_covariates_plot)$plot
+drake::readd(
+  significant_covariates_plot,
+  cache = drake::drake_cache(project)
+  )$plot
 ```
 
 ```{r model}
@@ -88,7 +93,7 @@ if (!isTRUE(config::get("skip model"))) {
   cat("# Model Identification
 Covariates are added as fixed and random effects iteratively if model improvement by  Bayesian Information Criteria (BIC) was observed.")
 
-summary <- drake::readd(model)
+summary <- drake::readd(model, cache = drake::drake_cache(project))
 knitr::kable(summary$to_visualize)
 as.character(summary$formula)[2]
 }
