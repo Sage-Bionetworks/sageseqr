@@ -60,7 +60,7 @@ corrplot::corrplot(correlation_input, col = col2(200), tl.col = "#000000")
 
 Remove genes that have less than 1 counts per million (CPM) in at least 50% of samples per specified condition.
 
-`r dim(drake::readd(filtered_counts))[1]` genes are used in this analysis.
+`r dim(drake::readd(filtered_counts, cache = drake_cache(project)))[1]` genes are used in this analysis.
 ```{r filter_genes}
 knitr::kable(drake::readd(biotypes, cache = drake::drake_cache(project)))
 ```
