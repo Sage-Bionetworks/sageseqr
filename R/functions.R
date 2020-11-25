@@ -622,6 +622,12 @@ prepare_results <- function(target, path_to_cache, rowname = NULL) {
 store_results <- function(parent_id, targets, rownames, names, inputs,
                           activity_provenance, config_file = NULL,
                           output_report = NULL) {
+
+  # include sageseqr package version in Synapse provenance
+  ver <- packageVersion("sageseqr")
+  description <- glue::glue(
+    "analyzed with sageseqr {ver}"
+    )
   file_location <- purrr::map2(
     targets,
     rownames,
@@ -648,15 +654,19 @@ store_results <- function(parent_id, targets, rownames, names, inputs,
   mash <- list(
     files = file_to_upload,
     inputs = inputs,
-    activity_provenance = activity_provenance
+    activity_provenance = activity_provenance,
+    activity_description = description
     )
 
   for_provenance <- purrr::pmap(
     mash,
-    function(files, inputs, activity_provenance) synapser::synStore(
-      obj = files,
-      used = inputs,
-      activityName = activity_provenance
+    function(
+      files, inputs, activity_provenance, activity_description
+      ) synapser::synStore(
+        obj = files,
+        used = inputs,
+        activityName = activity_provenance,
+        activityDescription = activity_description
       )
   )
 
@@ -691,7 +701,8 @@ store_results <- function(parent_id, targets, rownames, names, inputs,
     markdown_provenance <- synapser::synStore(
       obj = file,
       used = used_ids,
-      activityName = activity_provenance
+      activityName = activity_provenance,
+      activityDescription = description
     )
   }
   message(glue::glue("Files uploaded to {parent_id}"))
