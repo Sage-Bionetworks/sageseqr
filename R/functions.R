@@ -709,3 +709,34 @@ store_results <- function(parent_id, targets, rownames, names, inputs,
   }
   message(glue::glue("Files uploaded to {parent_id}"))
 }
+#' Provenance helper
+#'
+#' Collapse Synapse Ids and version.
+#'
+#' @inheritParams rnaseq_plan
+#' @export
+provenance_helper <- function(metadata_id,  counts_id, metadata_version = NULL,
+                              counts_version = NULL, biomart_id = NULL,
+                              biomart_version = NULL) {
+
+  if (is.null(metadata_version)) {
+    ids <- metadata_id
+  } else {
+    ids <- glue::glue("{metadata_id}.{metadata_version}")
+  }
+
+  if (is.null(counts_version)) {
+    ids <- c(ids, counts_id)
+  } else {
+    ids <- c(ids, glue::glue("{counts_id}.{counts_version}"))
+  }
+
+  if (is.null(biomart_version) & is.null(biomart_id)) {
+    ids
+  } else if (is.null(biomart_version) & !is.null(biomart_id)) {
+    ids <- c(ids, biomart_id)
+  } else {
+    ids <- c(ids, glue::glue("{biomart_id}.{biomart_version}"))
+  }
+  ids
+}

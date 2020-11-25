@@ -95,6 +95,11 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
         ),
       output_dir = "."
       ),
+    document_inputs = provenance_helper(
+      !!metadata_id, !!counts_id,
+      !!metadata_version, !!counts_version,
+      !!biomart_id, !!biomart_version
+    ),
     Synapse = store_results(
       parent_id = !!parent_id,
       targets = list("cqn_counts", "clean_md", "filtered_counts",
