@@ -599,7 +599,13 @@ prepare_results <- function(target, path_to_cache, rowname = NULL) {
     df <- tibble::rownames_to_column(df, rowname)
   }
   tmp <- fs::file_temp(target, ext = ".tsv")
-  write.table(df, file = tmp, sep = "\t", row.names = FALSE, quote = FALSE)
+  utils::write.table(
+    df,
+    file = tmp,
+    sep = "\t",
+    row.names = FALSE,
+    quote = FALSE
+    )
   tmp
 }
 #' Store output to Synapse
@@ -624,7 +630,7 @@ store_results <- function(parent_id, targets, rownames, names, inputs,
                           report_name = NULL) {
 
   # include sageseqr package version in Synapse provenance
-  ver <- packageVersion("sageseqr")
+  ver <- utils::packageVersion("sageseqr")
   description <- glue::glue(
     "analyzed with sageseqr {ver}"
     )
