@@ -672,7 +672,8 @@ store_results <- function(parent_id, targets, rownames, names, inputs,
         obj = files,
         used = inputs,
         activityName = activity_provenance,
-        activityDescription = activity_description
+        activityDescription = activity_description,
+        forceVersion = FALSE
       )
   )
 
