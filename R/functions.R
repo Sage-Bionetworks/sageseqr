@@ -617,11 +617,11 @@ prepare_results <- function(target, path_to_cache, rowname = NULL) {
 #' @param activity_provenance A phrase to describe the data transformation for
 #' provenance.
 #' @param config_file Optional. Path to configuration file.
-#' @param output_report Optional. Path to html report.
+#' @inheritParams rnaseq_plan
 #' @export
 store_results <- function(parent_id, targets, rownames, names, inputs,
                           activity_provenance, config_file = NULL,
-                          output_report = NULL) {
+                          report_name = NULL) {
 
   # include sageseqr package version in Synapse provenance
   ver <- packageVersion("sageseqr")
@@ -685,7 +685,9 @@ store_results <- function(parent_id, targets, rownames, names, inputs,
     for_provenance <- append(for_provenance, config_provenance)
   }
 
-  if (!is.null(output_report)) {
+  if (!is.null(report_name)) {
+    path <- glue::glue("{getwd()}/{report_name}.html")
+
     used_ids <- unlist(
       purrr::map(
         for_provenance,
@@ -694,7 +696,7 @@ store_results <- function(parent_id, targets, rownames, names, inputs,
     )
 
     file <- synapser::File(
-      path = output_report,
+      path = path,
       parent = parent_id
     )
 
