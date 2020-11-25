@@ -27,7 +27,10 @@ rnaseq_plan(
   shape,
   size,
   report_name,
-  skip_model
+  skip_model,
+  parent_id,
+  rownames,
+  config_file
 )
 }
 \arguments{
@@ -90,6 +93,14 @@ by size.}
 \item{report_name}{Name of output markdown file.}
 
 \item{skip_model}{If TRUE, does not run regression model.}
+
+\item{parent_id}{A Synapse Id that corresponds to a project or
+folder to store output.}
+
+\item{rownames}{A list of variables to store rownames. If not applicable,
+set as NULL.}
+
+\item{config_file}{Optional. Path to configuration file.}
 }
 \description{
 This function wraps the \code{"drake::plan()"} and copies the R markdown
