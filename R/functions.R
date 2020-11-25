@@ -587,16 +587,112 @@ summarize_biotypes <- function(filtered_counts, biomart_results) {
 }
 #' Prepare output
 #'
-#' Store data that will be uploaded to Synapse in temporary files.
+#' Store data in temporary files to prepare for Synapse upload.
 #' @param target The name of the object to be stored.
-#' @rowname Optional. If applicable, the name of the variable to store rownames.
+#' @param rowname Optional. If applicable, the name of the variable to store
+#' rownames.
+#' @param path_to_cache Path to Drake cache.
 #' @export
-prepare_results <- function(target, rowname = NULL) {
-  df <- get(target)
+prepare_results <- function(target, path_to_cache, rowname = NULL) {
+  df <- drake::readd(target, cache = drake::drake_cache(path_to_cache))
   if (!is.null(rowname)) {
     df <- tibble::rownames_to_column(df, rowname)
   }
   tmp <- fs::file_temp(target, ext = ".tsv")
   write.table(df, file = tmp, sep = "\t", row.names = FALSE, quote = FALSE)
   tmp
+}
+#' Store output to Synapse
+#'
+#' Store transformed data, markdown and html report to a Folder in Synapse.
+#'
+#' @param parent_id A Synapse Id that corresponds to a project or
+#' folder to store output.
+#' @param targets A list of object names to be stored.
+#' @param rownames A list of variables to store rownames. If not applicable,
+#' set as NULL.
+#' @param names A list of human-readable names for the Synapse entities.
+#' @param inputs A character vector of Synapse Ids to create provenance between
+#' output files and input files.
+#' @param activity_provenance A phrase to describe the data transformation for
+#' provenance.
+#' @param config_file Optional. Path to configuration file.
+#' @param output_report Optional. Path to html report.
+#' @export
+store_results <- function(parent_id, targets, rownames, names, inputs,
+                          activity_provenance, config_file = NULL,
+                          output_report = NULL) {
+  file_location <- purrr::map2(
+    targets,
+    rownames,
+    ~ prepare_results(
+      .x,
+      .y
+      )
+    )
+
+  mash <- list(parent = parent_id, names = names, paths = file_location)
+
+  file_to_upload <- purrr::pmap(
+    mash,
+    function(paths, parent, names) synapser::File(
+      path = paths,
+      parent = parent,
+      name = names
+      )
+  )
+
+  # nest input Synapse Ids to apply the same provenance to all files
+  inputs <- list(inputs)
+
+  mash <- list(
+    files = file_to_upload,
+    inputs = inputs,
+    activity_provenance = activity_provenance
+    )
+
+  for_provenance <- purrr::pmap(
+    mash,
+    function(files, inputs, activity_provenance) synapser::synStore(
+      obj = files,
+      used = inputs,
+      activityName = activity_provenance
+      )
+  )
+
+  if (!is.null(config_file)) {
+    file <- synapser::File(
+      path = config_file,
+      parent = parent_id,
+      name = "Configuration file"
+    )
+
+    config_provenance <- synapser::synStore(
+      obj = file,
+      activityName = activity_provenance
+      )
+
+    for_provenance <- append(for_provenance, config_provenance)
+  }
+
+  if (!is.null(output_report)) {
+    used_ids <- unlist(
+      purrr::map(
+        for_provenance,
+        ~.x$get("id")
+        )
+    )
+
+    file <- synapser::File(
+      path = output_report,
+      parent = parent_id
+    )
+
+    markdown_provenance <- synapser::synStore(
+      obj = file,
+      used = used_ids,
+      activityName = activity_provenance
+    )
+  }
+  message(glue::glue("Files uploaded to {parent_id}"))
 }
