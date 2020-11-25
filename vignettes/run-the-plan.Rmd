@@ -53,7 +53,15 @@ plan <- sageseqr::rnaseq_plan(
   shape = config::get("dimensions")$shape,
   size = config::get("dimensions")$size,
   report_name = config::get("report"),
-  skip_model = config::get("skip model")
+  skip_model = config::get("skip model"),
+  parent_id = config::get("store output"),
+  rownames = list(
+    config::get("counts")$`gene id`, 
+    config::get("metadata")$`sample id`,
+    config::get("counts")$`gene id`,
+    config::get("biomart results")$filters
+    ),
+  config_file = "config.yml"
 )
 
 drake::make(
