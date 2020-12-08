@@ -12,6 +12,8 @@ Description: This workflow normalizes counts, performs model selection from know
     customizable threshold and performs differential expression analysis for repeated
     measures.
 License: MIT + file LICENSE
+URL: https://sage-bionetworks.github.io/sageseqr,
+    https://github.com/Sage-Bionetworks/sageseqr
 Encoding: UTF-8
 LazyData: true
 Suggests: 
