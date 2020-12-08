@@ -15,8 +15,8 @@ The workflow takes RNA-seq gene counts and sample metadata as inputs, normalizes
 The series of steps that make up the workflow are called targets. The target objects are stored in a cache and can either be read or loaded into your environment with the `drake` functions `readd` or `loadd`. Source code for each target can be visualized by setting `show_source = TRUE` with `loadd` and `readd`. The targets are called by the `sageseqr` `rnaseq_plan` function and are:
 
 Raw data: 
-- `import_metadata`
-- `import_counts`
+- `import_metadata`- imports the raw metadata directly from synapse
+- `import_counts` - imports the raw counts directly from synapse
 - `biomart_results` - the complete list of genes with biomaRt annotations.
 
 Exploratory data visualizations:
