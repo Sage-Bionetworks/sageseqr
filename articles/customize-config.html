@@ -62,7 +62,14 @@
   </ul>
 </li>
       </ul>
-<ul class="nav navbar-nav navbar-right"></ul>
+<ul class="nav navbar-nav navbar-right">
+<li>
+  <a href="https://github.com/Sage-Bionetworks/sageseqr/">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 <!--/.nav-collapse -->
   </div>
@@ -79,30 +86,61 @@
       <h1 data-toc-skip>Write your own config file</h1>
             
       
-      
+      <small class="dont-index">Source: <a href="https://github.com/Sage-Bionetworks/sageseqr/blob/master/vignettes/customize-config.Rmd"><code>vignettes/customize-config.Rmd</code></a></small>
       <div class="hidden name"><code>customize-config.Rmd</code></div>
 
     </div>
 
     
     
-<p>A <a href="https://github.com/kelshmo/sageseqr/blob/master/config.yml">configuration file</a> defines the inputs for the RNA-seq workflow. Update the default parameters to the Synapse ID where your data is stored and to the factor and continuous variables you want to test in the covariate model selection. The full list of configurable options are:</p>
-<pre><code>analysis title: Name for the html output file and analysis-specific drake cache.
+<p>A <a href="https://github.com/kelshmo/sageseqr/blob/master/config.yml">configuration file</a> defines the inputs for the RNA-seq workflow. Update the default parameters to include the Synapse ID where your data is stored and to the factor and continuous variables you want to test in the covariate model selection. The full list of configurable options are:</p>
+<pre><code>analysis title: The name of your project. This will become the name of your
+                cache and the name of your output html file.
 counts:
-  synID: Synapse ID to counts data frame with identifiers to the metadata as column names and gene ids in a column.
+  synID: Synapse ID to counts data frame with identifiers to the metadata as
+         column names and gene ids in a column. (Required)
   version: Optionally, include Synapse file version number (e.g. 3).
-  gene id: Column name that corresponds to the gene ids (e.g. feature).
+  gene id: Column name that corresponds to the gene ids (e.g. feature). (Required)
 metadata:
-  synID: Synapse ID to cleaned metadata file with sample identifiers in a column and variables of interest as column names.
+  synID: Synapse ID to cleaned metadata file with sample identifiers in a
+         column and variables of interest as column names. (Required)
   version: Optionally, include Synapse file version number (e.g. 3).
-  sample id: Column name that corresponds to the sample ids (e.g. donorid).
+  sample id: Column name that corresponds to the sample ids (e.g. donorid). (Required)
 biomart:
-  synID: This input is optional. If left blank, Ensembl will be queried with the gene ids provided in the counts. Otherwise, you may provide the Synapse ID to gene metadata from Ensembl. This must include gene length and GC content in order to implement Conditional Quantile Normalization. 
+  synID: This input is optional. If left blank, Ensembl will be queried with
+         the gene ids provided in the counts. Otherwise, you may provide the
+         Synapse ID to gene metadata from Ensembl. This must include gene
+         length and GC content in order to implement Conditional Quantile
+         Normalization. 
   version: Optionally, include Synapse file version number (e.g. 3).
-  gene id: Column name that corresponds to the gene ids (e.g. ensembl_gene_id)
-factors: List of factor variables in brackets. Variables must be present in the metadata as column names (e.g. [ "donorid", "source"]).
-continuous: List of continuous variables in brackets. Variables must be present in the metadata as column names (e.g. [ "rin", "rin2"]).
-conditions: Filtering low-expression genes is a common practice to improve sensitivity in detection of differentially expressed genes. Low count genes that have less than 1 counts per million (cpm) in 50% of the samples per the conditions provided here will be removed. (e.g. ["diagnosis", "sex"])</code></pre>
+  filters: Column name that corresponds to the gene ids (e.g. ensembl_gene_id)
+  host: An optional character vector specifying the BioMart database release
+        version. This specification is highly recommended for a reproducible           
+        workflow. Defaults to ensembl.org.
+  organism: A character vector of the organism name. This argument takes
+            partial strings. For example,"hsa" will match       
+            "hsapiens_gene_ensembl".
+factors: List of factor variables in brackets. Variables must be present in the
+         metadata as column names (e.g. [ "donorid", "source"]).
+continuous: List of continuous variables in brackets. Variables must be present
+            in the metadata as column names (e.g. [ "rin", "rin2"]).
+x_var: A boxplot will visualize the distribution of continuous variables using
+       the x_var as a dimension.
+conditions: Filtering low-expression genes is a common practice to improve
+            sensitivity in detection of differentially expressed genes. Low
+            count genes that have less than 1 counts per million (cpm) in 50%
+            of the samples per the conditions provided here will be removed.
+            (e.g. ["diagnosis", "sex"])
+sex check: The exact variable name that corresponds to reported gender or sex
+           to check the distribution of x and y marker expression across
+           samples.
+dimensions: Specify the PCA dimensions by variable name. 
+  color:
+  shape:
+  size:
+skip model: If TRUE, the exploratory data report is run. Model selection and 
+            differential expression is not computed.
+report: The output html report. </code></pre>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

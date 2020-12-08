@@ -65,7 +65,14 @@
   </ul>
 </li>
       </ul>
-<ul class="nav navbar-nav navbar-right"></ul>
+<ul class="nav navbar-nav navbar-right">
+<li>
+  <a href="https://github.com/Sage-Bionetworks/sageseqr/">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 <!--/.nav-collapse -->
   </div>
@@ -88,7 +95,49 @@
 <h1 class="hasAnchor">
 <a href="#rna-seq-normalization-workflow-in-r" class="anchor"></a>RNA-seq normalization workflow in R</h1>
 <p>The <code>sageseqr</code> package integrates the <a href="https://github.com/ropensci/drake/"><code>drake</code> R package</a>, the <a href="https://cran.r-project.org/web/packages/config/vignettes/introduction.html"><code>config</code> package for R</a>, and <a href="https://www.synapse.org/">Synapse</a>. <code>drake</code> tracks dependency relationships in the workflow and only updates data when it has changed. A <code>config</code> file allows inputs and parameters to be explicitly defined in one location. Synapse is a data repository that allows sensitive data to be <a href="https://docs.synapse.org/articles/article_index.html#governance">stored and shared responsibly</a>.</p>
-<p>The workflow takes RNA-seq gene counts and sample metadata as inputs, normalizes counts by <a href="https://bioconductor.org/packages/release/bioc/html/cqn.html">CQN</a>, removes outliers based on a user-defined threshold, empirically selects meaningful covariates and returns differential expression analysis results.</p>
+<p>The workflow takes RNA-seq gene counts and sample metadata as inputs, normalizes counts by conditional quantile normalization <a href="https://bioconductor.org/packages/release/bioc/html/cqn.html">(CQN)</a>, removes outliers based on a user-defined threshold, empirically selects meaningful covariates and returns differential expression analysis results. The data is also visualized in several ways to help you understand meaningful trends. The visualizations include a heatmap identifying highly correlated covariates, a sample-specific x and y marker gene check, boxplots visualizing the distribution of continuous variables and a principal component analysis (PCA) to visualize sample distribution.</p>
+</div>
+<div id="the-targets" class="section level1">
+<h1 class="hasAnchor">
+<a href="#the-targets" class="anchor"></a>The Targets</h1>
+<p>The series of steps that make up the workflow are called targets. The target objects are stored in a cache and can either be read or loaded into your environment with the <code>drake</code> functions <code>readd</code> or <code>loadd</code>. Source code for each target can be visualized by setting <code>show_source = TRUE</code> with <code>loadd</code> and <code>readd</code>. The targets are called by the <code>sageseqr</code> <code>rnaseq_plan</code> function and are:</p>
+<p>Raw data:</p>
+<ul>
+<li>
+<code>import_metadata</code>- imports the raw metadata directly from synapse</li>
+<li>
+<code>import_counts</code> - imports the raw counts directly from synapse</li>
+<li>
+<code>biomart_results</code> - the complete list of genes with biomaRt annotations.</li>
+</ul>
+<p>Exploratory data visualizations:</p>
+<ul>
+<li>
+<code>gene_coexpression</code> - the distribution of correlated gene counts.</li>
+<li>
+<code>boxplots</code> - the distribution of continuous variables.</li>
+<li>
+<code>sex_plot</code> - the distribution of samples by x and y marker genes.</li>
+<li>
+<code>correlation_plot</code> - the correlation of covariates.</li>
+<li>
+<code>significant_covariates_plot</code> - the correlation of covariates to gene expression.</li>
+<li>
+<code>outliers</code> - the clustering of samples by PCA.</li>
+</ul>
+<p>Transformed or normalized data:</p>
+<ul>
+<li>
+<code>clean_md</code> - metadata with factor and numeric types.</li>
+<li>
+<code>filtered_counts</code> - counts matrix with low gene expression removed.</li>
+<li>
+<code>biotypes</code> - gene proportions summarized by biotype.</li>
+<li>
+<code>cqn_counts</code> - CQN normalized counts.</li>
+<li>
+<code>model</code> - Model selected by multivariate forward stepwise regression (evaluated by Bayesian Information Criteria (BIC)).</li>
+</ul>
 </div>
 <div id="access-to-data" class="section level1">
 <h1 class="hasAnchor">
@@ -99,11 +148,25 @@
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
-    <div class="license">
+    <div class="links">
+<h2>Links</h2>
+<ul class="list-unstyled">
+<li>Browse source code at <br><a href="https://github.com/Sage-Bionetworks/sageseqr/">https://​github.com/​Sage-Bionetworks/​sageseqr/​</a>
+</li>
+</ul>
+</div>
+<div class="license">
 <h2>License</h2>
 <ul class="list-unstyled">
 <li><a href="LICENSE.html">Full license</a></li>
 <li><small><a href="https://opensource.org/licenses/mit-license.php">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a></small></li>
+</ul>
+</div>
+<div class="community">
+<h2>Community</h2>
+<ul class="list-unstyled">
+<li><a href="CONTRIBUTING.html">Contributing guide</a></li>
+<li><a href="CODE_OF_CONDUCT.html">Code of conduct</a></li>
 </ul>
 </div>
 <div class="developers">

@@ -62,7 +62,14 @@
   </ul>
 </li>
       </ul>
-<ul class="nav navbar-nav navbar-right"></ul>
+<ul class="nav navbar-nav navbar-right">
+<li>
+  <a href="https://github.com/Sage-Bionetworks/sageseqr/">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 <!--/.nav-collapse -->
   </div>
@@ -79,7 +86,7 @@
       <h1 data-toc-skip>Run the drake plan</h1>
             
       
-      
+      <small class="dont-index">Source: <a href="https://github.com/Sage-Bionetworks/sageseqr/blob/master/vignettes/run-the-plan.Rmd"><code>vignettes/run-the-plan.Rmd</code></a></small>
       <div class="hidden name"><code>run-the-plan.Rmd</code></div>
 
     </div>
@@ -96,7 +103,7 @@
 <li>Load the <code>sageseqr</code> library and login to <a href="https://www.synapse.org/">Synapse</a>. <code><a href="../reference/rnaseq_plan.html">rnaseq_plan()</a></code> calls the arguments from the config file and creates the <code>drake</code> plan. Execute <code><a href="https://docs.ropensci.org/drake/reference/make.html">drake::make(plan)</a></code> to compute. It is required to explicitly specify the name of the cache created with <code><a href="https://docs.ropensci.org/drake/reference/new_cache.html">drake::new_cache()</a></code> when multiple plans are executed in the same R session. Run this code from your project root.</li>
 </ol>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">sageseqr</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://sage-bionetworks.github.io/sageseqr">sageseqr</a></span><span class="op">)</span>
 
 <span class="co"># Login to Synapse. Make a Synapse account and use synapser to login: https://r-docs.synapse.org/articles/manageSynapseCredentials.html</span>
 <span class="fu">synapser</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/synapser/man/synLogin.html">synLogin</a></span><span class="op">(</span><span class="op">)</span>
