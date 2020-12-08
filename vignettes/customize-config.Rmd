@@ -21,14 +21,14 @@ analysis title: The name of your project. This will become the name of your
                 cache and the name of your output html file.
 counts:
   synID: Synapse ID to counts data frame with identifiers to the metadata as
-         column names and gene ids in a column.
+         column names and gene ids in a column. (Required)
   version: Optionally, include Synapse file version number (e.g. 3).
-  gene id: Column name that corresponds to the gene ids (e.g. feature).
+  gene id: Column name that corresponds to the gene ids (e.g. feature). (Required)
 metadata:
   synID: Synapse ID to cleaned metadata file with sample identifiers in a
-         column and variables of interest as column names.
+         column and variables of interest as column names. (Required)
   version: Optionally, include Synapse file version number (e.g. 3).
-  sample id: Column name that corresponds to the sample ids (e.g. donorid).
+  sample id: Column name that corresponds to the sample ids (e.g. donorid). (Required)
 biomart:
   synID: This input is optional. If left blank, Ensembl will be queried with
          the gene ids provided in the counts. Otherwise, you may provide the
