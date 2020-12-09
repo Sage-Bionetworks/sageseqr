@@ -589,9 +589,9 @@ summarize_biotypes <- function(filtered_counts, biomart_results) {
 #'
 #' Store data in temporary files to prepare for Synapse upload.
 #' @param target The name of the object to be stored.
+#' @param path_to_cache Path to Drake cache.
 #' @param rowname Optional. If applicable, the name of the variable to store
 #' rownames.
-#' @param path_to_cache Path to Drake cache.
 #' @export
 prepare_results <- function(target, path_to_cache, rowname = NULL) {
   df <- drake::readd(target, cache = drake::drake_cache(path_to_cache))
@@ -624,22 +624,30 @@ prepare_results <- function(target, path_to_cache, rowname = NULL) {
 #' provenance.
 #' @param config_file Optional. Path to configuration file.
 #' @inheritParams rnaseq_plan
+#' @inheritParams prepare_results
 #' @export
 store_results <- function(parent_id, targets, rownames, names, inputs,
-                          activity_provenance, config_file = NULL,
-                          report_name = NULL) {
+                          activity_provenance, path_to_cache,
+                          config_file = NULL, report_name = NULL) {
 
   # include sageseqr package version in Synapse provenance
   ver <- utils::packageVersion("sageseqr")
   description <- glue::glue(
     "analyzed with sageseqr {ver}"
     )
-  file_location <- purrr::map2(
-    targets,
-    rownames,
+
+  mash <- list(
+    target = targets,
+    path_to_cache = path_to_cache,
+    rowname = rownames
+  )
+
+  file_location <- purrr::pmap(
+    mash,
     ~ prepare_results(
-      .x,
-      .y
+      target,
+      path_to_cache,
+      rowname
       )
     )
 
