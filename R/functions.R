@@ -648,11 +648,7 @@ store_results <- function(parent_id, targets, rownames, names, inputs,
 
   file_location <- purrr::pmap(
     mash,
-    ~ prepare_results(
-      target,
-      path_to_cache,
-      rowname
-      )
+    prepare_results
     )
 
   mash <- list(parent = parent_id, names = names, paths = file_location)
