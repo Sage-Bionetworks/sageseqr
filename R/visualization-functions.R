@@ -672,10 +672,13 @@ plot_sexcheck <- function(clean_metadata, count_df, biomart_results, sex_var) {
                                  values_to = "counts(log)") %>%
     dplyr::mutate(`counts(log)` = log(.data$`counts(log)`),
                   `counts(log)` = ifelse(.data$`counts(log)` == -Inf, 0, .data$`counts(log)`))
+  results <- tidyr::pivot_wider(
+    dplyr::select(results, -chromosome_name, -geneId),
+    names_from = "hgnc_symbol",
+    values_from = "counts(log)"
+    )
   results <- dplyr::left_join(results, md, "sampleId")
-  results <- tidyr::spread(results, key = .data$hgnc_symbol, value = .data$`counts(log)`) %>%
-    dplyr::mutate(UTY = ifelse(is.na(.data$UTY), 0, .data$UTY),
-                  XIST = ifelse(is.na(.data$XIST), 0, .data$XIST))
+
   p <- ggplot2::ggplot(results, ggplot2::aes(x = .data$XIST, y = .data$UTY)) +
     ggplot2::geom_point(ggplot2::aes(color = .data[[sex_var]])) +
     sagethemes::scale_color_sage_d() +
