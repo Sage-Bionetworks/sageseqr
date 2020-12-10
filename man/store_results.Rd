@@ -11,6 +11,7 @@ store_results(
   names,
   inputs,
   activity_provenance,
+  path_to_cache,
   config_file = NULL,
   report_name = NULL
 )
@@ -31,6 +32,8 @@ output files and input files.}
 
 \item{activity_provenance}{A phrase to describe the data transformation for
 provenance.}
+
+\item{path_to_cache}{Path to Drake cache.}
 
 \item{config_file}{Optional. Path to configuration file.}
 
