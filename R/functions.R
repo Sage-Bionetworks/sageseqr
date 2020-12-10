@@ -651,7 +651,11 @@ store_results <- function(parent_id, targets, rownames, names, inputs,
     prepare_results
     )
 
-  mash <- list(parent = parent_id, names = names, paths = file_location)
+  mash <- list(
+    parent = parent_id,
+    names = names,
+    paths = file_location
+    )
 
   file_to_upload <- purrr::pmap(
     mash,
