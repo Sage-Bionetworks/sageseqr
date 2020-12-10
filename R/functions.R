@@ -594,7 +594,11 @@ summarize_biotypes <- function(filtered_counts, biomart_results) {
 #' rownames.
 #' @export
 prepare_results <- function(target, path_to_cache, rowname = NULL) {
-  df <- drake::readd(target, cache = drake::drake_cache(path_to_cache))
+  df <- drake::readd(
+    target,
+    character_only = TRUE,
+    cache = drake::drake_cache(path_to_cache)
+    )
   if (!is.null(rowname)) {
     df <- tibble::rownames_to_column(df, rowname)
   }
