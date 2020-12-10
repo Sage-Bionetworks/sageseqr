@@ -37,7 +37,7 @@ provenance.}
 
 \item{config_file}{Optional. Path to configuration file.}
 
-\item{report_name}{Name of output markdown file.}
+\item{report_name}{Name of output markdown file and cache.}
 }
 \description{
 Store transformed data, markdown and html report to a Folder in Synapse.
