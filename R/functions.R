@@ -630,8 +630,8 @@ prepare_results <- function(target, path_to_cache, rowname = NULL) {
 #' @inheritParams rnaseq_plan
 #' @inheritParams prepare_results
 #' @export
-store_results <- function(parent_id, targets, rownames, names, inputs,
-                          activity_provenance, path_to_cache,
+store_results <- function(parent_id, targets, names, inputs,
+                          activity_provenance, path_to_cache, rownames = NULL,
                           config_file = NULL, report_name = NULL) {
 
   # include sageseqr package version in Synapse provenance
