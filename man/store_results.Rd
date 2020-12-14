@@ -7,11 +7,11 @@
 store_results(
   parent_id,
   targets,
-  rownames,
   names,
   inputs,
   activity_provenance,
   path_to_cache,
+  rownames = NULL,
   config_file = NULL,
   report_name = NULL
 )
@@ -22,9 +22,6 @@ folder to store output.}
 
 \item{targets}{A list of object names to be stored.}
 
-\item{rownames}{A list of variables to store rownames. If not applicable,
-set as NULL.}
-
 \item{names}{A list of human-readable names for the Synapse entities.}
 
 \item{inputs}{A character vector of Synapse Ids to create provenance between
@@ -34,6 +31,9 @@ output files and input files.}
 provenance.}
 
 \item{path_to_cache}{Path to Drake cache.}
+
+\item{rownames}{A list of variables to store rownames. If not applicable,
+set as NULL.}
 
 \item{config_file}{Optional. Path to configuration file.}
 
