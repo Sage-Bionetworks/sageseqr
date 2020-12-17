@@ -585,3 +585,177 @@ summarize_biotypes <- function(filtered_counts, biomart_results) {
     dplyr::filter(.data$fraction > 100) %>%
     dplyr::mutate(fraction = .data$fraction/dim(filtered_counts)[1])
 }
+#' Prepare output
+#'
+#' Store data in temporary files to prepare for Synapse upload.
+#' @param target The name of the object to be stored.
+#' @param path_to_cache Path to Drake cache.
+#' @param rowname Optional. If applicable, the name of the variable to store
+#' rownames.
+#' @export
+prepare_results <- function(target, path_to_cache, rowname = NULL) {
+  df <- drake::readd(
+    target,
+    character_only = TRUE,
+    cache = drake::drake_cache(path_to_cache)
+    )
+  if (!is.null(rowname)) {
+    df <- tibble::rownames_to_column(df, rowname)
+  }
+  tmp <- fs::file_temp(target, ext = ".tsv")
+  utils::write.table(
+    df,
+    file = tmp,
+    sep = "\t",
+    row.names = FALSE,
+    quote = FALSE
+    )
+  tmp
+}
+#' Store output to Synapse
+#'
+#' Store transformed data, markdown and html report to a Folder in Synapse.
+#'
+#' @param parent_id A Synapse Id that corresponds to a project or
+#' folder to store output.
+#' @param targets A list of object names to be stored.
+#' @param rownames A list of variables to store rownames. If not applicable,
+#' set as NULL.
+#' @param names A list of human-readable names for the Synapse entities.
+#' @param inputs A character vector of Synapse Ids to create provenance between
+#' output files and input files.
+#' @param activity_provenance A phrase to describe the data transformation for
+#' provenance.
+#' @param config_file Optional. Path to configuration file.
+#' @inheritParams rnaseq_plan
+#' @inheritParams prepare_results
+#' @export
+store_results <- function(parent_id, targets, names, inputs,
+                          activity_provenance, path_to_cache, rownames = NULL,
+                          config_file = NULL, report_name = NULL) {
+
+  # include sageseqr package version in Synapse provenance
+  ver <- utils::packageVersion("sageseqr")
+  description <- glue::glue(
+    "analyzed with sageseqr {ver}"
+    )
+
+  mash <- list(
+    target = targets,
+    path_to_cache = path_to_cache,
+    rowname = rownames
+  )
+
+  file_location <- purrr::pmap(
+    mash,
+    prepare_results
+    )
+
+  mash <- list(
+    parent = parent_id,
+    names = names,
+    paths = file_location
+    )
+
+  file_to_upload <- purrr::pmap(
+    mash,
+    function(paths, parent, names) synapser::File(
+      path = paths,
+      parent = parent,
+      name = names
+      )
+  )
+
+  # nest input Synapse Ids to apply the same provenance to all files
+  inputs <- list(inputs)
+
+  mash <- list(
+    files = file_to_upload,
+    inputs = inputs,
+    activity_provenance = activity_provenance,
+    activity_description = description
+    )
+
+  for_provenance <- purrr::pmap(
+    mash,
+    function(
+      files, inputs, activity_provenance, activity_description
+      ) synapser::synStore(
+        obj = files,
+        used = inputs,
+        activityName = activity_provenance,
+        activityDescription = activity_description,
+        forceVersion = FALSE
+      )
+  )
+
+  if (!is.null(config_file)) {
+    file <- synapser::File(
+      path = config_file,
+      parent = parent_id,
+      name = "Configuration file"
+    )
+
+    config_provenance <- synapser::synStore(
+      obj = file,
+      activityName = activity_provenance
+      )
+
+    for_provenance <- append(for_provenance, config_provenance)
+  }
+
+  if (!is.null(report_name)) {
+    path <- glue::glue("{getwd()}/{report_name}.html")
+
+    used_ids <- unlist(
+      purrr::map(
+        for_provenance,
+        ~.x$get("id")
+        )
+    )
+
+    file <- synapser::File(
+      path = path,
+      parent = parent_id
+    )
+
+    markdown_provenance <- synapser::synStore(
+      obj = file,
+      used = used_ids,
+      activityName = activity_provenance,
+      activityDescription = description
+    )
+  }
+  message(glue::glue("Files uploaded to {parent_id}"))
+}
+#' Provenance helper
+#'
+#' Collapse Synapse Ids and version.
+#'
+#' @inheritParams rnaseq_plan
+#' @export
+provenance_helper <- function(metadata_id,  counts_id, metadata_version = NULL,
+                              counts_version = NULL, biomart_id = NULL,
+                              biomart_version = NULL) {
+
+  if (is.null(metadata_version)) {
+    ids <- metadata_id
+  } else {
+    ids <- glue::glue("{metadata_id}.{metadata_version}")
+  }
+
+  if (is.null(counts_version)) {
+    ids <- c(ids, counts_id)
+  } else {
+    ids <- c(ids, glue::glue("{counts_id}.{counts_version}"))
+  }
+
+  if (is.null(biomart_version) & is.null(biomart_id)) {
+    ids
+  } else if (is.null(biomart_version) & !is.null(biomart_id)) {
+    ids <- c(ids, biomart_id)
+  } else {
+    ids <- c(ids, glue::glue("{biomart_id}.{biomart_version}"))
+  }
+  ids
+}

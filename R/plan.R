@@ -20,11 +20,13 @@
 #' @param biomart_id Synapse ID to biomart object.
 #' @param biomart_version Optionally, include Synapse file version number.
 #' @param x_var_for_plot Variable to separate groups for boxplot.
-#' @param report_name Name of output markdown file.
+#' @param report_name Name of output markdown file and cache.
 #' @inheritParams plot_sexcheck
 #' @inheritParams get_biomart
 #' @inheritParams filter_genes
 #' @inheritParams identify_outliers
+#' @inheritParams store_results
+#' @inheritParams prepare_results
 #' @param skip_model If TRUE, does not run regression model.
 #' @export
 rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
@@ -34,7 +36,8 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                         organism, conditions, cpm_threshold = 1,
                         conditions_threshold = 0.5,
                         x_var_for_plot, sex_var, color, shape, size,
-                        report_name, skip_model) {
+                        report_name, skip_model, parent_id,
+                        rownames, config_file, path_to_cache) {
   # Copies markdown to user's working directory
   if (!file.exists("sageseqr-report.Rmd")) {
     fs::file_copy(system.file("sageseqr-report.Rmd", package = "sageseqr"),
@@ -92,6 +95,24 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
         !!glue::glue("{getwd()}/{report_name}.html")
         ),
       output_dir = "."
+      ),
+    document_inputs = provenance_helper(
+      !!metadata_id, !!counts_id,
+      !!metadata_version, !!counts_version,
+      !!biomart_id, !!biomart_version
+    ),
+    Synapse = store_results(
+      parent_id = !!parent_id,
+      targets = list("cqn_counts", "clean_md", "filtered_counts",
+                     "biomart_results"),
+      rownames = !!rownames,
+      names = list("Normalized counts (CQN)", "Covariates",
+                   "Filtered counts (>1cpm)", "BioMart query results"),
+      inputs = document_inputs,
+      activity_provenance = "Analyze RNA-seq data with sageseqr pkg",
+      path_to_cache = !!path_to_cache,
+      config_file = !!config_file,
+      report_name = !!report_name
       )
     )
-}
+  }

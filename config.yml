@@ -28,3 +28,4 @@ default:
     size: "ageofdeath"
   skip model: TRUE
   report: "output-report"
+  store output: syn23572479
