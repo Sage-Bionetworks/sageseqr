@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Execute the drake RNA-seq plan — rnaseq_plan • sageseqr</title>
+<title>Store output to Synapse — store_results • sageseqr</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,8 @@
 
 
 
-<meta property="og:title" content="Execute the drake RNA-seq plan — rnaseq_plan" />
-<meta property="og:description" content="This function wraps the &quot;drake::plan()&quot; and copies the R markdown
-report to the user's working directory." />
+<meta property="og:title" content="Store output to Synapse — store_results" />
+<meta property="og:description" content="Store transformed data, markdown and html report to a Folder in Synapse." />
 
 
 
@@ -124,159 +123,56 @@ report to the user's working directory." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Execute the drake RNA-seq plan</h1>
-    <small class="dont-index">Source: <a href='https://github.com/Sage-Bionetworks/sageseqr/blob/master/R/plan.R'><code>R/plan.R</code></a></small>
-    <div class="hidden name"><code>rnaseq_plan.Rd</code></div>
+    <h1>Store output to Synapse</h1>
+    <small class="dont-index">Source: <a href='https://github.com/Sage-Bionetworks/sageseqr/blob/master/R/functions.R'><code>R/functions.R</code></a></small>
+    <div class="hidden name"><code>store_results.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This function wraps the <code>"drake::plan()"</code> and copies the R markdown
-report to the user's working directory.</p>
+    <p>Store transformed data, markdown and html report to a Folder in Synapse.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>rnaseq_plan</span><span class='op'>(</span>
-  <span class='va'>metadata_id</span>,
-  <span class='va'>metadata_version</span>,
-  <span class='va'>counts_id</span>,
-  <span class='va'>counts_version</span>,
-  <span class='va'>gene_id_input</span>,
-  <span class='va'>sample_id_input</span>,
-  <span class='va'>factor_input</span>,
-  <span class='va'>continuous_input</span>,
-  <span class='va'>biomart_id</span>,
-  <span class='va'>biomart_version</span>,
-  <span class='va'>host</span>,
-  <span class='va'>filters</span>,
-  <span class='va'>organism</span>,
-  <span class='va'>conditions</span>,
-  cpm_threshold <span class='op'>=</span> <span class='fl'>1</span>,
-  conditions_threshold <span class='op'>=</span> <span class='fl'>0.5</span>,
-  <span class='va'>x_var_for_plot</span>,
-  <span class='va'>sex_var</span>,
-  <span class='va'>color</span>,
-  <span class='va'>shape</span>,
-  <span class='va'>size</span>,
-  <span class='va'>report_name</span>,
-  <span class='va'>skip_model</span>,
+    <pre class="usage"><span class='fu'>store_results</span><span class='op'>(</span>
   <span class='va'>parent_id</span>,
-  <span class='va'>rownames</span>,
-  <span class='va'>config_file</span>,
-  <span class='va'>path_to_cache</span>
+  <span class='va'>targets</span>,
+  <span class='va'>names</span>,
+  <span class='va'>inputs</span>,
+  <span class='va'>activity_provenance</span>,
+  <span class='va'>path_to_cache</span>,
+  rownames <span class='op'>=</span> <span class='cn'>NULL</span>,
+  config_file <span class='op'>=</span> <span class='cn'>NULL</span>,
+  report_name <span class='op'>=</span> <span class='cn'>NULL</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>metadata_id</th>
-      <td><p>Synapse ID to clean metadata file with sample identifiers
-in a column and variables of interest as column names. There cannot be any
-missing values.</p></td>
-    </tr>
-    <tr>
-      <th>metadata_version</th>
-      <td><p>Optionally, include Synapse file version number. If
-omitted, current version will be downloaded.</p></td>
-    </tr>
-    <tr>
-      <th>counts_id</th>
-      <td><p>Synapse ID to counts data frame with identifiers to the
-metadata as column names and gene ids in a column.</p></td>
-    </tr>
-    <tr>
-      <th>counts_version</th>
-      <td><p>Optionally, include Synapse file version number.</p></td>
-    </tr>
-    <tr>
-      <th>gene_id_input</th>
-      <td><p>Column name of the gene ids in the counts_id file.</p></td>
-    </tr>
-    <tr>
-      <th>sample_id_input</th>
-      <td><p>Column name of the sample ids in the metadata_id file.</p></td>
-    </tr>
-    <tr>
-      <th>factor_input</th>
-      <td><p>Vector of factor variables. Variables must be present
-in the metadata as column names.</p></td>
-    </tr>
-    <tr>
-      <th>continuous_input</th>
-      <td><p>Vector of continuous variables. Variables must be
-present in the metadata as column names.</p></td>
-    </tr>
-    <tr>
-      <th>biomart_id</th>
-      <td><p>Synapse ID to biomart object.</p></td>
-    </tr>
-    <tr>
-      <th>biomart_version</th>
-      <td><p>Optionally, include Synapse file version number.</p></td>
-    </tr>
-    <tr>
-      <th>host</th>
-      <td><p>An optional character vector specifying the release version.
-This specification is highly recommended for a reproducible workflow.
-(see <code>"biomaRt::listEnsemblArchives()"</code>)</p></td>
-    </tr>
-    <tr>
-      <th>filters</th>
-      <td><p>A character vector listing biomaRt query filters.
-(For a list of filters see <code>"biomaRt::listFilters()"</code>)</p></td>
-    </tr>
-    <tr>
-      <th>organism</th>
-      <td><p>A character vector of the organism name. This argument
-takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".</p></td>
-    </tr>
-    <tr>
-      <th>conditions</th>
-      <td><p>Optional. Conditions to bin gene counts that correspond to
-variables in `md`.</p></td>
-    </tr>
-    <tr>
-      <th>cpm_threshold</th>
-      <td><p>The minimum number of CPM allowed.</p></td>
-    </tr>
-    <tr>
-      <th>conditions_threshold</th>
-      <td><p>Percentage of samples that should contain the minimum CPM.</p></td>
-    </tr>
-    <tr>
-      <th>x_var_for_plot</th>
-      <td><p>Variable to separate groups for boxplot.</p></td>
-    </tr>
-    <tr>
-      <th>sex_var</th>
-      <td><p>Column name of the sex or gender-specific metadata.</p></td>
-    </tr>
-    <tr>
-      <th>color</th>
-      <td><p>Discrete variable in `clean_metadata` differentiated
-by color.</p></td>
-    </tr>
-    <tr>
-      <th>shape</th>
-      <td><p>Discrete variable in `clean_metadata` differentiated
-by shape.</p></td>
-    </tr>
-    <tr>
-      <th>size</th>
-      <td><p>Continuous variable in `clean_metadata` differentiated
-by size.</p></td>
-    </tr>
-    <tr>
-      <th>report_name</th>
-      <td><p>Name of output markdown file and cache.</p></td>
-    </tr>
-    <tr>
-      <th>skip_model</th>
-      <td><p>If TRUE, does not run regression model.</p></td>
-    </tr>
-    <tr>
       <th>parent_id</th>
       <td><p>A Synapse Id that corresponds to a project or
 folder to store output.</p></td>
+    </tr>
+    <tr>
+      <th>targets</th>
+      <td><p>A list of object names to be stored.</p></td>
+    </tr>
+    <tr>
+      <th>names</th>
+      <td><p>A list of human-readable names for the Synapse entities.</p></td>
+    </tr>
+    <tr>
+      <th>inputs</th>
+      <td><p>A character vector of Synapse Ids to create provenance between
+output files and input files.</p></td>
+    </tr>
+    <tr>
+      <th>activity_provenance</th>
+      <td><p>A phrase to describe the data transformation for
+provenance.</p></td>
+    </tr>
+    <tr>
+      <th>path_to_cache</th>
+      <td><p>Path to Drake cache.</p></td>
     </tr>
     <tr>
       <th>rownames</th>
@@ -288,8 +184,8 @@ set as NULL.</p></td>
       <td><p>Optional. Path to configuration file.</p></td>
     </tr>
     <tr>
-      <th>path_to_cache</th>
-      <td><p>Path to Drake cache.</p></td>
+      <th>report_name</th>
+      <td><p>Name of output markdown file and cache.</p></td>
     </tr>
     </table>
 
