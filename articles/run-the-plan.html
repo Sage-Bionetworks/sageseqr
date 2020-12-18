@@ -137,7 +137,8 @@
     <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span><span class="st">"counts"</span><span class="op">)</span><span class="op">$</span><span class="va">`gene id`</span>,
     <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span><span class="st">"biomart results"</span><span class="op">)</span><span class="op">$</span><span class="va">filters</span>
     <span class="op">)</span>,
-  config_file <span class="op">=</span> <span class="st">"config.yml"</span>
+  config_file <span class="op">=</span> <span class="st">"config.yml"</span>,
+  path_to_cache <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span><span class="st">"analysis title"</span><span class="op">)</span>
 <span class="op">)</span>
 
 <span class="fu">drake</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/drake/reference/make.html">make</a></span><span class="op">(</span>
