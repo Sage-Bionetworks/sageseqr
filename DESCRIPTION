@@ -64,6 +64,6 @@ Remotes:
     th1vairam/CovariateAnalysis@dev,
     GabrielHoffman/mvIC@master,
     Sage-Bionetworks/sagethemes@main,
-    GabrielHoffman/variancePartition@da5003f
+    GabrielHoffman/variancePartition
 VignetteBuilder:
     knitr
