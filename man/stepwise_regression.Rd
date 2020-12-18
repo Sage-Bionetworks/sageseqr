@@ -4,7 +4,13 @@
 \alias{stepwise_regression}
 \title{Stepwise Regression}
 \usage{
-stepwise_regression(md, model_variables = NULL, primary_variable, cqn_counts)
+stepwise_regression(
+  md,
+  model_variables = NULL,
+  primary_variable,
+  cqn_counts,
+  skip = NULL
+)
 }
 \arguments{
 \item{md}{A data frame with sample identifiers in a column and relevant experimental covariates.}
@@ -16,6 +22,9 @@ If not supplied, the model will include all variables in \code{md}.}
 fixed effect interaction term.}
 
 \item{cqn_counts}{A counts data frame normalized by CQN.}
+
+\item{skip}{Defaults to NULL. If TRUE, this step will be skipped in the
+Drake plan.}
 }
 \description{
 This function performs multivariate forward stepwise regression evaluated by multivariate Bayesian Information
