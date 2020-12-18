@@ -134,7 +134,13 @@ Critera (BIC) by wrapping &quot;mvIC::mvForwardStepwise()&quot;." />
 Critera (BIC) by wrapping <code>"mvIC::mvForwardStepwise()"</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>stepwise_regression</span><span class='op'>(</span><span class='va'>md</span>, model_variables <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>primary_variable</span>, <span class='va'>cqn_counts</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>stepwise_regression</span><span class='op'>(</span>
+  <span class='va'>md</span>,
+  model_variables <span class='op'>=</span> <span class='cn'>NULL</span>,
+  <span class='va'>primary_variable</span>,
+  <span class='va'>cqn_counts</span>,
+  skip <span class='op'>=</span> <span class='cn'>NULL</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -156,6 +162,11 @@ fixed effect interaction term.</p></td>
     <tr>
       <th>cqn_counts</th>
       <td><p>A counts data frame normalized by CQN.</p></td>
+    </tr>
+    <tr>
+      <th>skip</th>
+      <td><p>Defaults to NULL. If TRUE, this step will be skipped in the
+Drake plan.</p></td>
     </tr>
     </table>
 
