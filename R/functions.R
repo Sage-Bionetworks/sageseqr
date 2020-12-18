@@ -551,8 +551,13 @@ wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
 #'
 #' @inheritParams differential_expression
 #' @inheritParams build_formula
+#' @param skip Defaults to NULL. If TRUE, this step will be skipped in the
+#' Drake plan.
 #' @export
-stepwise_regression <- function(md, model_variables = NULL, primary_variable, cqn_counts) {
+stepwise_regression <- function(md, model_variables = NULL,
+                                primary_variable, cqn_counts,
+                                skip = NULL) {
+  drake::cancel_if(isTRUE(skip))
   metadata_input <- build_formula(md, model_variables, primary_variable)
   model <- mvIC::mvForwardStepwise(exprObj = cqn_counts$E,
                                    baseFormula = metadata_input$formula,
