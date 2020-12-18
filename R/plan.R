@@ -83,11 +83,11 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                                                                 clean_md),
     outliers = identify_outliers(filtered_counts, clean_md, !!color, !!shape,
                                  !!size),
-     model = drake::cancel_if(isTRUE(!!skip_model)),
-      stepwise_regression(
-        clean_md,
-        primary_variable = !!x_var_for_plot,
-        cqn_counts = cqn_counts
+     model = stepwise_regression(
+       clean_md,
+       primary_variable = !!x_var_for_plot,
+       cqn_counts = cqn_counts,
+       skip = !!skip_model
         ),
     report = rmarkdown::render(
       drake::knitr_in("sageseqr-report.Rmd"),
