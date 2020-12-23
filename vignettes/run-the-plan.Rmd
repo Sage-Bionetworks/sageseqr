@@ -65,9 +65,9 @@ plan <- sageseqr::rnaseq_plan(
 )
 
 drake::make(
-  plan
+  plan,
+  envir = getNamespace("sageseqr")
     )
-  )
 ```
 
 4. Visualize the results of your work. 
@@ -75,6 +75,7 @@ drake::make(
 ```{r visualize}
 drake::vis_drake_graph(
   plan,
+  envir = getNamespace("sageseqr"),
   targets_only = TRUE
   )
 ```
