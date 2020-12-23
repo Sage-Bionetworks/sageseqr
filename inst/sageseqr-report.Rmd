@@ -75,7 +75,7 @@ drake::readd(gene_coexpression)
 ```{r plot_outliers}
 drake::readd(outliers)$plot
 ```
-Outliers, based on logCPM expression, are `r glue::glue_collapse(drake::readd(outliers))$outliers, ", ", last = " and ")`.
+Outliers, based on logCPM expression, are `r glue::glue_collapse(drake::readd(outliers)$outliers, ", ", last = " and ")`.
 
 # Significant Covariates
 
