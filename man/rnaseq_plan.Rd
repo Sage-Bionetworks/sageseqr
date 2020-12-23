@@ -30,8 +30,7 @@ rnaseq_plan(
   skip_model,
   parent_id,
   rownames,
-  config_file,
-  path_to_cache
+  config_file
 )
 }
 \arguments{
@@ -91,7 +90,7 @@ by shape.}
 \item{size}{Continuous variable in `clean_metadata` differentiated
 by size.}
 
-\item{report_name}{Name of output markdown file and cache.}
+\item{report_name}{Name of output markdown file.}
 
 \item{skip_model}{If TRUE, does not run regression model.}
 
@@ -102,8 +101,6 @@ folder to store output.}
 set as NULL.}
 
 \item{config_file}{Optional. Path to configuration file.}
-
-\item{path_to_cache}{Path to Drake cache.}
 }
 \description{
 This function wraps the \code{"drake::plan()"} and copies the R markdown

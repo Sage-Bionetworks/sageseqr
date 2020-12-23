@@ -10,7 +10,6 @@ store_results(
   names,
   inputs,
   activity_provenance,
-  path_to_cache,
   rownames = NULL,
   config_file = NULL,
   report_name = NULL
@@ -30,14 +29,12 @@ output files and input files.}
 \item{activity_provenance}{A phrase to describe the data transformation for
 provenance.}
 
-\item{path_to_cache}{Path to Drake cache.}
-
 \item{rownames}{A list of variables to store rownames. If not applicable,
 set as NULL.}
 
 \item{config_file}{Optional. Path to configuration file.}
 
-\item{report_name}{Name of output markdown file and cache.}
+\item{report_name}{Name of output markdown file.}
 }
 \description{
 Store transformed data, markdown and html report to a Folder in Synapse.

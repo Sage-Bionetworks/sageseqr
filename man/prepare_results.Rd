@@ -4,12 +4,10 @@
 \alias{prepare_results}
 \title{Prepare output}
 \usage{
-prepare_results(target, path_to_cache, rowname = NULL)
+prepare_results(target, rowname = NULL)
 }
 \arguments{
 \item{target}{The name of the object to be stored.}
-
-\item{path_to_cache}{Path to Drake cache.}
 
 \item{rowname}{Optional. If applicable, the name of the variable to store
 rownames.}
