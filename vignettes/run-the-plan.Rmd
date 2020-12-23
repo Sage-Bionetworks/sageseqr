@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-1. [Write your own config file](https://kelshmo.github.io/sageseqr/articles/customize-config.html).
+1. [Write your own config file](https://sage-bionetworks.github.io/sageseqr/articles/customize-config.html).
 
 2. Specify the active configuration by setting `R_CONFIG_ACTIVE`.
 
