@@ -12,7 +12,11 @@ The workflow takes RNA-seq gene counts and sample metadata as inputs, normalizes
 
 # The Targets
 
-The series of steps that make up the workflow are called targets. The target objects are stored in a cache and can either be read or loaded into your environment with the `drake` functions `readd` or `loadd`. Source code for each target can be visualized by setting `show_source = TRUE` with `loadd` and `readd`. The targets are called by the `sageseqr` `rnaseq_plan` function and are:
+The series of steps that make up the workflow are called targets. The target objects are stored in a cache and can either be read or loaded into your environment with the `drake` functions `readd` or `loadd`. Source code for each target can be visualized by setting `show_source = TRUE` with `loadd` and `readd`. 
+
+Importantly, running `clean` will remove the data stored as targets ([but, the data is never completely gone!](https://books.ropensci.org/drake/walkthrough.html)). You may specific targets by name by passing them to the `clean` function.
+
+The targets are called by the `sageseqr` `rnaseq_plan()` function and are:
 
 Raw data: 
 - `import_metadata`- imports the raw metadata directly from synapse
