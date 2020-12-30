@@ -20,7 +20,7 @@
 #' @param biomart_id Synapse ID to biomart object.
 #' @param biomart_version Optionally, include Synapse file version number.
 #' @param x_var_for_plot Variable to separate groups for boxplot.
-#' @param report_name Name of output markdown file and cache.
+#' @param report_name Name of output markdown file.
 #' @inheritParams plot_sexcheck
 #' @inheritParams get_biomart
 #' @inheritParams filter_genes
@@ -37,7 +37,7 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                         conditions_threshold = 0.5,
                         x_var_for_plot, sex_var, color, shape, size,
                         report_name, skip_model, parent_id,
-                        rownames, config_file, path_to_cache) {
+                        rownames, config_file) {
   # Copies markdown to user's working directory
   if (!file.exists("sageseqr-report.Rmd")) {
     fs::file_copy(system.file("sageseqr-report.Rmd", package = "sageseqr"),
@@ -110,7 +110,6 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                    "Filtered counts (>1cpm)", "BioMart query results"),
       inputs = document_inputs,
       activity_provenance = "Analyze RNA-seq data with sageseqr pkg",
-      path_to_cache = !!path_to_cache,
       config_file = !!config_file,
       report_name = !!report_name
       )

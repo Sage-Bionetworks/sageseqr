@@ -594,15 +594,13 @@ summarize_biotypes <- function(filtered_counts, biomart_results) {
 #'
 #' Store data in temporary files to prepare for Synapse upload.
 #' @param target The name of the object to be stored.
-#' @param path_to_cache Path to Drake cache.
 #' @param rowname Optional. If applicable, the name of the variable to store
 #' rownames.
 #' @export
-prepare_results <- function(target, path_to_cache, rowname = NULL) {
+prepare_results <- function(target, rowname = NULL) {
   df <- drake::readd(
     target,
-    character_only = TRUE,
-    cache = drake::drake_cache(path_to_cache)
+    character_only = TRUE
     )
   if (!is.null(rowname)) {
     df <- tibble::rownames_to_column(df, rowname)
@@ -636,7 +634,7 @@ prepare_results <- function(target, path_to_cache, rowname = NULL) {
 #' @inheritParams prepare_results
 #' @export
 store_results <- function(parent_id, targets, names, inputs,
-                          activity_provenance, path_to_cache, rownames = NULL,
+                          activity_provenance, rownames = NULL,
                           config_file = NULL, report_name = NULL) {
 
   # include sageseqr package version in Synapse provenance
@@ -647,7 +645,6 @@ store_results <- function(parent_id, targets, names, inputs,
 
   mash <- list(
     target = targets,
-    path_to_cache = path_to_cache,
     rowname = rownames
   )
 
