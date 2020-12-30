@@ -100,7 +100,9 @@
 <div id="the-targets" class="section level1">
 <h1 class="hasAnchor">
 <a href="#the-targets" class="anchor"></a>The Targets</h1>
-<p>The series of steps that make up the workflow are called targets. The target objects are stored in a cache and can either be read or loaded into your environment with the <code>drake</code> functions <code>readd</code> or <code>loadd</code>. Source code for each target can be visualized by setting <code>show_source = TRUE</code> with <code>loadd</code> and <code>readd</code>. The targets are called by the <code>sageseqr</code> <code>rnaseq_plan</code> function and are:</p>
+<p>The series of steps that make up the workflow are called targets. The target objects are stored in a cache and can either be read or loaded into your environment with the <code>drake</code> functions <code>readd</code> or <code>loadd</code>. Source code for each target can be visualized by setting <code>show_source = TRUE</code> with <code>loadd</code> and <code>readd</code>.</p>
+<p>Importantly, running <code>clean</code> will remove the data stored as targets (<a href="https://books.ropensci.org/drake/walkthrough.html">but, the data is never completely gone!</a>). You may specific targets by name by passing them to the <code>clean</code> function.</p>
+<p>The targets are called by the <code>sageseqr</code> <code><a href="reference/rnaseq_plan.html">rnaseq_plan()</a></code> function and are:</p>
 <p>Raw data:</p>
 <ul>
 <li>
