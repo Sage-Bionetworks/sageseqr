@@ -157,35 +157,54 @@ get_biomart <- function(count_df, synid, version, host, filters, organism) {
     # Parse gene IDs to use in query
     gene_ids <- convert_geneids(count_df)
 
-    message(paste0("Downloading sequence",
-                   ifelse(length(gene_ids) > 1, "s", ""), " ..."))
+    message(
+      paste0(
+        "Downloading sequence",
+        ifelse(length(gene_ids) > 1, "s", ""),
+        " ..."
+        )
+      )
 
     if (length(gene_ids) > 100)
       message("This may take a few minutes ...")
 
-    attrs <- c(filters, "ensembl_exon_id", "chromosome_name", "exon_chrom_start", "exon_chrom_end")
-    coords <- biomaRt::getBM(filters = filters,
-                             attributes = attrs,
-                             values = gene_ids,
-                             mart = ensembl,
-                             useCache = FALSE)
+    attrs <- c(filters, "ensembl_exon_id", "chromosome_name",
+               "exon_chrom_start", "exon_chrom_end")
+    coords <- biomaRt::getBM(
+      filters = filters,
+      attributes = attrs,
+      values = gene_ids,
+      mart = ensembl,
+      useCache = FALSE
+      )
     gene_ids <- unique(coords[, filters])
 
     coords <- sapply(gene_ids, function(i) {
-      i.coords <- coords[coords[, 1] == i, 3:5]
-      g <- GenomicRanges::GRanges(i.coords[, 1], IRanges::IRanges(i.coords[, 2], i.coords[, 3]))
+      i.coords <- coords[
+        coords[, 1] == i,
+        c("chromosome_name", "exon_chrom_start", "exon_chrom_end")
+        ]
+      g <- GenomicRanges::GRanges(
+        i.coords[, 1], IRanges::IRanges(i.coords[, 2], i.coords[, 3])
+        )
       g
-    })
+      }
+    )
 
-    length <- plyr::ldply(coords[gene_ids], function(x) sum(IRanges::width(x)), .id = "ensembl_gene_id") %>%
+    length <- plyr::ldply(
+      coords[gene_ids],
+      function(x) sum(IRanges::width(x)), .id = "ensembl_gene_id"
+      ) %>%
       dplyr::rename(gene_length = .data$V1)
 
-    gc_content <- biomaRt::getBM(filters = filters,
-                                 attributes = c(filters, "hgnc_symbol", "percentage_gene_gc_content",
-                                                "gene_biotype", "chromosome_name"),
-                                 values = gene_ids,
-                                 mart = ensembl,
-                                 useCache = FALSE)
+    gc_content <- biomaRt::getBM(
+      filters = filters,
+      attributes = c(filters, "hgnc_symbol", "percentage_gene_gc_content",
+                     "gene_biotype", "chromosome_name"),
+      values = gene_ids,
+      mart = ensembl,
+      useCache = FALSE
+      )
 
     biomart_results <- dplyr::full_join(gc_content, length)
 
@@ -193,7 +212,9 @@ get_biomart <- function(count_df, synid, version, host, filters, organism) {
     biomart_results <- collapse_duplicate_hgnc_symbol(biomart_results)
 
     # Biomart IDs as rownames
-    biomart_results <- tibble::column_to_rownames(biomart_results, var = filters)
+    biomart_results <- tibble::column_to_rownames(
+      biomart_results, var = filters
+      )
 
     biomart_results
   } else {
@@ -201,15 +222,19 @@ get_biomart <- function(count_df, synid, version, host, filters, organism) {
     biomart_results <- get_data(synid, version)
 
     # Biomart IDs as rownames
-    biomart_results <- tibble::column_to_rownames(biomart_results, var = filters)
+    biomart_results <- tibble::column_to_rownames(
+      biomart_results, var = filters
+      )
 
     # Gene metadata required for count CQN
     required_variables <- c("gene_length", "percentage_gene_gc_content")
 
     if (!all(required_variables %in% colnames(biomart_results))) {
-      vars <- glue::glue_collapse(setdiff(required_variables, colnames(biomart_results)),
-                                  sep = ", ",
-                                  last = " and ")
+      vars <- glue::glue_collapse(
+        setdiff(required_variables, colnames(biomart_results)),
+        sep = ", ",
+        last = " and "
+        )
       message(glue::glue("Warning: {vars} missing from biomart object.
                          This information is required for Conditional
                          Quantile Normalization"))
