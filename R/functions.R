@@ -180,7 +180,10 @@ get_biomart <- function(count_df, synid, version, host, filters, organism) {
     gene_ids <- unique(coords[, filters])
 
     coords <- sapply(gene_ids, function(i) {
-      i.coords <- coords[coords[, 1] == i, 3:5]
+      i.coords <- coords[
+        coords[, 1] == i,
+        c("chromosome_name", "exon_chrom_start", "exon_chrom_end")
+        ]
       g <- GenomicRanges::GRanges(
         i.coords[, 1], IRanges::IRanges(i.coords[, 2], i.coords[, 3])
         )
