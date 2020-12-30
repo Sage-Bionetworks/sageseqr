@@ -103,7 +103,7 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
     ),
     Synapse = store_results(
       parent_id = !!parent_id,
-      targets = list("cqn_counts", "clean_md", "filtered_counts",
+      targets = list(c("cqn_counts", "counts"), "clean_md", "filtered_counts",
                      "biomart_results"),
       rownames = !!rownames,
       names = list("Normalized counts (CQN)", "Covariates",
