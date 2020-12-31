@@ -641,7 +641,8 @@ prepare_results <- function(target, rowname = NULL) {
   if (!is.null(rowname)) {
     df <- tibble::rownames_to_column(df, rowname)
   }
-  tmp <- fs::file_temp(target, ext = ".tsv")
+  # the file name will contain the primary name of the target
+  tmp <- fs::file_temp(target[1], ext = ".tsv")
   utils::write.table(
     df,
     file = tmp,
