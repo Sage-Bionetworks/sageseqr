@@ -733,9 +733,13 @@ conditional_plot_sexcheck <- function(clean_metadata, count_df, biomart_results,
 #' by shape.
 #' @param size Continuous variable in `clean_metadata` differentiated
 #' by size.
+#' @param split_conditions Defaults to NULL. A variable present in
+#' `clean_metadata` is required. If provided, SDs from the mean
+#' computed on sub-groups.
 #' @export
 identify_outliers <- function(filtered_counts, clean_metadata,
-                              color, shape, size, z = 4) {
+                              color, shape, size, z = 4,
+                              split_condition = NULL) {
   PC <- stats::prcomp(limma::voom(
     filtered_counts),
     scale. = TRUE,
@@ -751,27 +755,45 @@ identify_outliers <- function(filtered_counts, clean_metadata,
   pc1 <- eigen[1]/sum(eigen)
   pc2 <- eigen[2]/sum(eigen)
 
-  # Identify outliers - samples 4SDs from the mean
-  outliers <- as.character(
-    data$SampleID[
+  # If split_condition is provided, SDs from the mean will be computed on
+  # subgroups to detect trends. If not provided, data is stored in a list.
+  if (!is.null(split_condition)) {
+    var <- tibble::rownames_to_column(clean_metadata, var = "SampleID")
+    var <- dplyr::select(var, SampleID, all_of(!!split_condition))
+    split <- dplyr::right_join(var, data)
+    split <- dplyr::group_by(split, .data[[split_condition]])
+    split <- dplyr::group_split(split)
+  } else {
+    split <- list(data)
+  }
+
+  # Identify outliers - samples z SDs from the mean
+  outliers <- purrr::map(
+    split, function(x) as.character(
+      x$SampleID[
       c(
-        which(data$PC1 < mean(data$PC1) - z*stats::sd(data$PC1)),
-        which(data$PC1 > mean(data$PC1) + z*stats::sd(data$PC1))
+        which(x$PC1 < mean(x$PC1) - z*stats::sd(x$PC1)),
+        which(x$PC1 > mean(x$PC1) + z*stats::sd(x$PC1))
         ),
       drop = TRUE
       ]
     )
-  outliers <- c(outliers,
-                as.character(
-                  data$SampleID[
-                    c(
-                      which(data$PC2 < mean(data$PC2) - z*stats::sd(data$PC2)),
-                      which(data$PC2 > mean(data$PC2) + z*stats::sd(data$PC2))
-                      ),
-                    drop = TRUE
-                    ]
-                  )
-                )
+  )
+  outliers <- purrr::map(
+    split, function(x) c(
+      outliers,
+      as.character(
+        x$SampleID[c(
+          which(x$PC2 < mean(x$PC2) - z*stats::sd(x$PC2)),
+          which(x$PC2 > mean(x$PC2) + z*stats::sd(x$PC2))
+          ),
+          drop = TRUE
+          ]
+        )
+      )
+    )
+
+  outliers <- unique(unlist(outliers))
 
   plotdata <- dplyr::left_join(
     data,
