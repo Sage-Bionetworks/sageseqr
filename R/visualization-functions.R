@@ -828,3 +828,42 @@ identify_outliers <- function(filtered_counts, clean_metadata,
       )
   )
 }
+#' Explore metadata by gene expression on the sex chromosomes (PCA)
+#'
+#' Principal Component Analysis (PCA) of sex-specific genes. Samples greater
+#' than z standard deviations (SDs) from the mean of sample sub-groups defined
+#' by \code{"split_conditions"} are labeled in the plot.
+#'
+#' @inheritParams filter_genes
+#' @inheritParams identify_outliers
+#' @param gene_annots Annotations that include the mapping between gene Ids and
+#'  chromosome name. Gene Ids must be rownames.
+#' @export
+plot_sexcheck_pca <- function(clean_metadata, filtered_counts,
+                              gene_annots, sex_var, color, shape, size, z,
+                              split_condition) {
+
+  # subset counts matrix to include genes on the X or Y chromosome
+  annots <- gene_annots[
+    gene_annots$chromosome_name %in% c("X", "Y"),, drop = F
+    ]
+  annots <- tibble::rownames_to_column(annots, var = "key")
+
+  counts <- tibble::rownames_to_column(filtered_counts, var = "key")
+
+  counts <- dplyr::inner_join(annots, counts)
+
+  # remove gene annotations
+  counts <- dplyr::select(counts, -chromosome_name)
+  counts <- tibble::column_to_rownames(counts, "key")
+
+  identify_outliers(
+    filtered_counts = counts,
+    clean_metadata = clean_metadata,
+    color = color,
+    shape = shape,
+    size = size,
+    z = z,
+    split_condition = split_condition
+    )
+}

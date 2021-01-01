@@ -39,11 +39,14 @@ drake::readd(boxplots)
 
 ```{r boxplot_sex_chromosomes, results = "asis"}
 if (!is.null(config::get("sex check"))) {
-  cat("Visualize gene expression (log-transformed counts) of sex chromosomes using XIST 
+  cat("Visualize gene expression of sex chromosomes using XIST 
       as a X-chromosome marker and UTY as a Y-chromosome marker.")
   drake::readd(sex_plot)$plot
+   cat("Visualize gene expression across X and Y chromosomes by principal component analysis (PCA).")
+   drake::readd(sex_plot_pca)$plot
 }
 ```
+Possible outliers, identified as 2 standard deviations from the mean of samples n split by `r config::get("sex check")`, are `r glue::glue_collapse(drake::readd(sex_plot_pca)$outliers, ", ", last = " and ")`.
 
 Visualize the relationships between covariates.
 ```{r heatmap_covariates}
