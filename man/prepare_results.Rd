@@ -7,7 +7,8 @@
 prepare_results(target, rowname = NULL)
 }
 \arguments{
-\item{target}{The name of the object to be stored.}
+\item{target}{The name of the object to be stored. You may pass two values
+to save a target that has multidimensional arrays.}
 
 \item{rowname}{Optional. If applicable, the name of the variable to store
 rownames.}

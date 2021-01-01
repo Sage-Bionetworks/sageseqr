@@ -618,19 +618,31 @@ summarize_biotypes <- function(filtered_counts, biomart_results) {
 #' Prepare output
 #'
 #' Store data in temporary files to prepare for Synapse upload.
-#' @param target The name of the object to be stored.
+#' @param target The name of the object to be stored. You may pass two values
+#' to save a target that has multidimensional arrays.
 #' @param rowname Optional. If applicable, the name of the variable to store
 #' rownames.
 #' @export
 prepare_results <- function(target, rowname = NULL) {
-  df <- drake::readd(
-    target,
-    character_only = TRUE
+  # add check for multidimensional array
+  if (length(target) == 2) {
+    df <- drake::readd(
+      target[1],
+      character_only = TRUE
     )
+    df <- df[[target[2]]]
+  } else {
+    df <- drake::readd(
+      target,
+      character_only = TRUE
+    )
+  }
+
   if (!is.null(rowname)) {
     df <- tibble::rownames_to_column(df, rowname)
   }
-  tmp <- fs::file_temp(target, ext = ".tsv")
+  # the file name will contain the primary name of the target
+  tmp <- fs::file_temp(target[1], ext = ".tsv")
   utils::write.table(
     df,
     file = tmp,
