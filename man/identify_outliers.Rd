@@ -32,7 +32,7 @@ by size.}
 \item{z}{Allowable number of standard deviations (SDs) from the mean.
 Defaults to 4.}
 
-\item{split_conditions}{Defaults to NULL. A variable present in
+\item{split_condition}{Defaults to NULL. A variable present in
 `clean_metadata` is required. If provided, SDs from the mean
 computed on sub-groups.}
 }

@@ -733,7 +733,7 @@ conditional_plot_sexcheck <- function(clean_metadata, count_df, biomart_results,
 #' by shape.
 #' @param size Continuous variable in `clean_metadata` differentiated
 #' by size.
-#' @param split_conditions Defaults to NULL. A variable present in
+#' @param split_condition Defaults to NULL. A variable present in
 #' `clean_metadata` is required. If provided, SDs from the mean
 #' computed on sub-groups.
 #' @export
@@ -836,6 +836,7 @@ identify_outliers <- function(filtered_counts, clean_metadata,
 #'
 #' @inheritParams filter_genes
 #' @inheritParams identify_outliers
+#' @inheritParams plot_sexcheck
 #' @param gene_annots Annotations that include the mapping between gene Ids and
 #'  chromosome name. Gene Ids must be rownames.
 #' @export

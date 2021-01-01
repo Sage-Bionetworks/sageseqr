@@ -25,6 +25,8 @@ factors or numeric as determined by \code{"sageseqr::clean_covariates()"}.}
 \item{gene_annots}{Annotations that include the mapping between gene Ids and
 chromosome name. Gene Ids must be rownames.}
 
+\item{sex_var}{Column name of the sex or gender-specific metadata.}
+
 \item{color}{Discrete variable in `clean_metadata` differentiated
 by color.}
 
@@ -36,6 +38,10 @@ by size.}
 
 \item{z}{Allowable number of standard deviations (SDs) from the mean.
 Defaults to 4.}
+
+\item{split_condition}{Defaults to NULL. A variable present in
+`clean_metadata` is required. If provided, SDs from the mean
+computed on sub-groups.}
 }
 \description{
 Principal Component Analysis (PCA) of sex-specific genes. Samples greater
