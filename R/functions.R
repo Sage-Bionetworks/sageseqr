@@ -582,7 +582,11 @@ wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
 stepwise_regression <- function(md, model_variables = NULL,
                                 primary_variable, cqn_counts,
                                 skip = NULL) {
-  drake::cancel_if(isTRUE(skip))
+  #Quick out if user specify to skip stepwise model generation
+  if( isTRUE(skip) ){
+    message("Skipping Stepwise Model Generation") 
+    return( "Skipping Stepwise Model Generation" )
+  }
   metadata_input <- build_formula(md, model_variables, primary_variable)
   model <- mvIC::mvForwardStepwise(exprObj = cqn_counts$E,
                                    baseFormula = metadata_input$formula,
