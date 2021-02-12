@@ -841,7 +841,7 @@ identify_outliers <- function(filtered_counts, clean_metadata,
 #'  chromosome name. Gene Ids must be rownames.
 #' @export
 plot_sexcheck_pca <- function(clean_metadata, filtered_counts,
-                              gene_annots, sex_var, color, shape, size, z,
+                              gene_annots, sex_var, shape, size, z,
                               split_condition) {
 
   # subset counts matrix to include genes on the X or Y chromosome
@@ -861,7 +861,7 @@ plot_sexcheck_pca <- function(clean_metadata, filtered_counts,
   identify_outliers(
     filtered_counts = counts,
     clean_metadata = clean_metadata,
-    color = color,
+    color = sex_var,
     shape = shape,
     size = size,
     z = z,

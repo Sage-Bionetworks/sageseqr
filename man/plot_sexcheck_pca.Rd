@@ -9,7 +9,6 @@ plot_sexcheck_pca(
   filtered_counts,
   gene_annots,
   sex_var,
-  color,
   shape,
   size,
   z,
@@ -26,9 +25,6 @@ factors or numeric as determined by \code{"sageseqr::clean_covariates()"}.}
 chromosome name. Gene Ids must be rownames.}
 
 \item{sex_var}{Column name of the sex or gender-specific metadata.}
-
-\item{color}{Discrete variable in `clean_metadata` differentiated
-by color.}
 
 \item{shape}{Discrete variable in `clean_metadata` differentiated
 by shape.}

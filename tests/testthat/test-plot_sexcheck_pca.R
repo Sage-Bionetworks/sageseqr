@@ -21,7 +21,7 @@ counts <- data.frame(matrix(
 ))
 
 plot <- plot_sexcheck_pca(metadata, counts, biomart, sex_var = "sex",
-                          color = "sex", shape = "diagnosis", size = "RIN",
+                          shape = "diagnosis", size = "RIN",
                           z = 2, split_condition = "sex")
 
 test_that("output is plot", {
