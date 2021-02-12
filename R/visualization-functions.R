@@ -1,3 +1,42 @@
+#' Co-expression Histogram generation
+#'
+#' Visualize the pairwise gene correlation across all samples for 
+#' the cqn normalized expression data
+#'
+#'@param cqn_counts A counts data frame normalized by CQN.
+#'@export
+plot_coexpression <- function( cqn_counts ){
+  if( !(class(cqn_counts)=='cqn') ){
+    message("Error: Input object not class cqn")
+    return("Error: Input object not class cqn")
+  }
+  if( !exists("E", where=cqn_counts) ){
+    message("Error: Input cqn object does not contain normalized Expression Matrix")
+    return("Error: Input cqn object does not contain normalized Expression Matrix")
+  }
+  if( !(class(cqn_counts$E)[1]=="matrix" && class(cqn_counts$E)[2]=="array") ){
+    message('Error: Input cqn_counts$E object not class c( \"matrix\" \"array\") ')
+    return('Error: Input cqn_counts$E object not class c( \"matrix\" \"array\") ')
+  }
+  
+  Cor_counts <- as.data.frame(stats::cor(t(cqn_counts$E)))
+  Plot_Cor_Counts <- tidyr::gather(Cor_counts)
+  
+  hist <- ggplot2::ggplot( data=Plot_Cor_Counts, ggplot2::aes( x=value) ) +
+    ggplot2::geom_histogram( bins = 90 ) +
+    ggplot2::labs(
+      x = "Correlation Value",
+      y = "Frequency"
+    ) +
+    sagethemes::theme_sage() +
+    ggplot2::theme(
+      legend.title = ggplot2::element_blank(),
+      axis.text.x = ggplot2::element_text( size = 12 ),
+      axis.text.y = ggplot2::element_text( size = 12 )
+    )
+  return( hist )
+}
+
 #' Compute principal component analysis (PCA) and plot correlations
 #'
 #' Identify principal components (PCs) of normalized gene counts and correlate
