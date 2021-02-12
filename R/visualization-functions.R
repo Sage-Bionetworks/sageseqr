@@ -22,19 +22,19 @@ plot_coexpression <- function( cqn_counts ){
   Cor_counts <- as.data.frame(stats::cor(t(cqn_counts$E)))
   Plot_Cor_Counts <- tidyr::gather(Cor_counts)
   
-  hist <- ggplot2::ggplot( data=Plot_Cor_Counts, ggplot2::aes( x=value) ) +
-    ggplot2::geom_histogram( bins = 90 ) +
-    ggplot2::labs(
-      x = "Correlation Value",
-      y = "Frequency"
-    ) +
-    sagethemes::theme_sage() +
-    ggplot2::theme(
-      legend.title = ggplot2::element_blank(),
-      axis.text.x = ggplot2::element_text( size = 12 ),
-      axis.text.y = ggplot2::element_text( size = 12 )
-    )
-  return( hist )
+  return( ggplot2::ggplot( data=Plot_Cor_Counts, ggplot2::aes( x=value) ) +
+            ggplot2::geom_histogram( bins = 90 ) +
+            ggplot2::labs(
+              x = "Correlation Value",
+              y = "Frequency"
+              ) +
+            sagethemes::theme_sage() +
+            ggplot2::theme(
+              legend.title = ggplot2::element_blank(),
+              axis.text.x = ggplot2::element_text( size = 12 ),
+              axis.text.y = ggplot2::element_text( size = 12 )
+            )
+   )
 }
 
 #' Compute principal component analysis (PCA) and plot correlations
