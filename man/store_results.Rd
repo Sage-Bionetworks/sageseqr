@@ -5,9 +5,12 @@
 \title{Store output to Synapse}
 \usage{
 store_results(
+  clean_md = clean_md,
+  filtered_counts = filtered_counts,
+  biomart_results = biomart_results,
+  cqn_counts = cqn_counts$counts,
+  syn_names,
   parent_id,
-  targets,
-  names,
   inputs,
   activity_provenance,
   rownames = NULL,
@@ -16,12 +19,27 @@ store_results(
 )
 }
 \arguments{
+\item{clean_md}{The drake target containing the metadata data frame.
+Defaults to target name constrained by \code{"sageseqr::rnaseq_plan()"}.}
+
+\item{filtered_counts}{The drake target containing counts after low gene
+expression has been removed. Defaults to target name constrained by
+ \code{"sageseqr::rnaseq_plan()"}.}
+
+\item{biomart_results}{The drake target containing gene annotations from
+biomart. Defaults to target name constrained by
+\code{"sageseqr::rnaseq_plan()"}.}
+
+\item{cqn_counts}{The drake target containing Conditional Quantile Normalized
+(CQN) counts. Defaults to target name constrained by
+\code{"sageseqr::rnaseq_plan()"}.}
+
+\item{syn_names}{A list of human-readable names for the Synapse entities
+ordered
+by `metadata`, `filtered_counts`, `biomart_results`, `cqn_counts`.}
+
 \item{parent_id}{A Synapse Id that corresponds to a project or
 folder to store output.}
-
-\item{targets}{A list of object names to be stored.}
-
-\item{names}{A list of human-readable names for the Synapse entities.}
 
 \item{inputs}{A character vector of Synapse Ids to create provenance between
 output files and input files.}
@@ -29,7 +47,8 @@ output files and input files.}
 \item{activity_provenance}{A phrase to describe the data transformation for
 provenance.}
 
-\item{rownames}{A list of variables to store rownames. If not applicable,
+\item{rownames}{A list of variables to store rownames ordered by `metadata`,
+`filtered_counts`, `biomart_results`, `cqn_counts`. If not applicable,
 set as NULL.}
 
 \item{config_file}{Optional. Path to configuration file.}

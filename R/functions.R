@@ -618,33 +618,20 @@ summarize_biotypes <- function(filtered_counts, biomart_results) {
 #' Prepare output
 #'
 #' Store data in temporary files to prepare for Synapse upload.
-#' @param target The name of the object to be stored. You may pass two values
-#' to save a target that has multidimensional arrays.
+#' @param target The object to be stored.
 #' @param rowname Optional. If applicable, the name of the variable to store
 #' rownames.
 #' @export
 prepare_results <- function(target, rowname = NULL) {
-  # add check for multidimensional array
-  if (length(target) == 2) {
-    df <- drake::readd(
-      target[1],
-      character_only = TRUE
-    )
-    df <- df[[target[2]]]
-  } else {
-    df <- drake::readd(
-      target,
-      character_only = TRUE
-    )
+  if (!is.null(rowname)) {
+    target <- tibble::rownames_to_column(target, rowname)
   }
 
-  if (!is.null(rowname)) {
-    df <- tibble::rownames_to_column(df, rowname)
-  }
   # the file name will contain the primary name of the target
-  tmp <- fs::file_temp(target[1], ext = ".tsv")
+  tmp <- fs::file_temp(names(target), ext = ".tsv")
+
   utils::write.table(
-    df,
+    target,
     file = tmp,
     sep = "\t",
     row.names = FALSE,
@@ -658,10 +645,23 @@ prepare_results <- function(target, rowname = NULL) {
 #'
 #' @param parent_id A Synapse Id that corresponds to a project or
 #' folder to store output.
-#' @param targets A list of object names to be stored.
-#' @param rownames A list of variables to store rownames. If not applicable,
+#' @param cqn_counts The drake target containing Conditional Quantile Normalized
+#'  (CQN) counts. Defaults to target name constrained by
+#'  \code{"sageseqr::rnaseq_plan()"}.
+#' @param clean_md The drake target containing the metadata data frame.
+#' Defaults to target name constrained by \code{"sageseqr::rnaseq_plan()"}.
+#' @param filtered_counts The drake target containing counts after low gene
+#' expression has been removed. Defaults to target name constrained by
+#'  \code{"sageseqr::rnaseq_plan()"}.
+#' @param biomart_results The drake target containing gene annotations from
+#' biomart. Defaults to target name constrained by
+#' \code{"sageseqr::rnaseq_plan()"}.
+#' @param rownames A list of variables to store rownames ordered by `metadata`,
+#' `filtered_counts`, `biomart_results`, `cqn_counts`. If not applicable,
 #' set as NULL.
-#' @param names A list of human-readable names for the Synapse entities.
+#' @param syn_names A list of human-readable names for the Synapse entities
+#' ordered
+#' by `metadata`, `filtered_counts`, `biomart_results`, `cqn_counts`.
 #' @param inputs A character vector of Synapse Ids to create provenance between
 #' output files and input files.
 #' @param activity_provenance A phrase to describe the data transformation for
@@ -670,15 +670,26 @@ prepare_results <- function(target, rowname = NULL) {
 #' @inheritParams rnaseq_plan
 #' @inheritParams prepare_results
 #' @export
-store_results <- function(parent_id, targets, names, inputs,
-                          activity_provenance, rownames = NULL,
-                          config_file = NULL, report_name = NULL) {
+store_results <- function(clean_md = clean_md,
+                          filtered_counts = filtered_counts,
+                          biomart_results = biomart_results,
+                          cqn_counts = cqn_counts$counts,
+                          syn_names, parent_id, inputs, activity_provenance,
+                          rownames = NULL, config_file = NULL,
+                          report_name = NULL) {
 
   # include sageseqr package version in Synapse provenance
   ver <- utils::packageVersion("sageseqr")
   description <- glue::glue(
     "analyzed with sageseqr {ver}"
     )
+
+  # nest drake targets in a list
+  targets <- list(clean_md, filtered_counts, biomart_results, cqn_counts)
+
+  # create named list for drake targets
+  names(targets) <- c("clean_md", "filtered_counts", "biomart_results",
+                      "cqn_counts")
 
   mash <- list(
     target = targets,
@@ -692,7 +703,7 @@ store_results <- function(parent_id, targets, names, inputs,
 
   mash <- list(
     parent = parent_id,
-    names = names,
+    syn_names = syn_names,
     paths = file_location
     )
 
@@ -701,7 +712,7 @@ store_results <- function(parent_id, targets, names, inputs,
     function(paths, parent, names) synapser::File(
       path = paths,
       parent = parent,
-      name = names
+      name = syn_names
       )
   )
 
