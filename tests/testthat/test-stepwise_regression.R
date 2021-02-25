@@ -6,7 +6,7 @@ metadata <- data.frame(
     row.names = c("S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8"),
     stringsAsFactors = FALSE
   )
-  
+
 counts <- data.frame(matrix(
     sample(0:100, size = 16),
     ncol = 8,
@@ -14,11 +14,11 @@ counts <- data.frame(matrix(
                     c("S1", "S2", "S3", "S4",  "S5", "S6", "S7", "S8"))
   ))
 
-test_that("Skip Function in Stepwise Model Regression is implemented", {
-  expect_identical(stepwise_regression( metadata, 
-                              model_variables = c('batch','RIN'), 
+test_that("Skipping stepwise regression model generation...", {
+  expect_identical(stepwise_regression( metadata,
+                              model_variables = c('batch','RIN'),
                               primary_variable="diagnosis",
                               counts,
                               skip = TRUE),
-         "Skipping Stepwise Model Generation")
+         "Skipping stepwise regression model generation...")
 })
