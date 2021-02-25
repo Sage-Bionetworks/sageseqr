@@ -582,7 +582,10 @@ wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
 stepwise_regression <- function(md, model_variables = NULL,
                                 primary_variable, cqn_counts,
                                 skip = NULL) {
-  drake::cancel_if(isTRUE(skip))
+  # skip stepwise generation if skip = TRUE
+  if(isTRUE(skip)) {
+    return("Skipping stepwise regression model generation...")
+  } else {
   metadata_input <- build_formula(md, model_variables, primary_variable)
   model <- mvIC::mvForwardStepwise(exprObj = cqn_counts$E,
                                    baseFormula = metadata_input$formula,
@@ -599,6 +602,7 @@ stepwise_regression <- function(md, model_variables = NULL,
   model["to_visualize"] <- to_visualize
 
   model
+  }
 }
 #' Summarize Biotypes
 #'
