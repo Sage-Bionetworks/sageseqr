@@ -585,7 +585,7 @@ stepwise_regression <- function(md, model_variables = NULL,
   # skip stepwise generation if skip = TRUE
   if(isTRUE(skip)) {
     return("Skipping stepwise regression model generation...")
-  }
+  } else {
   metadata_input <- build_formula(md, model_variables, primary_variable)
   model <- mvIC::mvForwardStepwise(exprObj = cqn_counts$E,
                                    baseFormula = metadata_input$formula,
@@ -602,6 +602,7 @@ stepwise_regression <- function(md, model_variables = NULL,
   model["to_visualize"] <- to_visualize
 
   model
+  }
 }
 #' Summarize Biotypes
 #'
