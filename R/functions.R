@@ -668,7 +668,6 @@ prepare_results <- function(target, rowname = NULL) {
 #' provenance.
 #' @param config_file Optional. Path to configuration file.
 #' @inheritParams rnaseq_plan
-#' @inheritParams prepare_results
 #' @export
 store_results <- function(clean_md = clean_md,
                           filtered_counts = filtered_counts,
