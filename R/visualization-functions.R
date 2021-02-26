@@ -704,7 +704,7 @@ plot_sexcheck <- function(clean_metadata, count_df, biomart_results, sex_var) {
     ggplot2::geom_point(ggplot2::aes(color = .data[[sex_var]])) +
     sagethemes::scale_color_sage_d() +
     sagethemes::theme_sage() +
-    ggplot2::theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1))
 
   p <- list(plot = p,
             sex_specific_counts = results)
