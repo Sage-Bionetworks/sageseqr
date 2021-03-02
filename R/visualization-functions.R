@@ -654,69 +654,191 @@ boxplot_vars <- function(md, include_vars, x_var) {
 #'
 #' @inheritParams collapse_duplicate_hgnc_symbol
 #' @inheritParams filter_genes
+#' @inheritParams identify_outliers
 #' @param sex_var Column name of the sex or gender-specific metadata.
 #' @export
-plot_sexcheck <- function(clean_metadata, count_df, biomart_results, sex_var) {
-  md <- tibble::rownames_to_column(clean_metadata, var = "sampleId") %>%
-    dplyr::select(.data$sampleId, !!sex_var)
-  sex_specific <- count_df[
-    grepl(
-      paste0(
-        rownames(
-          biomart_results[
-            biomart_results$hgnc_symbol %in% c("UTY", "XIST"),
-            ]),
-        collapse = "|"
-        ),
-      rownames(count_df)
-      ),
-    ]
-  rownames(sex_specific) <- convert_geneids(sex_specific)
-  sex_specific <- tibble::rownames_to_column(sex_specific, var = "geneId")
-  results <- dplyr::select(
-    biomart_results,
-    .data$hgnc_symbol,
-    .data$chromosome_name
-    )
-  results <- dplyr::filter(results, .data$hgnc_symbol %in% c("XIST", "UTY"))
-  results <- tibble::rownames_to_column(results, var = "geneId")
-  results <- dplyr::left_join(results, sex_specific)
-  results <- tidyr::pivot_longer(
-    results,
-    -dplyr::all_of(c("geneId", "chromosome_name", "hgnc_symbol")),
-    names_to = "sampleId",
-    values_to = "counts(log)"
-    ) %>%
-    dplyr::mutate(
-      `counts(log)` = log(.data$`counts(log)`),
-      `counts(log)` = ifelse(
-        .data$`counts(log)` == -Inf, 0, .data$`counts(log)`
+plot_sexcheck <- function(clean_metadata, filtered_counts, biomart_results, sex_var) {
+  
+  #Initialize outputs
+  warning <- NULL
+  sex_outliers <- NA
+  discordance_plots <- NA
+  if( 'UTY' %in% biomart_results$hgnc_symbol &
+      row.names(biomart_results[ biomart_results$hgnc_symbol %in% c('UTY') , ]) %in% row.names(filtered_counts) &
+      'XIST' %in% biomart_results$hgnc_symbol &
+      row.names(biomart_results[ biomart_results$hgnc_symbol %in% c('XIST') , ]) %in% row.names(filtered_counts) ){
+    
+    sex_counts <- filtered_counts[ row.names(filtered_counts) %in% row.names(biomart_results[ biomart_results$chromosome_name %in% c('X','Y') , ]), ]
+    
+    sex_pc <- stats::prcomp( limma::voom(
+      sex_counts),
+      scale. = TRUE,
+      center = TRUE)
+    
+    filt_pcs <- as.numeric( table( (sex_pc$sdev^2/sum(sex_pc$sdev^2)) >= 0.01 )['TRUE'] )
+    
+    #Correlate the PCs above 1 to Sex
+    scan_vars <- as.data.frame( sex_pc$rotation[,1:filt_pcs] )
+    #scan_vars$sex <- eval( parse( text = paste0( 'clean_metadata[ row.names(scan_vars),]$', sex_var ) ) )
+    scan_vars$XIST <- t( filtered_counts[ row.names(biomart_results[ biomart_results$hgnc_symbol %in% 'XIST', ]), ] )
+    scan_vars$UTY <- t( filtered_counts[ row.names(biomart_results[ biomart_results$hgnc_symbol %in% 'UTY', ]), ] )
+    
+    #Store Comps for plots 
+    xist_comp <- 0
+    xist_estimate <- 0
+    uty_comp <- 0
+    uty_estimate <- 0
+    for( i in 1:filt_pcs ){
+      
+      test_xist <- cor.test( scan_vars[,i], scan_vars$XIST, method='kendall' ) 
+      test_uty <- cor.test( scan_vars[,i], scan_vars$UTY, method='kendall' ) 
+      
+      if( test_xist$p.value < 0.05 ){
+        if( abs(test_xist$statistic) > xist_estimate ){
+          xist_estimate <- abs(test_xist$statistic)
+          xist_comp <- i
+        }
+      }else{}
+      if( test_uty$p.value < 0.05 ){
+        if( abs(test_uty$statistic) > uty_estimate ){
+          uty_estimate <- abs(test_uty$statistic)
+          uty_comp <- i
+        }
+      }else{}
+      #message( paste0( 'PC: ', i, " PVal: ", signif(test_xist$p.value, digits=3), " Raw Coeff: ", signif(abs(test_xist$statistic), digits=3)) )
+      #message( paste0( 'PC: ', i, " PVal: ", signif(test_uty$p.value, digits=3), " Raw Coeff: ", signif(abs(test_uty$statistic), digits=3)) )
+      
+    }
+    
+    #Are XIST and UTY Expression Aligned to the same PC
+    plot_component <- NA
+    if( xist_comp == uty_comp ){
+      if( xist_comp == 1 ){
+        plot_component <- 2
+        plot_component_var <- signif( (sex_pc$sdev^2/sum(sex_pc$sdev^2))[2]*100, 3 )
+      }else{
+        plot_component <- 1
+        plot_component_var <- signif( (sex_pc$sdev^2/sum(sex_pc$sdev^2))[1]*100, 3 )
+      }
+      fit <- kmeans( sex_pc$rotation[, xist_comp ], 2 ) # 2 cluster solution
+      
+      xist_1 <- mean( as.numeric(
+        sex_counts[ row.names(biomart_results[ biomart_results$hgnc_symbol %in% 'XIST', ]),
+                    names(fit$cluster[ fit$cluster == 1 ])
+        ]
+      ))
+      xist_2 <- mean( as.numeric(
+        sex_counts[ row.names(biomart_results[ biomart_results$hgnc_symbol %in% 'XIST', ]),
+                    names(fit$cluster[ fit$cluster == 2 ])
+        ]
+      ))
+      uty_1 <- mean( as.numeric(
+        sex_counts[ row.names(biomart_results[ biomart_results$hgnc_symbol %in% 'UTY', ]),
+                    names(fit$cluster[ fit$cluster == 1 ])
+        ]
+      ))
+      uty_2 <- mean( as.numeric(
+        sex_counts[ row.names(biomart_results[ biomart_results$hgnc_symbol %in% 'UTY', ]),
+                    names(fit$cluster[ fit$cluster == 2 ])
+        ]
+      ))
+      if( (uty_2 < uty_1 & xist_2 > xist_1) | (uty_1 < uty_2 & xist_1 > xist_2) ){
+        if( uty_2 < uty_1 & xist_2 > xist_1 ){
+          #cluster 2 are females
+          fit$cluster[ fit$cluster == 2 ] <- 'female'
+          fit$cluster[ fit$cluster == 1 ] <- 'male'
+          eval(parse( text= paste0( 'clean_metadata$', sex_var, '_Predicted <- ', NA) ))
+          eval(parse( text= paste0( 'clean_metadata$', sex_var, '_Predicted <- as.factor( as.character( fit$cluster[ row.names(clean_metadata) ] ) )' )))
+          sex_outliers <- eval(parse( text = paste0( 'row.names( clean_metadata[ clean_metadata$', sex_var, '_Predicted != clean_metadata$', sex_var, ',])' ) ))
+          
+        }else{
+          #cluster 1 are females
+          fit$cluster[ fit$cluster == 1 ] <- 'female'
+          fit$cluster[ fit$cluster == 2 ] <- 'male'
+          eval(parse( text = paste0( 'clean_metadata$', sex_var, '_Predicted <-', NA) ))
+          eval(parse( text = paste0( 'clean_metadata$', sex_var, '_Predicted <- as.factor( as.character( fit$cluster[ row.names(clean_metadata) ] ) )' )))
+          sex_outliers <- eval(parse( text = paste0( 'row.names( clean_metadata[ clean_metadata$', sex_var, '_Predicted != clean_metadata$', sex_var, ',])' ) ))
+        }
+        
+        #Plot the data
+        ##Assemble the data
+        clean_metadata$DiscordantBySex <- 'NO'
+        clean_metadata[sex_outliers,]$DiscordantBySex <- 'YES'
+        voom_sexcounts <- limma::voom(sex_counts)  
+        results <- data.frame( SampleID = rownames(sex_pc$rotation),
+                                A = sex_pc$rotation[,xist_comp],
+                                B = sex_pc$rotation[,plot_component],
+                                XIST = as.numeric( voom_sexcounts$E[ row.names(biomart_results[ biomart_results$hgnc_symbol %in% c('XIST') , ]), rownames(sex_pc$rotation) ]),
+                                UTY = as.numeric( voom_sexcounts$E[ row.names(biomart_results[ biomart_results$hgnc_symbol %in% c('UTY') , ]), rownames(sex_pc$rotation) ]),
+                                Indicated_Sex = clean_metadata[ rownames(sex_pc$rotation), paste0( sex_var, '_Predicted') ],
+                                Sex_Predicted = clean_metadata[ rownames(sex_pc$rotation), paste0( sex_var, '_Predicted') ],
+                                DiscordantBySex = clean_metadata[ rownames(sex_pc$rotation), 'DiscordantBySex' ]
         )
-      )
-  results <- tidyr::pivot_wider(
-    dplyr::select(results, -chromosome_name, -geneId),
-    names_from = "hgnc_symbol",
-    values_from = "counts(log)"
-    )
-  results <- dplyr::left_join(results, md, "sampleId")
-
-  p <- ggplot2::ggplot(results, ggplot2::aes(x = .data$XIST, y = .data$UTY)) +
-    ggplot2::geom_point(ggplot2::aes(color = .data[[sex_var]])) +
-    sagethemes::scale_color_sage_d() +
-    sagethemes::theme_sage()
-  p <- list(plot = p,
-            sex_specific_counts = results)
-  p
+        
+        colnames(results)[ colnames(results) == 'A' ] <- paste0( 'PC', xist_comp )
+        colnames(results)[ colnames(results) == 'B' ] <-paste0( 'PC', plot_component )
+        
+        eigen <- sex_pc$sdev^2
+        pc_Comp <- signif( 100*(eigen[plot_component]/sum(eigen)), 3 )
+        pc_Sex <- signif( 100*(eigen[xist_comp]/sum(eigen)), 3)
+        
+        plot_markers <- ggplot2::ggplot( data = results  ) +
+          ggplot2::geom_point( ggplot2::aes( x=XIST, y=UTY, shape = Indicated_Sex, color = DiscordantBySex)  ) + 
+          ggplot2::xlab("Voom Normalized Log2 XIST Counts") + ggplot2::ylab("Voom Normalized Log2 UTY Counts") +
+          ggplot2::ggtitle( "PCA Clustered Sex Discordance by XIST and UTY Expression" ) + 
+          ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+        
+        if( plot_component < xist_comp ){
+          plot_components <- ggplot2::ggplot( data = results  ) + 
+            ggplot2::geom_point( ggplot2::aes( x=results[,3], y=results[,2], shape = Indicated_Sex, color = DiscordantBySex)  ) + 
+            ggplot2::xlab(paste0( "PC", plot_component,': ', pc_Comp )) + ggplot2::ylab( paste0("PC", xist_comp,': ', pc_Sex )) +
+            ggplot2::ggtitle( "PCA Clustered Sex Discordance by Relevant Principal Components" ) + 
+            ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+        }else{
+          plot_components <- ggplot2::ggplot( data = results  ) + 
+            ggplot2::geom_point( ggplot2::aes( x=results[,2], y=results[,3], shape = Indicated_Sex, color = DiscordantBySex)  ) + 
+            ggplot2::xlab(paste0( "PC", xist_comp,': ', pc_Sex )) + ggplot2::ylab( paste0("PC", plot_component,': ', pc_Comp )) +
+            ggplot2::ggtitle( "PCA Clustered Sex Discordance by Relevant Principal Components" ) + 
+            ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+        }
+        discordance_plots <- ggpubr::as_ggplot( gridExtra::arrangeGrob( plot_markers, plot_components, nrow=1) )
+      }else{
+        warn <-  c(warn, warning( "warnING identify_outliers: XIST and UTY discordant between clusters" ))
+        eval(parse( text = paste0( 'clean_metadata$', sex_var, '_Predicted <- ', NA) ))
+        eval(parse( text = paste0( 'clean_metadata$', sex_var, '_Predicted <- as.factor( as.character( fit$cluster[ row.names(clean_metadata) ] ) )' )))
+      }
+      
+      
+    }else{
+      warning <-  c(warn, warning( 
+        'warnING identify_outliers: XIST and UTY counts correlated to disconcordant Principle Components'
+      ))
+      eval(parse( text= paste0( text = 'clean_metadata$', sex_var, '_Predicted <- ', NA) ))
+    }
+  }else{
+    warning <-  c(warn, warning( 
+      'warnING identify_outliers: XIST and UTY not found in biomart results or expression'
+    ))
+    eval(parse( text= paste0( text ='clean_metadata$', sex_var, '_Predicted <- ', NA) ))
+  }
+  
+  p <- list(plot = discordance_plots,
+            sex_check_results = as_tibble( results ),
+            warnings = warning)
+  return( p )
+  
+  
 }
 #' Conditionally wrap plot_sexcheck for drake
 #'
 #' Work around to expose plot_sexcheck to testing and export but also leverage
 #' drakes function for skipping targets conditionally (see \code{"drake::cancel_if()"}).
 #' @inheritParams plot_sexcheck
+#' @inheritParams identify_outliers
 #' @export
-conditional_plot_sexcheck <- function(clean_metadata, count_df, biomart_results, sex_var) {
+conditional_plot_sexcheck <- function(clean_metadata, filtered_counts, biomart_results, sex_var) {
   drake::cancel_if(is.null(sex_var))
-  plot_sexcheck(clean_metadata, count_df, biomart_results, sex_var)
+  plot_sexcheck(clean_metadata, filtered_counts, biomart_results, sex_var)
 }
 #' Explore samples that are outliers
 #'
@@ -733,84 +855,58 @@ conditional_plot_sexcheck <- function(clean_metadata, count_df, biomart_results,
 #' by shape.
 #' @param size Continuous variable in `clean_metadata` differentiated
 #' by size.
-#' @param split_condition Defaults to NULL. A variable present in
-#' `clean_metadata` is required. If provided, SDs from the mean
-#' computed on sub-groups.
 #' @export
 identify_outliers <- function(filtered_counts, clean_metadata,
-                              color, shape, size, z = 4,
-                              split_condition = NULL) {
+                              color, shape, size, z = 4) {
+  
   PC <- stats::prcomp(limma::voom(
     filtered_counts),
     scale. = TRUE,
     center = TRUE)
-
+  
   # Plot first 2 PCs
   data <- data.frame(SampleID = rownames(PC$rotation),
-                         PC1 = PC$rotation[,1],
-                         PC2 = PC$rotation[,2])
-
+                     PC1 = PC$rotation[,1],
+                     PC2 = PC$rotation[,2])
+  
   # Percentage from each PC
   eigen <- PC$sdev^2
   pc1 <- eigen[1]/sum(eigen)
   pc2 <- eigen[2]/sum(eigen)
-
-  # If split_condition is provided, SDs from the mean will be computed on
-  # subgroups to detect trends. If not provided, data is stored in a list.
-  if (!is.null(split_condition)) {
-    var <- tibble::rownames_to_column(clean_metadata, var = "SampleID")
-    var <- dplyr::select(var, SampleID, all_of(!!split_condition))
-    split <- dplyr::right_join(var, data)
-    split <- dplyr::group_by(split, .data[[split_condition]])
-    split <- dplyr::group_split(split)
-  } else {
-    split <- list(data)
-  }
-
-  # Identify outliers - samples z SDs from the mean
-  outliers <- purrr::map(
-    split, function(x) as.character(
-      x$SampleID[
+  
+  # Identify outliers - ouside ellipse with Radii defined as 4SDs from the mean
+  outliers <- as.character(
+    data$SampleID[
       c(
-        which(x$PC1 < mean(x$PC1) - z*stats::sd(x$PC1)),
-        which(x$PC1 > mean(x$PC1) + z*stats::sd(x$PC1))
-        ),
+        which( ((data$PC1 - mean(data$PC1) )^2) / ((z*stats::sd(data$PC1))^2) + ((data$PC2 - mean(data$PC2) )^2) / ((z*stats::sd(data$PC2))^2) > 1 )
+      ),
       drop = TRUE
-      ]
-    )
+    ]
   )
-  outliers <- purrr::map(
-    split, function(x) c(
-      outliers,
-      as.character(
-        x$SampleID[c(
-          which(x$PC2 < mean(x$PC2) - z*stats::sd(x$PC2)),
-          which(x$PC2 > mean(x$PC2) + z*stats::sd(x$PC2))
-          ),
-          drop = TRUE
-          ]
-        )
-      )
-    )
-
-  outliers <- unique(unlist(outliers))
-
+  
   plotdata <- dplyr::left_join(
     data,
     tibble::rownames_to_column(clean_metadata, "SampleID")
-    ) %>%
+  ) %>%
     dplyr::mutate(label = .data$SampleID) %>%
     dplyr::mutate(label = ifelse((.data$label %in% outliers), .data$label, NA))
-
+  
   p <- ggplot2::ggplot(plotdata, ggplot2::aes(x = .data$PC1, y = .data$PC2))
-
+  
   p <- p + ggplot2::geom_point(ggplot2::aes(
     color = .data[[color]],
     size = .data[[size]],
     shape = .data[[shape]]
-    )
   )
-
+  )
+  
+  p <- p + ggforce::geom_ellipse(ggplot2::aes(x0 = mean(data$PC1),
+                                              y0 = mean(data$PC2),
+                                              a = z*stats::sd(data$PC1),
+                                              b = z*stats::sd(data$PC2), 
+                                              angle = 0)
+  ) 
+  
   p <- p + sagethemes::scale_color_sage_d() +
     sagethemes::theme_sage() +
     ggplot2::theme(legend.position = "right") +
@@ -819,13 +915,13 @@ identify_outliers <- function(filtered_counts, clean_metadata,
       family = "Lato",
       size = 4,
       hjust = 0
-      )
-
+    )
+  
   return(
     list(
       plot = p,
       outliers = outliers
-      )
+    )
   )
 }
 #' Explore metadata by gene expression on the sex chromosomes (PCA)
