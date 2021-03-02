@@ -823,7 +823,7 @@ plot_sexcheck <- function(clean_metadata, filtered_counts, biomart_results, sex_
   }
   
   p <- list(plot = discordance_plots,
-            sex_check_results = as_tibble( results ),
+            sex_check_results = tibble::as_tibble( results ),
             warnings = warning)
   return( p )
   
@@ -937,8 +937,8 @@ identify_outliers <- function(filtered_counts, clean_metadata,
 #'  chromosome name. Gene Ids must be rownames.
 #' @export
 plot_sexcheck_pca <- function(clean_metadata, filtered_counts,
-                              gene_annots, sex_var, shape, size, z,
-                              split_condition) {
+                              gene_annots, sex_var, shape, size, z
+                              ) {
 
   # subset counts matrix to include genes on the X or Y chromosome
   annots <- gene_annots[
@@ -961,6 +961,5 @@ plot_sexcheck_pca <- function(clean_metadata, filtered_counts,
     shape = shape,
     size = size,
     z = z,
-    split_condition = split_condition
     )
 }
