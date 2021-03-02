@@ -681,8 +681,8 @@ plot_sexcheck <- function(clean_metadata, filtered_counts, biomart_results, sex_
     #Correlate the PCs above 1 to Sex
     scan_vars <- as.data.frame( sex_pc$rotation[,1:filt_pcs] )
     #scan_vars$sex <- eval( parse( text = paste0( 'clean_metadata[ row.names(scan_vars),]$', sex_var ) ) )
-    scan_vars$XIST <- t( filtered_counts[ row.names(biomart_results[ biomart_results$hgnc_symbol %in% 'XIST', ]), ] )
-    scan_vars$UTY <- t( filtered_counts[ row.names(biomart_results[ biomart_results$hgnc_symbol %in% 'UTY', ]), ] )
+    scan_vars$xist <- t( filtered_counts[ row.names(biomart_results[ biomart_results$hgnc_symbol %in% 'XIST', ]), ] )
+    scan_vars$uty <- t( filtered_counts[ row.names(biomart_results[ biomart_results$hgnc_symbol %in% 'UTY', ]), ] )
     
     #Store Comps for plots 
     xist_comp <- 0
@@ -691,8 +691,8 @@ plot_sexcheck <- function(clean_metadata, filtered_counts, biomart_results, sex_
     uty_estimate <- 0
     for( i in 1:filt_pcs ){
       
-      test_xist <- stats::cor.test( scan_vars[,i], scan_vars$XIST, method='kendall' ) 
-      test_uty <- stats::cor.test( scan_vars[,i], scan_vars$UTY, method='kendall' ) 
+      test_xist <- stats::cor.test( scan_vars[,i], scan_vars$xist, method='kendall' ) 
+      test_uty <- stats::cor.test( scan_vars[,i], scan_vars$uty, method='kendall' ) 
       
       if( test_xist$p.value < 0.05 ){
         if( abs(test_xist$statistic) > xist_estimate ){
@@ -763,17 +763,17 @@ plot_sexcheck <- function(clean_metadata, filtered_counts, biomart_results, sex_
         
         #Plot the data
         ##Assemble the data
-        clean_metadata$DiscordantBySex <- 'NO'
-        clean_metadata[sex_outliers,]$DiscordantBySex <- 'YES'
+        clean_metadata$discordant_by_sex <- 'NO'
+        clean_metadata[sex_outliers,]$discordant_by_sex <- 'YES'
         voom_sexcounts <- limma::voom(sex_counts)  
         results <- data.frame( SampleID = rownames(sex_pc$rotation),
                                 A = sex_pc$rotation[,xist_comp],
                                 B = sex_pc$rotation[,plot_component],
                                 XIST = as.numeric( voom_sexcounts$E[ row.names(biomart_results[ biomart_results$hgnc_symbol %in% c('XIST') , ]), rownames(sex_pc$rotation) ]),
                                 UTY = as.numeric( voom_sexcounts$E[ row.names(biomart_results[ biomart_results$hgnc_symbol %in% c('UTY') , ]), rownames(sex_pc$rotation) ]),
-                                Indicated_Sex = clean_metadata[ rownames(sex_pc$rotation), paste0( sex_var, '_Predicted') ],
+                                indicated_sex = clean_metadata[ rownames(sex_pc$rotation), paste0( sex_var, '_Predicted') ],
                                 Sex_Predicted = clean_metadata[ rownames(sex_pc$rotation), paste0( sex_var, '_Predicted') ],
-                                DiscordantBySex = clean_metadata[ rownames(sex_pc$rotation), 'DiscordantBySex' ]
+                                discordant_by_sex = clean_metadata[ rownames(sex_pc$rotation), 'discordant_by_sex' ]
         )
         
         colnames(results)[ colnames(results) == 'A' ] <- paste0( 'PC', xist_comp )
@@ -784,20 +784,20 @@ plot_sexcheck <- function(clean_metadata, filtered_counts, biomart_results, sex_
         pc_Sex <- signif( 100*(eigen[xist_comp]/sum(eigen)), 3)
         
         plot_markers <- ggplot2::ggplot( data = results  ) +
-          ggplot2::geom_point( ggplot2::aes( x=XIST, y=UTY, shape = Indicated_Sex, color = DiscordantBySex)  ) + 
+          ggplot2::geom_point( ggplot2::aes( x=XIST, y=UTY, shape = indicated_sex, color = discordant_by_sex)  ) + 
           ggplot2::xlab("Voom Normalized Log2 XIST Counts") + ggplot2::ylab("Voom Normalized Log2 UTY Counts") +
           ggplot2::ggtitle( "PCA Clustered Sex Discordance by XIST and UTY Expression" ) + 
           ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
         
         if( plot_component < xist_comp ){
           plot_components <- ggplot2::ggplot( data = results  ) + 
-            ggplot2::geom_point( ggplot2::aes( x=results[,3], y=results[,2], shape = Indicated_Sex, color = DiscordantBySex)  ) + 
+            ggplot2::geom_point( ggplot2::aes( x=results[,3], y=results[,2], shape = indicated_sex, color = discordant_by_sex)  ) + 
             ggplot2::xlab(paste0( "PC", plot_component,': ', pc_Comp )) + ggplot2::ylab( paste0("PC", xist_comp,': ', pc_Sex )) +
             ggplot2::ggtitle( "PCA Clustered Sex Discordance by Relevant Principal Components" ) + 
             ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
         }else{
           plot_components <- ggplot2::ggplot( data = results  ) + 
-            ggplot2::geom_point( ggplot2::aes( x=results[,2], y=results[,3], shape = Indicated_Sex, color = DiscordantBySex)  ) + 
+            ggplot2::geom_point( ggplot2::aes( x=results[,2], y=results[,3], shape = indicated_sex, color = discordant_by_sex)  ) + 
             ggplot2::xlab(paste0( "PC", xist_comp,': ', pc_Sex )) + ggplot2::ylab( paste0("PC", plot_component,': ', pc_Comp )) +
             ggplot2::ggtitle( "PCA Clustered Sex Discordance by Relevant Principal Components" ) + 
             ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
