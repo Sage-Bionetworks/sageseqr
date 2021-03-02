@@ -15,13 +15,13 @@ metadata <- data.frame(
 )
 
 counts <- data.frame(matrix(
-  sample(0:100, size = 16),
-  ncol = 8,
-  dimnames = list(c("ENSG00000229807.12", "ENSG00000183878.12"),
-                  c("S1", "S2", "S3", "S4",  "S5", "S6", "S7", "S8"))
-))
+  sample(0:1000, size = 160),
+  ncol = 80,
+  dimnames = list(c("ENSG00000229807", "ENSG00000183878"),
+                  c( paste0("S", c(1:80)))
+)))
 
-plot <- plot_sexcheck(metadata, counts, biomart, sex_var = "sex")
+plot <- plot_sexcheck(metadata, counts, biomart_results = biomart, sex_var = "sex")
 
 test_that("numeric values exist for each marker", {
   expect_true(sum(plot$sex_specific_counts$UTY) != 0)
