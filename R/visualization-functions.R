@@ -71,7 +71,7 @@ run_pca_and_plot_correlations <- function(normalized_counts, clean_metadata,
       )
   }
   return(
-    list(
+    p <- list(
       significant_covariates = p$significant_covariates,
       pc_results = p$plot,
       effects_significant_vars = p$effects_significant_vars
@@ -936,12 +936,11 @@ identify_outliers <- function(filtered_counts, clean_metadata,
 #' @inheritParams plot_sexcheck
 #' @param gene_annots Annotations that include the mapping between gene Ids and
 #'  chromosome name. Gene Ids must be rownames.
-#' @param split_condition the condition to 
 #' @export
 plot_sexcheck_pca <- function(clean_metadata, filtered_counts,
                               gene_annots, sex_var, shape, size, z
                               ) {
-
+  
   # subset counts matrix to include genes on the X or Y chromosome
   annots <- gene_annots[
     gene_annots$chromosome_name %in% c("X", "Y"),, drop = F
@@ -962,6 +961,6 @@ plot_sexcheck_pca <- function(clean_metadata, filtered_counts,
     color = sex_var,
     shape = shape,
     size = size,
-    z = z,
+    z = z
     )
 }
