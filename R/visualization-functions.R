@@ -661,6 +661,7 @@ plot_sexcheck <- function(clean_metadata, filtered_counts, biomart_results, sex_
   
   #Initialize outputs
   warning <- NULL
+  results <- NULL
   sex_outliers <- NA
   discordance_plots <- NA
   if( 'UTY' %in% biomart_results$hgnc_symbol &
@@ -803,7 +804,7 @@ plot_sexcheck <- function(clean_metadata, filtered_counts, biomart_results, sex_
         }
         discordance_plots <- ggpubr::as_ggplot( gridExtra::arrangeGrob( plot_markers, plot_components, nrow=1) )
       }else{
-        warning <-  c(warning, warning( "warnING identify_outliers: XIST and UTY discordant between clusters" ))
+        warning <-  c(warning, warning( "WARNING identify_outliers: XIST and UTY discordant between clusters" ))
         eval(parse( text = paste0( 'clean_metadata$', sex_var, '_Predicted <- ', NA) ))
         eval(parse( text = paste0( 'clean_metadata$', sex_var, '_Predicted <- as.factor( as.character( fit$cluster[ row.names(clean_metadata) ] ) )' )))
       }
@@ -811,13 +812,13 @@ plot_sexcheck <- function(clean_metadata, filtered_counts, biomart_results, sex_
       
     }else{
       warning <-  c(warning, warning( 
-        'warnING identify_outliers: XIST and UTY counts correlated to disconcordant Principle Components'
+        'WARNING identify_outliers: XIST and UTY counts correlated to disconcordant Principle Components'
       ))
       eval(parse( text= paste0( text = 'clean_metadata$', sex_var, '_Predicted <- ', NA) ))
     }
   }else{
     warning <-  c(warning, warning( 
-      'warnING identify_outliers: XIST and UTY not found in biomart results or expression'
+      'WARNING identify_outliers: XIST and UTY not found in biomart results or expression'
     ))
     eval(parse( text= paste0( text ='clean_metadata$', sex_var, '_Predicted <- ', NA) ))
   }
@@ -935,9 +936,10 @@ identify_outliers <- function(filtered_counts, clean_metadata,
 #' @inheritParams plot_sexcheck
 #' @param gene_annots Annotations that include the mapping between gene Ids and
 #'  chromosome name. Gene Ids must be rownames.
+#' @param split_condition the condition to 
 #' @export
 plot_sexcheck_pca <- function(clean_metadata, filtered_counts,
-                              gene_annots, sex_var, shape, size, z
+                              gene_annots, sex_var, shape, size, z, split_condition
                               ) {
 
   # subset counts matrix to include genes on the X or Y chromosome
@@ -957,7 +959,7 @@ plot_sexcheck_pca <- function(clean_metadata, filtered_counts,
   identify_outliers(
     filtered_counts = counts,
     clean_metadata = clean_metadata,
-    color = sex_var,
+    color = split_condition,
     shape = shape,
     size = size,
     z = z,
