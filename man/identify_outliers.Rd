@@ -4,15 +4,7 @@
 \alias{identify_outliers}
 \title{Explore samples that are outliers}
 \usage{
-identify_outliers(
-  filtered_counts,
-  clean_metadata,
-  color,
-  shape,
-  size,
-  z = 4,
-  split_condition = NULL
-)
+identify_outliers(filtered_counts, clean_metadata, color, shape, size, z = 4)
 }
 \arguments{
 \item{filtered_counts}{A counts data frame with genes removed that have low expression.}
@@ -31,10 +23,6 @@ by size.}
 
 \item{z}{Allowable number of standard deviations (SDs) from the mean.
 Defaults to 4.}
-
-\item{split_condition}{Defaults to NULL. A variable present in
-`clean_metadata` is required. If provided, SDs from the mean
-computed on sub-groups.}
 }
 \description{
 Samples that are z standard deviations (SDs) from the mean of principal

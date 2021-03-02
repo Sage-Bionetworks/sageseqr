@@ -11,8 +11,7 @@ plot_sexcheck_pca(
   sex_var,
   shape,
   size,
-  z,
-  split_condition
+  z
 )
 }
 \arguments{
@@ -34,13 +33,8 @@ by size.}
 
 \item{z}{Allowable number of standard deviations (SDs) from the mean.
 Defaults to 4.}
-
-\item{split_condition}{Defaults to NULL. A variable present in
-`clean_metadata` is required. If provided, SDs from the mean
-computed on sub-groups.}
 }
 \description{
 Principal Component Analysis (PCA) of sex-specific genes. Samples greater
 than z standard deviations (SDs) from the mean of sample sub-groups defined
-by \code{"split_conditions"} are labeled in the plot.
 }
