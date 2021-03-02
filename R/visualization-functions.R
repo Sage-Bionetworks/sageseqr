@@ -691,8 +691,8 @@ plot_sexcheck <- function(clean_metadata, filtered_counts, biomart_results, sex_
     uty_estimate <- 0
     for( i in 1:filt_pcs ){
       
-      test_xist <- cor.test( scan_vars[,i], scan_vars$XIST, method='kendall' ) 
-      test_uty <- cor.test( scan_vars[,i], scan_vars$UTY, method='kendall' ) 
+      test_xist <- stats::cor.test( scan_vars[,i], scan_vars$XIST, method='kendall' ) 
+      test_uty <- stats::cor.test( scan_vars[,i], scan_vars$UTY, method='kendall' ) 
       
       if( test_xist$p.value < 0.05 ){
         if( abs(test_xist$statistic) > xist_estimate ){
@@ -721,7 +721,7 @@ plot_sexcheck <- function(clean_metadata, filtered_counts, biomart_results, sex_
         plot_component <- 1
         plot_component_var <- signif( (sex_pc$sdev^2/sum(sex_pc$sdev^2))[1]*100, 3 )
       }
-      fit <- kmeans( sex_pc$rotation[, xist_comp ], 2 ) # 2 cluster solution
+      fit <- stats::kmeans( sex_pc$rotation[, xist_comp ], 2 ) # 2 cluster solution
       
       xist_1 <- mean( as.numeric(
         sex_counts[ row.names(biomart_results[ biomart_results$hgnc_symbol %in% 'XIST', ]),
