@@ -929,7 +929,6 @@ identify_outliers <- function(filtered_counts, clean_metadata,
 #'
 #' Principal Component Analysis (PCA) of sex-specific genes. Samples greater
 #' than z standard deviations (SDs) from the mean of sample sub-groups defined
-#' by \code{"split_conditions"} are labeled in the plot.
 #'
 #' @inheritParams filter_genes
 #' @inheritParams identify_outliers
