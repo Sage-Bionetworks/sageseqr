@@ -803,20 +803,20 @@ plot_sexcheck <- function(clean_metadata, filtered_counts, biomart_results, sex_
         }
         discordance_plots <- ggpubr::as_ggplot( gridExtra::arrangeGrob( plot_markers, plot_components, nrow=1) )
       }else{
-        warn <-  c(warn, warning( "warnING identify_outliers: XIST and UTY discordant between clusters" ))
+        warning <-  c(warning, warning( "warnING identify_outliers: XIST and UTY discordant between clusters" ))
         eval(parse( text = paste0( 'clean_metadata$', sex_var, '_Predicted <- ', NA) ))
         eval(parse( text = paste0( 'clean_metadata$', sex_var, '_Predicted <- as.factor( as.character( fit$cluster[ row.names(clean_metadata) ] ) )' )))
       }
       
       
     }else{
-      warning <-  c(warn, warning( 
+      warning <-  c(warning, warning( 
         'warnING identify_outliers: XIST and UTY counts correlated to disconcordant Principle Components'
       ))
       eval(parse( text= paste0( text = 'clean_metadata$', sex_var, '_Predicted <- ', NA) ))
     }
   }else{
-    warning <-  c(warn, warning( 
+    warning <-  c(warning, warning( 
       'warnING identify_outliers: XIST and UTY not found in biomart results or expression'
     ))
     eval(parse( text= paste0( text ='clean_metadata$', sex_var, '_Predicted <- ', NA) ))
