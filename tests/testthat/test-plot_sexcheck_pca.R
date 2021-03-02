@@ -22,7 +22,7 @@ counts <- data.frame(matrix(
 
 plot <- plot_sexcheck_pca(metadata, counts, biomart, sex_var = "sex",
                           shape = "diagnosis", size = "RIN",
-                          z = 2, split_condition = "sex")
+                          z = 2)
 
 test_that("output is plot", {
   expect_true("gg" %in% class(plot$plot))
