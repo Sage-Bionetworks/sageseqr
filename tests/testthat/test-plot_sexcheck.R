@@ -6,11 +6,11 @@ biomart <- data.frame(
 )
 
 metadata <- data.frame(
-  batch = c("1", "2", "1", "2", "1", "2", "1", "2"),
-  diagnosis = c("dx", "dx", "ct", "ct", "dx", "dx", "ct", "ct"),
-  sex = c("M", "F", "M", "F", "M", "F", "M", "F"),
-  RIN = c(5, 5, 5, 5, 5, 5, 5, 5),
-  row.names = c("S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8"),
+  batch = rep( c("1", "2", "1", "2", "1", "2", "1", "2"), 10),
+  diagnosis = rep( c("dx", "dx", "ct", "ct", "dx", "dx", "ct", "ct"), 10),
+  sex = rep( c("M", "F", "M", "F", "M", "F", "M", "F"), 10),
+  RIN = rep( c(5, 5, 5, 5, 5, 5, 5, 5), 10),
+  row.names = c( paste0("S", c(1:80))),
   stringsAsFactors = FALSE
 )
 
@@ -21,16 +21,16 @@ counts <- data.frame(matrix(
                   c( paste0("S", c(1:80)))
 )))
 
-plot <- plot_sexcheck(metadata, counts, biomart_results = biomart, sex_var = "sex")
+plot <- plot_sexcheck(clean_metadata=metadata, filtered_counts=counts, biomart_results = biomart, sex_var = "sex")
 
 test_that("numeric values exist for each marker", {
-  expect_true(sum(plot$sex_specific_counts$UTY) != 0)
-  expect_true(sum(plot$sex_specific_counts$XIST) != 0)
+  expect_true(sum(plot$sex_check_results$UTY) != 0)
+  expect_true(sum(plot$sex_check_results$XIST) != 0)
 })
 
 test_that("there are no missing values, which would indicate a joining error", {
-  expect_false(any(is.na(plot$sex_specific_counts$UTY)))
-  expect_false(any(is.na(plot$sex_specific_counts$XIST)))
+  expect_false(any(is.na(plot$sex_check_results$UTY)))
+  expect_false(any(is.na(plot$sex_check_results$XIST)))
 })
 
 test_that("output is plot", {
