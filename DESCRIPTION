@@ -33,6 +33,7 @@ Imports:
     graphics,
     GenomicRanges,
     glue,
+    ggforce,
     ggplot2,
     gtools,
     IRanges,
