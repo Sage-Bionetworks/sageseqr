@@ -36,6 +36,7 @@ Imports:
     ggforce,
     ggplot2,
     ggpubr,
+    gridExtra,
     gtools,
     IRanges,
     knitr,
