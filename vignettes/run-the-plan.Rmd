@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 2. Specify the active configuration by setting `R_CONFIG_ACTIVE`.
 
 ```{r config-setup}
-Sys.setenv(R_CONFIG_ACTIVE = "rosmap")
+Sys.setenv(R_CONFIG_ACTIVE = "default")
 ```
 
 3. Load the `sageseqr` library and login to [Synapse](https://www.synapse.org/). `rnaseq_plan()` calls the arguments from the config file and creates the `drake` plan. Execute `drake::make(plan)` to compute. Run this code from your project root.
@@ -63,32 +63,6 @@ plan <- sageseqr::rnaseq_plan(
     ),
   config_file = "config.yml"
 )
-
-import_metadata <- get_data("syn23573928", 2L)
-import_counts <- get_data("syn23593968", NULL)
-counts <- tibble::column_to_rownames(import_counts, var = "feature")
-
-clean_md <- clean_covariates(md = import_metadata, factors = c("sampleid", "apoe4", "batch", "notes", "tissue", "diagnosis", "sex", "race", "spanish", "braaksc", "ceradsc", "cogdx", "dcfdx_lv"), continuous = c("pmi", "rincontinuous", "rin2", "age_death", "cts_mmse30_lv", "pct_pf_reads_aligned", "pct_coding_bases", "pct_intergenic_bases", "pct_intronic_bases", "pct_ribosomal_bases"), sample_identifier = "sampleid")
-
-biomart_results <- get_biomart(count_df = counts, synid = NULL, version = NULL, filters = "ensembl_gene_id", host = "ensembl.org", organism = "hsa")
-
-filtered_counts <- filter_genes(clean_metadata = clean_md, count_df = counts, conditions = list(`sex-diagnosis interaction` = c("diagnosis", "sex"), diagnosis = "diagnosis", sex = "sex"), cpm_threshold = 1, conditions_threshold = 0.5)
-
-biotypes <- summarize_biotypes(filtered_counts, biomart_results)
-
-cqn_counts <- cqn(filtered_counts, biomart_results)
-
-#gene_coexpression <- plot_coexpression(cqn_counts)
-
-boxplots <- boxplot_vars(md = clean_md, include_vars = c("pmi", "rincontinuous", "rin2", "age_death", "cts_mmse30_lv", "pct_pf_reads_aligned", "pct_coding_bases", "pct_intergenic_bases", "pct_intronic_bases", "pct_ribosomal_bases"), x_var = "diagnosis")
-
-sex_plot <- conditional_plot_sexcheck(clean_md, counts, biomart_results, "sex")
-
-correlation_plot <- get_association_statistics(clean_md)
-
-significant_covariates_plot <- run_pca_and_plot_correlations(cqn_counts$E, clean_md)
-
-outliers <- identify_outliers(filtered_counts, clean_md, "diagnosis", "batch", "ageofdeath")
 
 drake::make(
   plan,
