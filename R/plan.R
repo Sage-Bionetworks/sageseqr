@@ -81,7 +81,7 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
     sex_plot_pca = plot_sexcheck_pca(
       clean_md,
       filtered_counts,
-      biomart_results[,"chromosome_name", drop = F],
+      biomart_results,
       !!sex_var),
     correlation_plot = get_association_statistics(clean_md),
     significant_covariates_plot = run_pca_and_plot_correlations(cqn_counts$E,
