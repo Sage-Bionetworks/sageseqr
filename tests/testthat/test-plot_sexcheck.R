@@ -21,16 +21,16 @@ counts <- data.frame(matrix(
                   c( paste0("S", c(1:80)))
 )))
 
-plot <- plot_sexcheck(clean_metadata=metadata, filtered_counts=counts, biomart_results = biomart, sex_var = "sex")
+plot <- plot_sexcheck(clean_metadata=metadata, count_df=counts, biomart_results = biomart, sex_var = "sex")
 
 test_that("numeric values exist for each marker", {
-  expect_true(sum(plot$sex_check_results$UTY) != 0)
-  expect_true(sum(plot$sex_check_results$XIST) != 0)
+  expect_true(sum(plot$sex_specific_counts$UTY) != 0)
+  expect_true(sum(plot$sex_specific_counts$XIST) != 0)
 })
 
 test_that("there are no missing values, which would indicate a joining error", {
-  expect_false(any(is.na(plot$sex_check_results$UTY)))
-  expect_false(any(is.na(plot$sex_check_results$XIST)))
+  expect_false(any(is.na(plot$sex_specific_counts$UTY)))
+  expect_false(any(is.na(plot$sex_specific_counts$XIST)))
 })
 
 test_that("output is plot", {
