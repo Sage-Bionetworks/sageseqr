@@ -896,7 +896,7 @@ plot_sexcheck_pca <- function(clean_metadata, filtered_counts, biomart_results, 
       .,
       'xist_pval' := unlist(lapply(
         scan_vars[,paste0('PC', 1:filt_pcs)],
-        function(x) cor.test(
+        function(x) stats::cor.test(
           x,
           scan_vars$xist,
           method='kendall')$p.value
@@ -906,7 +906,7 @@ plot_sexcheck_pca <- function(clean_metadata, filtered_counts, biomart_results, 
       .,
       'xist_coeff' := abs(unlist(lapply(
         scan_vars[, paste0('PC', 1:filt_pcs)],
-        function(x) cor.test(
+        function(x) stats::cor.test(
           x,
           scan_vars$xist,
           method='kendall')$statistic
@@ -916,7 +916,7 @@ plot_sexcheck_pca <- function(clean_metadata, filtered_counts, biomart_results, 
       .,
       'uty_pval' := unlist(lapply(
         scan_vars[, paste0('PC', 1:filt_pcs)],
-        function(x) cor.test(
+        function(x) stats::cor.test(
           x,
           scan_vars$uty,
           method='kendall')$p.value
@@ -926,7 +926,7 @@ plot_sexcheck_pca <- function(clean_metadata, filtered_counts, biomart_results, 
       .,
       'uty_coeff' := abs(unlist(lapply(
         scan_vars[, paste0('PC', 1:filt_pcs)],
-        function(x) cor.test(
+        function(x) stats::cor.test(
           x,
           scan_vars$uty,
           method='kendall')$statistic
@@ -934,12 +934,12 @@ plot_sexcheck_pca <- function(clean_metadata, filtered_counts, biomart_results, 
     )
     
   #adjust p_vals for multiple comparisons
-  test_vals$xist_pval <- p.adjust( 
+  test_vals$xist_pval <- stats::p.adjust( 
     p = test_vals$xist_pval,
     n = dim(test_vals)[1],
     method = 'fdr'
   )
-  test_vals$uty_pval <- p.adjust( 
+  test_vals$uty_pval <- stats::p.adjust( 
     p = test_vals$uty_pval,
     n = dim(test_vals)[1],
     method = 'fdr'
