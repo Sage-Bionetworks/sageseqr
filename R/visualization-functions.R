@@ -858,7 +858,21 @@ plot_sexcheck_pca <- function(clean_metadata, filtered_counts, biomart_results, 
     
   #Find the number of components explaining 1 or more percent total variance
   filt_pcs <- length(sex_pc$sdev[sex_pc$sdev^2 / sum(sex_pc$sdev^2) >= 0.01])
-      
+  if (filt_pcs == 1){
+    p <- list(
+      plot = NULL,
+      sex_check_results = NULL,
+      warnings = warning(
+        'WARNING Data dimensionality is too low only 1 significant PC'
+      )
+    )
+    clean_metadata <- dplyr::mutate(
+      clean_metadata,
+      "{sex_var}_predicted" := NA
+    )
+    return(p)
+  }
+  
   #Build DF with relevant PCs, XIST exp, and UTY exp
   scan_vars <- as.data.frame(sex_pc$rotation[, 1:filt_pcs]) %>%
     dplyr::mutate(
