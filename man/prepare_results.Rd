@@ -4,10 +4,12 @@
 \alias{prepare_results}
 \title{Prepare output}
 \usage{
-prepare_results(target, rowname = NULL)
+prepare_results(target, data_name, rowname = NULL)
 }
 \arguments{
 \item{target}{The object to be stored.}
+
+\item{data_name}{An identifier to embed in the file name.}
 
 \item{rowname}{Optional. If applicable, the name of the variable to store
 rownames.}

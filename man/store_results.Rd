@@ -10,6 +10,7 @@ store_results(
   biomart_results = biomart_results,
   cqn_counts = cqn_counts$counts,
   syn_names,
+  data_names,
   parent_id,
   inputs,
   activity_provenance,
@@ -36,6 +37,9 @@ biomart. Defaults to target name constrained by
 
 \item{syn_names}{A list of human-readable names for the Synapse entities
 ordered
+by `metadata`, `filtered_counts`, `biomart_results`, `cqn_counts`.}
+
+\item{data_names}{A list of identifiers to embed in the file name ordered
 by `metadata`, `filtered_counts`, `biomart_results`, `cqn_counts`.}
 
 \item{parent_id}{A Synapse Id that corresponds to a project or
