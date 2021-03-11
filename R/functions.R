@@ -714,7 +714,7 @@ store_results <- function(clean_md = clean_md,
 
   file_to_upload <- purrr::pmap(
     mash,
-    function(paths, parent, names) synapser::File(
+    function(paths, parent, syn_names) synapser::File(
       path = paths,
       parent = parent,
       name = syn_names
