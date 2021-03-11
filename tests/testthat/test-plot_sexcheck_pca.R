@@ -26,7 +26,7 @@ metadata <- data.frame(
 
 ENSG00000183878 <- c(rchisq(40,24), rchisq(40,2))
 ENSG00000229807 <- c(rchisq(40,2), rchisq(40,24))
-ENSG00000183811 < -c(rchisq(53,5), rchisq(27,4))
+ENSG00000183811 <- c(rchisq(53,5), rchisq(27,4))
 ENSG00000229822 <- c(rchisq(53,3), rchisq(27,7))
 ENSG00000183833 <- c(rchisq(17,16), rchisq(63,22))
 ENSG00000229844 <- c(rchisq(17,98), rchisq(63,97))
