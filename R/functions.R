@@ -633,7 +633,7 @@ prepare_results <- function(target, data_name, rowname = NULL) {
   }
 
   # the file name will contain the primary name of the target
-  tmp <- fs::file_temp(names(target), ext = ".tsv")
+  tmp <- fs::file_temp(data_name, ext = ".tsv")
 
   utils::write.table(
     target,
