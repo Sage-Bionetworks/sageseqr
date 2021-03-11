@@ -623,10 +623,11 @@ summarize_biotypes <- function(filtered_counts, biomart_results) {
 #'
 #' Store data in temporary files to prepare for Synapse upload.
 #' @param target The object to be stored.
+#' @param data_name An identifier to embed in the file name.
 #' @param rowname Optional. If applicable, the name of the variable to store
 #' rownames.
 #' @export
-prepare_results <- function(target, rowname = NULL) {
+prepare_results <- function(target, data_name, rowname = NULL) {
   if (!is.null(rowname)) {
     target <- tibble::rownames_to_column(target, rowname)
   }
@@ -670,6 +671,8 @@ prepare_results <- function(target, rowname = NULL) {
 #' output files and input files.
 #' @param activity_provenance A phrase to describe the data transformation for
 #' provenance.
+#' @param data_names A list of identifiers to embed in the file name ordered
+#' by `metadata`, `filtered_counts`, `biomart_results`, `cqn_counts`.
 #' @param config_file Optional. Path to configuration file.
 #' @inheritParams rnaseq_plan
 #' @export
@@ -677,7 +680,8 @@ store_results <- function(clean_md = clean_md,
                           filtered_counts = filtered_counts,
                           biomart_results = biomart_results,
                           cqn_counts = cqn_counts$counts,
-                          syn_names, parent_id, inputs, activity_provenance,
+                          syn_names, data_names,
+                          parent_id, inputs, activity_provenance,
                           rownames = NULL, config_file = NULL,
                           report_name = NULL) {
 
@@ -687,16 +691,14 @@ store_results <- function(clean_md = clean_md,
     "analyzed with sageseqr {ver}"
     )
 
-  # nest drake targets in a list
+  # nest drake targets in a list. Every time a new target is to-be stored, it
+  # must be added as an argument to this function and then added to this list.
   targets <- list(clean_md, filtered_counts, biomart_results, cqn_counts)
-
-  # create named list for drake targets
-  names(targets) <- c("clean_md", "filtered_counts", "biomart_results",
-                      "cqn_counts")
 
   mash <- list(
     target = targets,
-    rowname = rownames
+    rowname = rownames,
+    data_name = data_names
   )
 
   file_location <- purrr::pmap(
