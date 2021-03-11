@@ -4,13 +4,14 @@
 \alias{plot_sexcheck}
 \title{Explore metadata by gene expression on the sex chromosomes.}
 \usage{
-plot_sexcheck(clean_metadata, filtered_counts, biomart_results, sex_var)
+plot_sexcheck(clean_metadata, count_df, biomart_results, sex_var)
 }
 \arguments{
 \item{clean_metadata}{A data frame with sample identifiers as rownames and variables as
 factors or numeric as determined by \code{"sageseqr::clean_covariates()"}.}
 
-\item{filtered_counts}{A counts data frame with genes removed that have low expression.}
+\item{count_df}{A counts data frame with sample identifiers as column names
+and transcript Ids removed with \code{"sageseqr::convert_geneids"}.}
 
 \item{biomart_results}{Output of \code{"sageseqr::get_biomart()"}.}
 
