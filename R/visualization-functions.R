@@ -815,6 +815,7 @@ identify_outliers <- function(filtered_counts, clean_metadata,
 #' @inheritParams filter_genes
 #' @inheritParams identify_outliers
 #' @inheritParams plot_sexcheck
+#' @importFrom rlang :=
 #' @export
 plot_sexcheck_pca <- function(clean_metadata, filtered_counts, biomart_results, sex_var) {
   
