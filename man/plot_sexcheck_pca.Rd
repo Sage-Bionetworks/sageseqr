@@ -15,9 +15,6 @@ factors or numeric as determined by \code{"sageseqr::clean_covariates()"}.}
 \item{biomart_results}{Output of \code{"sageseqr::get_biomart()"}.}
 
 \item{sex_var}{Column name of the sex or gender-specific metadata.}
-
-\item{gene_annots}{Annotations that include the mapping between gene Ids and
-chromosome name. Gene Ids must be rownames.}
 }
 \description{
 Principal Component Analysis (PCA) of sex-specific genes. Samples greater

@@ -815,8 +815,6 @@ identify_outliers <- function(filtered_counts, clean_metadata,
 #' @inheritParams filter_genes
 #' @inheritParams identify_outliers
 #' @inheritParams plot_sexcheck
-#' @param gene_annots Annotations that include the mapping between gene Ids and
-#'  chromosome name. Gene Ids must be rownames.
 #' @export
 plot_sexcheck_pca <- function(clean_metadata, filtered_counts, biomart_results, sex_var) {
   
