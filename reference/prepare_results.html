@@ -132,15 +132,18 @@
     <p>Store data in temporary files to prepare for Synapse upload.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>prepare_results</span><span class='op'>(</span><span class='va'>target</span>, rowname <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>prepare_results</span><span class='op'>(</span><span class='va'>target</span>, <span class='va'>data_name</span>, rowname <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>target</th>
-      <td><p>The name of the object to be stored. You may pass two values
-to save a target that has multidimensional arrays.</p></td>
+      <td><p>The object to be stored.</p></td>
+    </tr>
+    <tr>
+      <th>data_name</th>
+      <td><p>An identifier to embed in the file name.</p></td>
     </tr>
     <tr>
       <th>rowname</th>

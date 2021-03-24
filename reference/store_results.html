@@ -133,9 +133,13 @@
     </div>
 
     <pre class="usage"><span class='fu'>store_results</span><span class='op'>(</span>
+  clean_md <span class='op'>=</span> <span class='va'>clean_md</span>,
+  filtered_counts <span class='op'>=</span> <span class='va'>filtered_counts</span>,
+  biomart_results <span class='op'>=</span> <span class='va'>biomart_results</span>,
+  cqn_counts <span class='op'>=</span> <span class='va'>cqn_counts</span><span class='op'>$</span><span class='va'>counts</span>,
+  <span class='va'>syn_names</span>,
+  <span class='va'>data_names</span>,
   <span class='va'>parent_id</span>,
-  <span class='va'>targets</span>,
-  <span class='va'>names</span>,
   <span class='va'>inputs</span>,
   <span class='va'>activity_provenance</span>,
   rownames <span class='op'>=</span> <span class='cn'>NULL</span>,
@@ -147,17 +151,43 @@
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
+      <th>clean_md</th>
+      <td><p>The drake target containing the metadata data frame.
+Defaults to target name constrained by <code>"sageseqr::rnaseq_plan()"</code>.</p></td>
+    </tr>
+    <tr>
+      <th>filtered_counts</th>
+      <td><p>The drake target containing counts after low gene
+expression has been removed. Defaults to target name constrained by
+ <code>"sageseqr::rnaseq_plan()"</code>.</p></td>
+    </tr>
+    <tr>
+      <th>biomart_results</th>
+      <td><p>The drake target containing gene annotations from
+biomart. Defaults to target name constrained by
+<code>"sageseqr::rnaseq_plan()"</code>.</p></td>
+    </tr>
+    <tr>
+      <th>cqn_counts</th>
+      <td><p>The drake target containing Conditional Quantile Normalized
+(CQN) counts. Defaults to target name constrained by
+<code>"sageseqr::rnaseq_plan()"</code>.</p></td>
+    </tr>
+    <tr>
+      <th>syn_names</th>
+      <td><p>A list of human-readable names for the Synapse entities
+ordered
+by `metadata`, `filtered_counts`, `biomart_results`, `cqn_counts`.</p></td>
+    </tr>
+    <tr>
+      <th>data_names</th>
+      <td><p>A list of identifiers to embed in the file name ordered
+by `metadata`, `filtered_counts`, `biomart_results`, `cqn_counts`.</p></td>
+    </tr>
+    <tr>
       <th>parent_id</th>
       <td><p>A Synapse Id that corresponds to a project or
 folder to store output.</p></td>
-    </tr>
-    <tr>
-      <th>targets</th>
-      <td><p>A list of object names to be stored.</p></td>
-    </tr>
-    <tr>
-      <th>names</th>
-      <td><p>A list of human-readable names for the Synapse entities.</p></td>
     </tr>
     <tr>
       <th>inputs</th>
@@ -171,7 +201,8 @@ provenance.</p></td>
     </tr>
     <tr>
       <th>rownames</th>
-      <td><p>A list of variables to store rownames. If not applicable,
+      <td><p>A list of variables to store rownames ordered by `metadata`,
+`filtered_counts`, `biomart_results`, `cqn_counts`. If not applicable,
 set as NULL.</p></td>
     </tr>
     <tr>
