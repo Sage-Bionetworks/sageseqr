@@ -751,15 +751,19 @@ identify_outliers <- function(filtered_counts, clean_metadata,
   pc1 <- eigen[1]/sum(eigen)
   pc2 <- eigen[2]/sum(eigen)
 
-  # Identify outliers - ouside ellipse with Radii defined as 4SDs from the mean
+  # Samples outside ellipse with radii defined as z SDs from the mean are
+  # outliers
   outliers <- as.character(
     data$SampleID[
       c(
-        which( ((data$PC1 - mean(data$PC1) )^2) / ((z*stats::sd(data$PC1))^2) + ((data$PC2 - mean(data$PC2) )^2) / ((z*stats::sd(data$PC2))^2) > 1 )
+        which(
+          ((data$PC1 - mean(data$PC1))^2)/((z*stats::sd(data$PC1))^2) +
+            ((data$PC2 - mean(data$PC2))^2)/((z*stats::sd(data$PC2))^2) > 1
+        )
       ),
       drop = TRUE
-      ]
-    )
+    ]
+  )
 
   plotdata <- dplyr::left_join(
     data,
