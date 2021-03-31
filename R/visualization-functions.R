@@ -781,12 +781,15 @@ identify_outliers <- function(filtered_counts, clean_metadata,
     )
   )
 
-  p <- p + ggforce::geom_ellipse(ggplot2::aes(x0 = mean(data$PC1),
-                            y0 = mean(data$PC2),
-                            a = z*stats::sd(data$PC1),
-                            b = z*stats::sd(data$PC2),
-                            angle = 0)
-                       )
+  p <- p + ggforce::geom_ellipse(
+    ggplot2::aes(
+      x0 = mean(data$PC1),
+      y0 = mean(data$PC2),
+      a = z*stats::sd(data$PC1),
+      b = z*stats::sd(data$PC2),
+      angle = 0
+      )
+    )
 
   p <- p + sagethemes::scale_color_sage_d() +
     sagethemes::theme_sage() +
