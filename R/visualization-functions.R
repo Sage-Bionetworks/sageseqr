@@ -795,7 +795,8 @@ identify_outliers <- function(filtered_counts, clean_metadata,
       ggplot2::aes(label = .data$label),
       family = "Lato",
       size = 4,
-      hjust = 0
+      hjust = 0,
+      na.rm = TRUE
       )
 
   return(
