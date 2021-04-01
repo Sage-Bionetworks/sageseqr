@@ -754,19 +754,21 @@ identify_outliers <- function(filtered_counts, clean_metadata,
   eigen <- PC$sdev^2
   pc1 <- eigen[1]/sum(eigen)
   pc2 <- eigen[2]/sum(eigen)
-  
-  # Identify outliers - ouside ellipse with Radii defined as 4SDs from the mean
+
+  # Samples outside ellipse with radii defined as z SDs from the mean are
+  # outliers
   outliers <- as.character(
     data$SampleID[
       c(
-        which(((data$PC1 - mean(data$PC1))^2) / ((z * stats::sd(data$PC1))^2) + 
-                ((data$PC2 - mean(data$PC2))^2) / ((z * stats::sd(data$PC2))^2) 
-              > 1 )
+        which(
+          ((data$PC1 - mean(data$PC1))^2)/((z*stats::sd(data$PC1))^2) +
+            ((data$PC2 - mean(data$PC2))^2)/((z*stats::sd(data$PC2))^2) > 1
+        )
       ),
       drop = TRUE
     ]
   )
-  
+
   plotdata <- dplyr::left_join(
     data,
     tibble::rownames_to_column(clean_metadata, "SampleID")
@@ -781,15 +783,17 @@ identify_outliers <- function(filtered_counts, clean_metadata,
     size = .data[[size]],
     shape = .data[[shape]]
   )
-  )
-  
-  p <- p + ggforce::geom_ellipse(ggplot2::aes(x0 = mean(data$PC1),
-                                              y0 = mean(data$PC2),
-                                              a = z*stats::sd(data$PC1),
-                                              b = z*stats::sd(data$PC2), 
-                                              angle = 0)
-  ) 
-  
+
+  p <- p + ggforce::geom_ellipse(
+    ggplot2::aes(
+      x0 = mean(data$PC1),
+      y0 = mean(data$PC2),
+      a = z*stats::sd(data$PC1),
+      b = z*stats::sd(data$PC2),
+      angle = 0
+      )
+    )
+
   p <- p + sagethemes::scale_color_sage_d() +
     sagethemes::theme_sage() +
     ggplot2::theme(legend.position = "right") +
@@ -797,9 +801,10 @@ identify_outliers <- function(filtered_counts, clean_metadata,
       ggplot2::aes(label = .data$label),
       family = "Lato",
       size = 4,
-      hjust = 0
-    )
-  
+      hjust = 0,
+      na.rm = TRUE
+      )
+
   return(
     list(
       plot = p,

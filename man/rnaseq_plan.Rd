@@ -97,7 +97,8 @@ by size.}
 \item{parent_id}{A Synapse Id that corresponds to a project or
 folder to store output.}
 
-\item{rownames}{A list of variables to store rownames. If not applicable,
+\item{rownames}{A list of variables to store rownames ordered by `metadata`,
+`filtered_counts`, `biomart_results`, `cqn_counts`. If not applicable,
 set as NULL.}
 
 \item{config_file}{Optional. Path to configuration file.}
