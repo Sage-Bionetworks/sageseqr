@@ -665,19 +665,19 @@ plot_sexcheck <- function(clean_metadata, count_df, biomart_results, sex_var) {
         rownames(
           biomart_results[
             biomart_results$hgnc_symbol %in% c("UTY", "XIST"),
-          ]),
+            ]),
         collapse = "|"
-      ),
+        ),
       rownames(count_df)
-    ),
-  ]
+      ),
+    ]
   rownames(sex_specific) <- convert_geneids(sex_specific)
   sex_specific <- tibble::rownames_to_column(sex_specific, var = "geneId")
   results <- dplyr::select(
     biomart_results,
     .data$hgnc_symbol,
     .data$chromosome_name
-  )
+    )
   results <- dplyr::filter(results, .data$hgnc_symbol %in% c("XIST", "UTY"))
   results <- tibble::rownames_to_column(results, var = "geneId")
   results <- dplyr::left_join(results, sex_specific)
