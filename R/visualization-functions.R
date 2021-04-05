@@ -825,6 +825,13 @@ identify_outliers <- function(filtered_counts, clean_metadata,
 #' @export
 plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
                               sex_var) {
+  filtered_counts <- filter_genes(
+    clean_metadata,
+    count_df,
+    cpm_threshold = 1,
+    conditions_threshold = 0.5,
+    conditions = sex_var
+    )
 
   clean_metadata <- tibble::rownames_to_column(clean_metadata, var = "sampleId")
 
@@ -855,20 +862,20 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
     return(p)
   }
 
-  # extract sex-specific genes from counts into sex_counts obj.
+  # extract sex-specific genes from counts and store in sex_counts object
   sex_genes <- row.names(
     biomart_results[biomart_results$chromosome_name %in% c('X', 'Y'), ]
   )
   sex_counts <- filtered_counts[row.names(filtered_counts) %in% sex_genes, ]
 
-  #Perform PCA on sex specific genes obj. sex_counts
+  # perform PCA on sex-specific genes in object sex_counts
   sex_pc <- stats::prcomp(
     limma::voom(sex_counts),
     scale. = TRUE,
     center = TRUE
     )
 
-  #Find the number of components explaining 1 or more percent total variance
+  # retain number of components explaining 1 or more percent total variance
   filt_pcs <- length(sex_pc$sdev[sex_pc$sdev^2 / sum(sex_pc$sdev^2) >= 0.01])
   if (filt_pcs == 1){
     p <- list(
@@ -885,7 +892,7 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
     return(p)
   }
 
-  #Build DF with relevant PCs, XIST exp, and UTY exp
+  # create a new data frame with relevant PCs, XIST and UTY expression
   scan_vars <- as.data.frame(sex_pc$rotation[, 1:filt_pcs]) %>%
     dplyr::mutate(
       .,
@@ -897,7 +904,7 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
       )
   row.names(scan_vars) <- row.names(sex_pc$rotation)
 
-  #Correlate the PCs above 1 to sex specific genes XIST and UTY
+  # correlate the PCs above 1 to sex- specific genes XIST and UTY
   test_vals <- as.data.frame(
     matrix(
       NA,
@@ -945,7 +952,7 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
       )))
     )
 
-  #adjust p_vals for multiple comparisons
+  # adjust P-values for multiple comparisons
   test_vals$xist_pval <- stats::p.adjust(
     p = test_vals$xist_pval,
     n = dim(test_vals)[1],
@@ -957,7 +964,7 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
     method = 'fdr'
   )
 
-  #NA out non-significant Coefcients
+  # non-significant coefficients are assigned NA
   if (TRUE %in% (test_vals$xist_pval > 0.05)) {
     test_vals[test_vals$xist_pval > 0.05, ]$xist_coeff <- NA
   }
@@ -965,7 +972,8 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
     test_vals[test_vals$uty_pval > 0.05, ]$uty_coeff <- NA
   }
 
-  # If XIST and UTY highest coeffcient to different PCs return warning
+  # warning 2 of 3: if XIST and UTY highest coefficient correlate to different
+  # PCs, return warning
   if (which.max(test_vals$xist_coeff) != which.max(test_vals$uty_coeff)) {
     p <- list(
       plot = NULL,
@@ -982,7 +990,7 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
     return(p)
   }
 
-  #Find the highest component thats not the sex regressed component
+  # find the highest component that is not the sex regressed component
   plot_component <- NA
   if (which.max(test_vals$xist_coeff) == 1) {
     plot_component <- 2
@@ -998,20 +1006,22 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
     )
   }
 
-  # Cluster the PC that is correlated to XIST and UTY force to 2 groups
+  # cluster the PC that is correlated to XIST and UTY
+  # force to 2 kmeans cluster centers
   fit <- stats::kmeans(
     sex_pc$rotation[ ,which.max(test_vals$xist_coeff)],
     2
   )
 
-  #Find mean cluster values of XIST and UTY
+  # find mean cluster values of XIST and UTY
   scan_vars$cluster <- fit$cluster[row.names(scan_vars)]
   xist_1 <- mean(scan_vars[scan_vars$cluster == 1,]$xist)
   xist_2 <- mean(scan_vars[scan_vars$cluster == 2,]$xist)
   uty_1 <- mean(scan_vars[scan_vars$cluster == 1,]$uty)
   uty_2 <- mean(scan_vars[scan_vars$cluster == 2,]$uty)
 
-  #Return warning if the mean XIST & UTY values by cluster don't resolve sexes
+  # warning 3 of 3: if the mean of XIST and UTY values by cluster don't
+  # resolve sexes, return warning
   if (!(
     (uty_2 < uty_1 & xist_2 > xist_1) |
     (uty_1 < uty_2 & xist_1 > xist_2)
@@ -1030,7 +1040,7 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
     return(p)
   }
 
-  # Assign Sex Designation to clusters
+  # assign sex designation to clusters
   if (uty_2 < uty_1 & xist_2 > xist_1) {
     #cluster 2 are females
     scan_vars$cluster[scan_vars$cluster == 2] <- 'female'
@@ -1041,17 +1051,17 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
     scan_vars$cluster[scan_vars$cluster == 2] <- 'male'
   }
 
-  # Add Predicted/Assigned sex value to clean_metadata
+  # amend predicted sex to clean_metadata
   temp <- rep(NA, dim(clean_metadata)[1])
   names(temp) <- row.names(clean_metadata)
   temp[names(temp) %in% row.names(scan_vars)] <- scan_vars[names(temp), ]$cluster
   clean_metadata <- dplyr::mutate( clean_metadata, "{sex_var}_predicted" := temp )
 
-  colnames(scan_vars)[colnames(scan_vars) == "cluster"] <- "Sex_Predicted"
+  colnames(scan_vars)[colnames(scan_vars) == "cluster"] <- "sex_predicted"
   clean_metadata <- tibble::column_to_rownames(clean_metadata, var = "sampleId")
 
   scan_vars$indicated_sex <- clean_metadata[row.names(scan_vars), colnames(clean_metadata)[colnames(clean_metadata) == sex_var] ]
-  scan_vars$Sex_Predicted <- as.factor(scan_vars$Sex_Predicted)
+  scan_vars$sex_predicted <- as.factor(scan_vars$sex_predicted)
 
   # Find the discordant samples
   #If levels of sex_var are male female
@@ -1060,7 +1070,7 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
     names(discordant) <- c(FALSE, TRUE)
     scan_vars$discordant_by_sex <- as.factor(
       discordant[as.character(
-        scan_vars$Sex_Predicted == scan_vars$indicated_sex
+        scan_vars$sex_predicted == scan_vars$indicated_sex
       )]
     )
   }else{
@@ -1069,14 +1079,14 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
       which.max(
         table(
           scan_vars$indicated_sex,
-          scan_vars$Sex_Predicted )[,'female']
+          scan_vars$sex_predicted )[,'female']
       )
     )
     male <- names(
       which.max(
         table(
           scan_vars$indicated_sex,
-          scan_vars$Sex_Predicted )[,'male']
+          scan_vars$sex_predicted )[,'male']
       )
     )
     scan_vars$indicated_sex <- as.character(scan_vars$indicated_sex)
@@ -1091,16 +1101,16 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
     names(discordant) <- c(FALSE, TRUE)
     scan_vars$discordant_by_sex <- as.factor(
       discordant[as.character(
-        scan_vars$Sex_Predicted == scan_vars$indicated_sex
+        scan_vars$sex_predicted == scan_vars$indicated_sex
       )]
     )
   }
 
-  # Calc Voom normalized xist and uty counts
+  # calculate voom-normalized XIST and UTY counts
   scan_vars$XIST = limma::voom(scan_vars$xist)$E
   scan_vars$UTY = limma::voom(scan_vars$uty)$E
 
-  # Plot the two plots for output
+  # return the vooom-normalized sex-specific counts
   sex_comp <- as.numeric(which.max(test_vals$xist_coeff))
 
   eigen <- sex_pc$sdev^2
