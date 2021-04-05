@@ -715,6 +715,7 @@ plot_sexcheck <- function(clean_metadata, count_df, biomart_results, sex_var) {
 #' Work around to expose plot_sexcheck to testing and export but also leverage
 #' drakes function for skipping targets conditionally (see \code{"drake::cancel_if()"}).
 #' @inheritParams plot_sexcheck
+#' @inheritParams get_biomart
 #' @export
 conditional_plot_sexcheck <- function(clean_metadata, count_df, biomart_results, sex_var) {
   drake::cancel_if(is.null(sex_var))
@@ -827,19 +828,24 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
 
   clean_metadata$SNAMES <- row.names(clean_metadata)
 
-  #Warn 1 of 3: If XIST and UTY don't exist in filtered_counts, return(Warn)
-  uty_ensg <- row.names(biomart_results[biomart_results$hgnc_symbol %in% c('UTY'), ])
-  xist_ensg <- row.names(biomart_results[biomart_results$hgnc_symbol %in% c('XIST'), ])
+  # warning 1 of 3: If XIST and UTY doesn't exist in counts, return(warning)
+  uty_ensg <- row.names(
+    biomart_results[biomart_results$hgnc_symbol %in% c('UTY'), ]
+    )
+  xist_ensg <- row.names(
+    biomart_results[biomart_results$hgnc_symbol %in% c('XIST'), ]
+    )
   if ('UTY' %in% biomart_results$hgnc_symbol &
       uty_ensg %in% row.names(filtered_counts) &
       'XIST' %in% biomart_results$hgnc_symbol &
       xist_ensg %in% row.names(filtered_counts)) {
-  }else{
+  } else {
     p <- list(
       plot = NULL,
       sex_check_results = NULL,
       warnings = warning(
-        'WARNING identify_outliers: XIST and UTY not found in biomart results or expression'
+        'WARNING plot_sexcheck_pca:
+        XIST and UTY not found in biomart results or expression'
         )
       )
     clean_metadata <- dplyr::mutate(
@@ -849,7 +855,7 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
     return(p)
   }
 
-  #Extract Sex Chromosome genes from filtered_counts into sex_counts obj.
+  # extract sex-specific genes from counts into sex_counts obj.
   sex_genes <- row.names(
     biomart_results[biomart_results$chromosome_name %in% c('X', 'Y'), ]
   )
@@ -859,7 +865,8 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
   sex_pc <- stats::prcomp(
     limma::voom(sex_counts),
     scale. = TRUE,
-    center = TRUE)
+    center = TRUE
+    )
 
   #Find the number of components explaining 1 or more percent total variance
   filt_pcs <- length(sex_pc$sdev[sex_pc$sdev^2 / sum(sex_pc$sdev^2) >= 0.01])

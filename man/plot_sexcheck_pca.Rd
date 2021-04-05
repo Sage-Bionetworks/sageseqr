@@ -4,13 +4,14 @@
 \alias{plot_sexcheck_pca}
 \title{Explore metadata by gene expression on the sex chromosomes (PCA)}
 \usage{
-plot_sexcheck_pca(clean_metadata, filtered_counts, biomart_results, sex_var)
+plot_sexcheck_pca(clean_metadata, count_df, biomart_results, sex_var)
 }
 \arguments{
 \item{clean_metadata}{A data frame with sample identifiers as rownames and variables as
 factors or numeric as determined by \code{"sageseqr::clean_covariates()"}.}
 
-\item{filtered_counts}{A counts data frame with genes removed that have low expression.}
+\item{count_df}{A counts data frame with sample identifiers as column names
+and transcript Ids removed with \code{"sageseqr::convert_geneids"}.}
 
 \item{biomart_results}{Output of \code{"sageseqr::get_biomart()"}.}
 
@@ -18,5 +19,6 @@ factors or numeric as determined by \code{"sageseqr::clean_covariates()"}.}
 }
 \description{
 Principal Component Analysis (PCA) of sex-specific genes. Samples greater
-than z standard deviations (SDs) from the mean of sample sub-groups defined
+than z standard deviations (SDs) from the mean of sample sub-groups
+identified as outliers.
 }
