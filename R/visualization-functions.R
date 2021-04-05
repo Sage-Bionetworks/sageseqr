@@ -71,7 +71,7 @@ run_pca_and_plot_correlations <- function(normalized_counts, clean_metadata,
       )
   }
   return(
-    p <- list(
+    list(
       significant_covariates = p$significant_covariates,
       pc_results = p$plot,
       effects_significant_vars = p$effects_significant_vars
