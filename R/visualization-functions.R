@@ -826,7 +826,7 @@ identify_outliers <- function(filtered_counts, clean_metadata,
 plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
                               sex_var) {
 
-  clean_metadata$SNAMES <- row.names(clean_metadata)
+  clean_metadata <- tibble::rownames_to_column(clean_metadata, var = "sampleId")
 
   # warning 1 of 3: If XIST and UTY doesn't exist in counts, return(warning)
   uty_ensg <- row.names(
@@ -1048,7 +1048,7 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
   clean_metadata <- dplyr::mutate( clean_metadata, "{sex_var}_predicted" := temp )
 
   colnames(scan_vars)[colnames(scan_vars) == "cluster"] <- "Sex_Predicted"
-  row.names(clean_metadata) <- clean_metadata$SNAMES
+  clean_metadata <- tibble::column_to_rownames(clean_metadata, var = "sampleId")
 
   scan_vars$indicated_sex <- clean_metadata[row.names(scan_vars), colnames(clean_metadata)[colnames(clean_metadata) == sex_var] ]
   scan_vars$Sex_Predicted <- as.factor(scan_vars$Sex_Predicted)
