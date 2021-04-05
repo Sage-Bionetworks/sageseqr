@@ -738,7 +738,6 @@ conditional_plot_sexcheck <- function(clean_metadata, count_df, biomart_results,
 #' @export
 identify_outliers <- function(filtered_counts, clean_metadata,
                               color, shape, size, z = 4) {
-
   PC <- stats::prcomp(limma::voom(
     filtered_counts),
     scale. = TRUE,
@@ -771,7 +770,7 @@ identify_outliers <- function(filtered_counts, clean_metadata,
   plotdata <- dplyr::left_join(
     data,
     tibble::rownames_to_column(clean_metadata, "SampleID")
-  ) %>%
+    ) %>%
     dplyr::mutate(label = .data$SampleID) %>%
     dplyr::mutate(label = ifelse((.data$label %in% outliers), .data$label, NA))
 
