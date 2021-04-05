@@ -686,18 +686,18 @@ plot_sexcheck <- function(clean_metadata, count_df, biomart_results, sex_var) {
     -dplyr::all_of(c("geneId", "chromosome_name", "hgnc_symbol")),
     names_to = "sampleId",
     values_to = "counts(log)"
-  ) %>%
+    ) %>%
     dplyr::mutate(
       `counts(log)` = log(.data$`counts(log)`),
       `counts(log)` = ifelse(
         .data$`counts(log)` == -Inf, 0, .data$`counts(log)`
+        )
       )
-    )
   results <- tidyr::pivot_wider(
     dplyr::select(results, -chromosome_name, -geneId),
     names_from = "hgnc_symbol",
     values_from = "counts(log)"
-  )
+    )
   results <- dplyr::left_join(results, md, "sampleId")
 
   p <- ggplot2::ggplot(results, ggplot2::aes(x = .data$XIST, y = .data$UTY)) +
