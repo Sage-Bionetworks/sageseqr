@@ -717,9 +717,9 @@ plot_sexcheck <- function(clean_metadata, count_df, biomart_results, sex_var) {
 #' @inheritParams plot_sexcheck
 #' @inheritParams identify_outliers
 #' @export
-conditional_plot_sexcheck <- function(clean_metadata, filtered_counts, biomart_results, sex_var) {
+conditional_plot_sexcheck <- function(clean_metadata, count_df, biomart_results, sex_var) {
   drake::cancel_if(is.null(sex_var))
-  plot_sexcheck(clean_metadata, filtered_counts, biomart_results, sex_var)
+  plot_sexcheck(clean_metadata, count_df, biomart_results, sex_var)
 }
 #' Explore samples that are outliers
 #'
@@ -823,7 +823,8 @@ identify_outliers <- function(filtered_counts, clean_metadata,
 #' @inheritParams plot_sexcheck
 #' @importFrom rlang :=
 #' @export
-plot_sexcheck_pca <- function(clean_metadata, filtered_counts, biomart_results, sex_var) {
+plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
+                              sex_var) {
 
   clean_metadata$SNAMES <- row.names(clean_metadata)
 
