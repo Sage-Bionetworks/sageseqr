@@ -699,7 +699,7 @@ plot_sexcheck <- function(clean_metadata, count_df, biomart_results, sex_var) {
     values_from = "counts(log)"
   )
   results <- dplyr::left_join(results, md, "sampleId")
-  
+
   p <- ggplot2::ggplot(results, ggplot2::aes(x = .data$XIST, y = .data$UTY)) +
     ggplot2::geom_point(ggplot2::aes(color = .data[[sex_var]])) +
     sagethemes::scale_color_sage_d() +
@@ -739,17 +739,17 @@ conditional_plot_sexcheck <- function(clean_metadata, filtered_counts, biomart_r
 #' @export
 identify_outliers <- function(filtered_counts, clean_metadata,
                               color, shape, size, z = 4) {
-  
+
   PC <- stats::prcomp(limma::voom(
     filtered_counts),
     scale. = TRUE,
     center = TRUE)
-  
+
   # Plot first 2 PCs
   data <- data.frame(SampleID = rownames(PC$rotation),
                      PC1 = PC$rotation[,1],
                      PC2 = PC$rotation[,2])
-  
+
   # Percentage from each PC
   eigen <- PC$sdev^2
   pc1 <- eigen[1]/sum(eigen)
@@ -775,13 +775,14 @@ identify_outliers <- function(filtered_counts, clean_metadata,
   ) %>%
     dplyr::mutate(label = .data$SampleID) %>%
     dplyr::mutate(label = ifelse((.data$label %in% outliers), .data$label, NA))
-  
+
   p <- ggplot2::ggplot(plotdata, ggplot2::aes(x = .data$PC1, y = .data$PC2))
-  
+
   p <- p + ggplot2::geom_point(ggplot2::aes(
     color = .data[[color]],
     size = .data[[size]],
     shape = .data[[shape]]
+    )
   )
 
   p <- p + ggforce::geom_ellipse(
@@ -823,9 +824,9 @@ identify_outliers <- function(filtered_counts, clean_metadata,
 #' @importFrom rlang :=
 #' @export
 plot_sexcheck_pca <- function(clean_metadata, filtered_counts, biomart_results, sex_var) {
-  
+
   clean_metadata$SNAMES <- row.names(clean_metadata)
-  
+
   #Warn 1 of 3: If XIST and UTY don't exist in filtered_counts, return(Warn)
   uty_ensg <- row.names(biomart_results[biomart_results$hgnc_symbol %in% c('UTY'), ])
   xist_ensg <- row.names(biomart_results[biomart_results$hgnc_symbol %in% c('XIST'), ])
@@ -847,19 +848,19 @@ plot_sexcheck_pca <- function(clean_metadata, filtered_counts, biomart_results, 
       )
     return(p)
   }
-  
+
   #Extract Sex Chromosome genes from filtered_counts into sex_counts obj.
   sex_genes <- row.names(
     biomart_results[biomart_results$chromosome_name %in% c('X', 'Y'), ]
-  )  
+  )
   sex_counts <- filtered_counts[row.names(filtered_counts) %in% sex_genes, ]
-    
+
   #Perform PCA on sex specific genes obj. sex_counts
   sex_pc <- stats::prcomp(
     limma::voom(sex_counts),
     scale. = TRUE,
     center = TRUE)
-    
+
   #Find the number of components explaining 1 or more percent total variance
   filt_pcs <- length(sex_pc$sdev[sex_pc$sdev^2 / sum(sex_pc$sdev^2) >= 0.01])
   if (filt_pcs == 1){
@@ -876,23 +877,23 @@ plot_sexcheck_pca <- function(clean_metadata, filtered_counts, biomart_results, 
     )
     return(p)
   }
-  
+
   #Build DF with relevant PCs, XIST exp, and UTY exp
   scan_vars <- as.data.frame(sex_pc$rotation[, 1:filt_pcs]) %>%
     dplyr::mutate(
       .,
       "xist" := as.numeric(filtered_counts[xist_ensg, ])
-      ) %>% 
+      ) %>%
     dplyr::mutate(
       .,
       "uty" := as.numeric(filtered_counts[uty_ensg, ])
       )
   row.names(scan_vars) <- row.names(sex_pc$rotation)
-    
+
   #Correlate the PCs above 1 to sex specific genes XIST and UTY
   test_vals <- as.data.frame(
     matrix(
-      NA, 
+      NA,
       nrow = filt_pcs,
       ncol = 0)
     ) %>%
@@ -916,7 +917,7 @@ plot_sexcheck_pca <- function(clean_metadata, filtered_counts, biomart_results, 
           method='kendall')$statistic
         )))
     ) %>%
-    dplyr::mutate( 
+    dplyr::mutate(
       .,
       'uty_pval' := unlist(lapply(
         scan_vars[, paste0('PC', 1:filt_pcs)],
@@ -926,7 +927,7 @@ plot_sexcheck_pca <- function(clean_metadata, filtered_counts, biomart_results, 
           method='kendall')$p.value
         ))
       ) %>%
-    dplyr::mutate( 
+    dplyr::mutate(
       .,
       'uty_coeff' := abs(unlist(lapply(
         scan_vars[, paste0('PC', 1:filt_pcs)],
@@ -936,33 +937,33 @@ plot_sexcheck_pca <- function(clean_metadata, filtered_counts, biomart_results, 
           method='kendall')$statistic
       )))
     )
-    
+
   #adjust p_vals for multiple comparisons
-  test_vals$xist_pval <- stats::p.adjust( 
+  test_vals$xist_pval <- stats::p.adjust(
     p = test_vals$xist_pval,
     n = dim(test_vals)[1],
     method = 'fdr'
   )
-  test_vals$uty_pval <- stats::p.adjust( 
+  test_vals$uty_pval <- stats::p.adjust(
     p = test_vals$uty_pval,
     n = dim(test_vals)[1],
     method = 'fdr'
   )
 
   #NA out non-significant Coefcients
-  if (TRUE %in% (test_vals$xist_pval > 0.05)) { 
+  if (TRUE %in% (test_vals$xist_pval > 0.05)) {
     test_vals[test_vals$xist_pval > 0.05, ]$xist_coeff <- NA
   }
-  if (TRUE %in% (test_vals$uty_pval > 0.05)) { 
+  if (TRUE %in% (test_vals$uty_pval > 0.05)) {
     test_vals[test_vals$uty_pval > 0.05, ]$uty_coeff <- NA
   }
-    
-  # If XIST and UTY highest coeffcient to different PCs return warning 
+
+  # If XIST and UTY highest coeffcient to different PCs return warning
   if (which.max(test_vals$xist_coeff) != which.max(test_vals$uty_coeff)) {
     p <- list(
       plot = NULL,
       sex_check_results = NULL,
-      warnings = warning( 
+      warnings = warning(
         'WARNING identify_outliers: XIST and UTY counts correlated to disconcordant Principle Components'
       )
     )
@@ -973,13 +974,13 @@ plot_sexcheck_pca <- function(clean_metadata, filtered_counts, biomart_results, 
     eval(parse( text= paste0( text = 'clean_metadata$', sex_var, '_Predicted <- ', NA) ))
     return(p)
   }
-    
+
   #Find the highest component thats not the sex regressed component
   plot_component <- NA
   if (which.max(test_vals$xist_coeff) == 1) {
     plot_component <- 2
     plot_component_var <- signif(
-      (sex_pc$sdev^2 / sum(sex_pc$sdev^2))[plot_component] * 100, 
+      (sex_pc$sdev^2 / sum(sex_pc$sdev^2))[plot_component] * 100,
       3
     )
   }else{
@@ -989,23 +990,23 @@ plot_sexcheck_pca <- function(clean_metadata, filtered_counts, biomart_results, 
       3
     )
   }
-    
+
   # Cluster the PC that is correlated to XIST and UTY force to 2 groups
   fit <- stats::kmeans(
-    sex_pc$rotation[ ,which.max(test_vals$xist_coeff)], 
+    sex_pc$rotation[ ,which.max(test_vals$xist_coeff)],
     2
   )
-    
-  #Find mean cluster values of XIST and UTY 
+
+  #Find mean cluster values of XIST and UTY
   scan_vars$cluster <- fit$cluster[row.names(scan_vars)]
   xist_1 <- mean(scan_vars[scan_vars$cluster == 1,]$xist)
   xist_2 <- mean(scan_vars[scan_vars$cluster == 2,]$xist)
   uty_1 <- mean(scan_vars[scan_vars$cluster == 1,]$uty)
   uty_2 <- mean(scan_vars[scan_vars$cluster == 2,]$uty)
-    
-  #Return warning if the mean XIST & UTY values by cluster don't resolve sexes 
+
+  #Return warning if the mean XIST & UTY values by cluster don't resolve sexes
   if (!(
-    (uty_2 < uty_1 & xist_2 > xist_1) | 
+    (uty_2 < uty_1 & xist_2 > xist_1) |
     (uty_1 < uty_2 & xist_1 > xist_2)
   )) {
     p <- list(
@@ -1021,8 +1022,8 @@ plot_sexcheck_pca <- function(clean_metadata, filtered_counts, biomart_results, 
     )
     return(p)
   }
-   
-  # Assign Sex Designation to clusters   
+
+  # Assign Sex Designation to clusters
   if (uty_2 < uty_1 & xist_2 > xist_1) {
     #cluster 2 are females
     scan_vars$cluster[scan_vars$cluster == 2] <- 'female'
@@ -1038,13 +1039,13 @@ plot_sexcheck_pca <- function(clean_metadata, filtered_counts, biomart_results, 
   names(temp) <- row.names(clean_metadata)
   temp[names(temp) %in% row.names(scan_vars)] <- scan_vars[names(temp), ]$cluster
   clean_metadata <- dplyr::mutate( clean_metadata, "{sex_var}_predicted" := temp )
-    
+
   colnames(scan_vars)[colnames(scan_vars) == "cluster"] <- "Sex_Predicted"
   row.names(clean_metadata) <- clean_metadata$SNAMES
-  
+
   scan_vars$indicated_sex <- clean_metadata[row.names(scan_vars), colnames(clean_metadata)[colnames(clean_metadata) == sex_var] ]
   scan_vars$Sex_Predicted <- as.factor(scan_vars$Sex_Predicted)
-  
+
   # Find the discordant samples
   #If levels of sex_var are male female
   if ("female" %in% levels(scan_vars$indicated_sex) & "male" %in% levels(scan_vars$indicated_sex)) {
@@ -1056,7 +1057,7 @@ plot_sexcheck_pca <- function(clean_metadata, filtered_counts, biomart_results, 
       )]
     )
   }else{
-    # Re-assign Labels 
+    # Re-assign Labels
     female <- names(
       which.max(
         table(
@@ -1087,29 +1088,29 @@ plot_sexcheck_pca <- function(clean_metadata, filtered_counts, biomart_results, 
       )]
     )
   }
-  
+
   # Calc Voom normalized xist and uty counts
   scan_vars$XIST = limma::voom(scan_vars$xist)$E
   scan_vars$UTY = limma::voom(scan_vars$uty)$E
-  
+
   # Plot the two plots for output
   sex_comp <- as.numeric(which.max(test_vals$xist_coeff))
-  
+
   eigen <- sex_pc$sdev^2
   pc_Comp <- signif( 100*(eigen[plot_component]/sum(eigen)), 3 )
   pc_Sex <- signif( 100*(eigen[sex_comp]/sum(eigen)), 3)
-          
+
   plot_markers <- ggplot2::ggplot(data = scan_vars) +
     ggplot2::geom_point(
-      ggplot2::aes(x=XIST, y=UTY, shape = indicated_sex, color = discordant_by_sex)) + 
-    ggplot2::xlab("Voom Normalized Log2 XIST Counts") + 
+      ggplot2::aes(x=XIST, y=UTY, shape = indicated_sex, color = discordant_by_sex)) +
+    ggplot2::xlab("Voom Normalized Log2 XIST Counts") +
     ggplot2::ylab("Voom Normalized Log2 UTY Counts") +
-    ggplot2::ggtitle("PCA Clustered Sex Discordance by XIST and UTY Expression") + 
+    ggplot2::ggtitle("PCA Clustered Sex Discordance by XIST and UTY Expression") +
     sagethemes::scale_color_sage_d() +
     sagethemes::theme_sage() +
     ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1))
-          
+
   if( plot_component < sex_comp ){
     plot_components <- ggplot2::ggplot(data = scan_vars) +
       ggplot2::geom_point(
@@ -1135,18 +1136,18 @@ plot_sexcheck_pca <- function(clean_metadata, filtered_counts, biomart_results, 
       ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
       ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1))
   }
-  
-  # Combine plots 
+
+  # Combine plots
   discordance_plots <- ggpubr::as_ggplot(
     gridExtra::arrangeGrob(
       plot_markers,
-      plot_components, 
+      plot_components,
       nrow=1
     )
   )
-  
+
   # Return list, results, and null warning value
-  warning <- NULL      
+  warning <- NULL
   p <- list(
     plot = discordance_plots,
     sex_check_results = tibble::as_tibble(scan_vars),
