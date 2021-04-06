@@ -981,15 +981,19 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
       plot = NULL,
       sex_check_results = NULL,
       warnings = warning(
-        'WARNING identify_outliers: XIST and UTY counts correlated to disconcordant Principle Components'
+        'plot_sexcheck_pca: XIST and UTY counts correlated to disconcordant principle pomponents (PCs)'
       )
     )
     clean_metadata <- dplyr::mutate(
       clean_metadata,
       "{sex_var}_predicted" := NA
     )
-    eval(parse( text= paste0( text = 'clean_metadata$', sex_var, '_Predicted <- ', NA) ))
+    clean_metadata <- dplyr::mutate(
+      clean_metadata,
+      "{sex_var}_predicted" := NA
+    )
     return(p)
+    quit()
   }
 
   # find the highest component that is not the sex regressed component
