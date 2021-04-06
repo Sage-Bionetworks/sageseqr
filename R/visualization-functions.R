@@ -1127,7 +1127,7 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
       ggplot2::aes(x=XIST, y=UTY, shape = `indicated sex`, color = `discordant by sex`)) +
     ggplot2::xlab("Voom Normalized Log2 XIST Counts") +
     ggplot2::ylab("Voom Normalized Log2 UTY Counts") +
-    ggplot2::ggtitle("PCA Clustered Sex Discordance by XIST and UTY Expression") +
+    ggplot2::ggtitle("PCA Clustered Sex Discordance\n by XIST and UTY Expression") +
     sagethemes::scale_color_sage_d() +
     sagethemes::theme_sage() +
     ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
@@ -1138,9 +1138,9 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
       ggplot2::geom_point(
         ggplot2::aes(x=scan_vars[,plot_component], y=scan_vars[,sex_comp], shape = `indicated sex`, color = `discordant by sex`)
       ) +
-      ggplot2::xlab(paste0( "PC", plot_component,': ', pc_Comp)) +
-      ggplot2::ylab(paste0("PC", sex_comp,': ', pc_Sex )) +
-      ggplot2::ggtitle("PCA Clustered Sex Discordance by Relevant Principal Components") +
+      ggplot2::xlab(paste0( "PC", plot_component,": ", pc_Comp, "% total variance explained")) +
+      ggplot2::ylab(paste0("PC", sex_comp,": ", pc_Sex, "% total variance explained" )) +
+      ggplot2::ggtitle("PCA Clustered Sex Discordance\n by Relevant Principal Components") +
       sagethemes::scale_color_sage_d() +
       sagethemes::theme_sage() +
       ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
@@ -1150,9 +1150,9 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
       ggplot2::geom_point(
         ggplot2::aes(y=scan_vars[,plot_component], x=scan_vars[,sex_comp], shape = `indicated sex`, color = `discordant by sex`)
       ) +
-      ggplot2::ylab(paste0( "PC", plot_component,': ', pc_Comp)) +
-      ggplot2::xlab(paste0("PC", sex_comp,': ', pc_Sex )) +
-      ggplot2::ggtitle("PCA Clustered Sex Discordance by Relevant Principal Components") +
+      ggplot2::ylab(paste0( "PC", plot_component,": ", pc_Comp, "% total variance explained")) +
+      ggplot2::xlab(paste0("PC", sex_comp,": ", pc_Sex, "% total variance explained" )) +
+      ggplot2::ggtitle("PCA Clustered Sex Discordance\n by Relevant Principal Components") +
       sagethemes::scale_color_sage_d() +
       sagethemes::theme_sage() +
       ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
