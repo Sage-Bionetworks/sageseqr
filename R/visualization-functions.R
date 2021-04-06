@@ -842,17 +842,15 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
   xist_ensg <- row.names(
     biomart_results[biomart_results$hgnc_symbol %in% c('XIST'), ]
     )
-  if ('UTY' %in% biomart_results$hgnc_symbol &
-      uty_ensg %in% row.names(filtered_counts) &
-      'XIST' %in% biomart_results$hgnc_symbol &
-      xist_ensg %in% row.names(filtered_counts)) {
-  } else {
+  if (!('UTY' %in% biomart_results$hgnc_symbol &
+        uty_ensg %in% row.names(filtered_counts) &
+        'XIST' %in% biomart_results$hgnc_symbol &
+        xist_ensg %in% row.names(filtered_counts))) {
     p <- list(
       plot = NULL,
       sex_check_results = NULL,
       warnings = warning(
-        'WARNING plot_sexcheck_pca:
-        XIST and UTY not found in biomart results or expression'
+      'plot_sexcheck_pca: XIST and UTY not found in biomart_results or count_df'
         )
       )
     clean_metadata <- dplyr::mutate(
@@ -860,6 +858,7 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
       "{sex_var}_predicted" := NA
       )
     return(p)
+    quit()
   }
 
   # extract sex-specific genes from counts and store in sex_counts object
