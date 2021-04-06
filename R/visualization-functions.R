@@ -876,12 +876,14 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
 
   # retain number of components explaining 1 or more percent total variance
   filt_pcs <- length(sex_pc$sdev[sex_pc$sdev^2 / sum(sex_pc$sdev^2) >= 0.01])
-  if (filt_pcs == 1){
+
+  if (filt_pcs == 1) {
     p <- list(
       plot = NULL,
       sex_check_results = NULL,
       warnings = warning(
-        'WARNING Data dimensionality is too low only 1 significant PC'
+        'plot_sexcheck_pca: there is only 1 significant PC and data
+        dimensionality is too low'
       )
     )
     clean_metadata <- dplyr::mutate(
@@ -889,6 +891,7 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
       "{sex_var}_predicted" := NA
     )
     return(p)
+    quit()
   }
 
   # create a new data frame with relevant PCs, XIST and UTY expression
