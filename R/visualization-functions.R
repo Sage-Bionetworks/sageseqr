@@ -1057,20 +1057,20 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
   temp[names(temp) %in% row.names(scan_vars)] <- scan_vars[names(temp), ]$cluster
   clean_metadata <- dplyr::mutate( clean_metadata, "{sex_var}_predicted" := temp )
 
-  colnames(scan_vars)[colnames(scan_vars) == "cluster"] <- "sex_predicted"
+  colnames(scan_vars)[colnames(scan_vars) == "cluster"] <- "sex predicted"
   clean_metadata <- tibble::column_to_rownames(clean_metadata, var = "sampleId")
 
-  scan_vars$indicated_sex <- clean_metadata[row.names(scan_vars), colnames(clean_metadata)[colnames(clean_metadata) == sex_var] ]
-  scan_vars$sex_predicted <- as.factor(scan_vars$sex_predicted)
+  scan_vars$`indicated sex` <- clean_metadata[row.names(scan_vars), colnames(clean_metadata)[colnames(clean_metadata) == sex_var] ]
+  scan_vars$`sex predicted` <- as.factor(scan_vars$`sex predicted`)
 
   # Find the discordant samples
   #If levels of sex_var are male female
-  if ("female" %in% levels(scan_vars$indicated_sex) & "male" %in% levels(scan_vars$indicated_sex)) {
+  if ("female" %in% levels(scan_vars$`indicated sex`) & "male" %in% levels(scan_vars$`indicated sex`)) {
     discordant <- c("Yes", "No")
     names(discordant) <- c(FALSE, TRUE)
     scan_vars$discordant_by_sex <- as.factor(
       discordant[as.character(
-        scan_vars$sex_predicted == scan_vars$indicated_sex
+        scan_vars$`sex predicted` == scan_vars$`indicated sex`
       )]
     )
   }else{
@@ -1078,30 +1078,30 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
     female <- names(
       which.max(
         table(
-          scan_vars$indicated_sex,
-          scan_vars$sex_predicted )[,'female']
+          scan_vars$`indicated sex`,
+          scan_vars$`sex predicted` )[,'female']
       )
     )
     male <- names(
       which.max(
         table(
-          scan_vars$indicated_sex,
-          scan_vars$sex_predicted )[,'male']
+          scan_vars$`indicated sex`,
+          scan_vars$`sex predicted` )[,'male']
       )
     )
-    scan_vars$indicated_sex <- as.character(scan_vars$indicated_sex)
-    scan_vars$indicated_sex[
-      scan_vars$indicated_sex %in% as.character(male)
+    scan_vars$`indicated sex` <- as.character(scan_vars$`indicated sex`)
+    scan_vars$`indicated sex`[
+      scan_vars$`indicated sex` %in% as.character(male)
     ] <- 'male'
-    scan_vars$indicated_sex[
-      scan_vars$indicated_sex %in% as.character(female)
+    scan_vars$`indicated sex`[
+      scan_vars$`indicated sex` %in% as.character(female)
     ] <- 'female'
-    scan_vars$indicated_sex <- as.factor(scan_vars$indicated_sex)
+    scan_vars$`indicated sex` <- as.factor(scan_vars$`indicated sex`)
     discordant <- c("Yes", "No")
     names(discordant) <- c(FALSE, TRUE)
     scan_vars$discordant_by_sex <- as.factor(
       discordant[as.character(
-        scan_vars$sex_predicted == scan_vars$indicated_sex
+        scan_vars$`sex predicted` == scan_vars$`indicated sex`
       )]
     )
   }
@@ -1119,7 +1119,7 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
 
   plot_markers <- ggplot2::ggplot(data = scan_vars) +
     ggplot2::geom_point(
-      ggplot2::aes(x=XIST, y=UTY, shape = indicated_sex, color = discordant_by_sex)) +
+      ggplot2::aes(x=XIST, y=UTY, shape = `indicated sex`, color = discordant_by_sex)) +
     ggplot2::xlab("Voom Normalized Log2 XIST Counts") +
     ggplot2::ylab("Voom Normalized Log2 UTY Counts") +
     ggplot2::ggtitle("PCA Clustered Sex Discordance by XIST and UTY Expression") +
@@ -1131,7 +1131,7 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
   if( plot_component < sex_comp ){
     plot_components <- ggplot2::ggplot(data = scan_vars) +
       ggplot2::geom_point(
-        ggplot2::aes(x=scan_vars[,plot_component], y=scan_vars[,sex_comp], shape = indicated_sex, color = discordant_by_sex)
+        ggplot2::aes(x=scan_vars[,plot_component], y=scan_vars[,sex_comp], shape = `indicated sex`, color = discordant_by_sex)
       ) +
       ggplot2::xlab(paste0( "PC", plot_component,': ', pc_Comp)) +
       ggplot2::ylab(paste0("PC", sex_comp,': ', pc_Sex )) +
@@ -1143,7 +1143,7 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
   }else{
     plot_components <- ggplot2::ggplot(data = scan_vars) +
       ggplot2::geom_point(
-        ggplot2::aes(y=scan_vars[,plot_component], x=scan_vars[,sex_comp], shape = indicated_sex, color = discordant_by_sex)
+        ggplot2::aes(y=scan_vars[,plot_component], x=scan_vars[,sex_comp], shape = `indicated sex`, color = discordant_by_sex)
       ) +
       ggplot2::ylab(paste0( "PC", plot_component,': ', pc_Comp)) +
       ggplot2::xlab(paste0("PC", sex_comp,': ', pc_Sex )) +
