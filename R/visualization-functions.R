@@ -1028,15 +1028,12 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
 
   # warning 3 of 3: if the mean of XIST and UTY values by cluster don't
   # resolve sexes, return warning
-  if (!(
-    (uty_2 < uty_1 & xist_2 > xist_1) |
-    (uty_1 < uty_2 & xist_1 > xist_2)
-  )) {
+  if (!((uty_2 < uty_1 & xist_2 > xist_1) |(uty_1 < uty_2 & xist_1 > xist_2))) {
     p <- list(
       plot = NULL,
       sex_check_results = NULL,
       warnings = warning(
-        'WARNING identify_outliers: XIST and UTY discordant between clusters'
+        'plot_sexcheck_pca: XIST and UTY discordant between clusters'
       )
     )
     clean_metadata <- dplyr::mutate(
@@ -1044,6 +1041,7 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
       "{sex_var}_predicted" := NA
     )
     return(p)
+    quit()
   }
 
   # assign sex designation to clusters
@@ -1080,7 +1078,8 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
       )]
     )
   }else{
-    # Re-assign Labels
+    # re-assign sex factor variables. This code makes an assumption that the
+    # majority of the sex values in the metadata are correct.
     female <- names(
       which.max(
         table(
