@@ -1112,8 +1112,10 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
   }
 
   # calculate voom-normalized XIST and UTY counts
-  scan_vars$XIST = limma::voom(scan_vars$xist)$E
-  scan_vars$UTY = limma::voom(scan_vars$uty)$E
+  normalized <- limma::voom(t(scan_vars[,c("xist", "uty"), drop = F]))
+  normalized <- t(normalized)
+  scan_vars$XIST <- normalized$xist
+  scan_vars$UTY <- normalized$uty
 
   # return the vooom-normalized sex-specific counts
   sex_comp <- as.numeric(which.max(test_vals$xist_coeff))
