@@ -1120,7 +1120,7 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
 
   # calculate voom-normalized XIST and UTY counts
   normalized <- limma::voom(t(scan_vars[,c("xist", "uty"), drop = F]))
-  normalized <- t(normalized)
+  normalized <- as.data.frame(t(normalized$E))
   scan_vars$XIST <- normalized$xist
   scan_vars$UTY <- normalized$uty
 
@@ -1150,7 +1150,7 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
     ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1))
 
-  if(plot_component < sex_comp) {
+  if (plot_component < sex_comp) {
     plot_components <- ggplot2::ggplot(data = scan_vars) +
       ggplot2::geom_point(
         ggplot2::aes(
