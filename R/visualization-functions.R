@@ -981,7 +981,8 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
       plot = NULL,
       sex_check_results = NULL,
       warnings = warning(
-        'plot_sexcheck_pca: XIST and UTY counts correlated to disconcordant principle pomponents (PCs)'
+        'plot_sexcheck_pca: XIST and UTY counts correlated to disconcordant
+        principle pomponents (PCs)'
       )
     )
     clean_metadata <- dplyr::mutate(
@@ -1004,7 +1005,7 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
       (sex_pc$sdev^2 / sum(sex_pc$sdev^2))[plot_component] * 100,
       3
     )
-  }else{
+  } else {
     plot_component <- 1
     plot_component_var <- signif(
       (sex_pc$sdev^2 / sum(sex_pc$sdev^2))[1] * 100,
@@ -1049,7 +1050,7 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
     #cluster 2 are females
     scan_vars$cluster[scan_vars$cluster == 2] <- 'female'
     scan_vars$cluster[scan_vars$cluster == 1] <- 'male'
-  }else{
+  } else {
     #cluster 1 are females
     scan_vars$cluster[scan_vars$cluster == 1] <- 'female'
     scan_vars$cluster[scan_vars$cluster == 2] <- 'male'
@@ -1059,17 +1060,23 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
   temp <- rep(NA, dim(clean_metadata)[1])
   names(temp) <- row.names(clean_metadata)
   temp[names(temp) %in% row.names(scan_vars)] <- scan_vars[names(temp), ]$cluster
-  clean_metadata <- dplyr::mutate( clean_metadata, "{sex_var} predicted" := temp )
-
+  clean_metadata <- dplyr::mutate(
+    clean_metadata,
+    "{sex_var} predicted" := temp
+    )
   colnames(scan_vars)[colnames(scan_vars) == "cluster"] <- "sex predicted"
   clean_metadata <- tibble::column_to_rownames(clean_metadata, var = "sampleId")
 
-  scan_vars$`indicated sex` <- clean_metadata[row.names(scan_vars), colnames(clean_metadata)[colnames(clean_metadata) == sex_var] ]
+  scan_vars$`indicated sex` <- clean_metadata[
+    row.names(scan_vars),
+    colnames(clean_metadata)[colnames(clean_metadata) == sex_var]
+    ]
   scan_vars$`sex predicted` <- as.factor(scan_vars$`sex predicted`)
 
   # Find the discordant samples
   #If levels of sex_var are male female
-  if ("female" %in% levels(scan_vars$`indicated sex`) & "male" %in% levels(scan_vars$`indicated sex`)) {
+  if ("female" %in% levels(scan_vars$`indicated sex`) &
+      "male" %in% levels(scan_vars$`indicated sex`)) {
     discordant <- c("Yes", "No")
     names(discordant) <- c(FALSE, TRUE)
     scan_vars$`discordant by sex` <- as.factor(
@@ -1077,7 +1084,7 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
         scan_vars$`sex predicted` == scan_vars$`indicated sex`
       )]
     )
-  }else{
+  } else {
     # re-assign sex factor variables. This code makes an assumption that the
     # majority of the sex values in the metadata are correct.
     female <- names(
@@ -1121,40 +1128,94 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
   sex_comp <- as.numeric(which.max(test_vals$xist_coeff))
 
   eigen <- sex_pc$sdev^2
-  pc_Comp <- signif( 100*(eigen[plot_component]/sum(eigen)), 3 )
+  pc_Comp <- signif( 100*(eigen[plot_component]/sum(eigen)), 3)
   pc_Sex <- signif( 100*(eigen[sex_comp]/sum(eigen)), 3)
 
   plot_markers <- ggplot2::ggplot(data = scan_vars) +
     ggplot2::geom_point(
-      ggplot2::aes(x=XIST, y=UTY, shape = `indicated sex`, color = `discordant by sex`)) +
+      ggplot2::aes(
+        x = XIST,
+        y = UTY,
+        shape = `indicated sex`,
+        color = `discordant by sex`
+        )
+      ) +
     ggplot2::xlab("Voom Normalized Log2 XIST Counts") +
     ggplot2::ylab("Voom Normalized Log2 UTY Counts") +
-    ggplot2::ggtitle("PCA Clustered Sex Discordance\n by XIST and UTY Expression") +
+    ggplot2::ggtitle(
+      "PCA Clustered Sex Discordance\n by XIST and UTY Expression"
+      ) +
     sagethemes::scale_color_sage_d() +
     sagethemes::theme_sage() +
     ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1))
 
-  if( plot_component < sex_comp ){
+  if(plot_component < sex_comp) {
     plot_components <- ggplot2::ggplot(data = scan_vars) +
       ggplot2::geom_point(
-        ggplot2::aes(x=scan_vars[,plot_component], y=scan_vars[,sex_comp], shape = `indicated sex`, color = `discordant by sex`)
-      ) +
-      ggplot2::xlab(paste0( "PC", plot_component,": ", pc_Comp, "% total variance explained")) +
-      ggplot2::ylab(paste0("PC", sex_comp,": ", pc_Sex, "% total variance explained" )) +
-      ggplot2::ggtitle("PCA Clustered Sex Discordance\n by Relevant Principal Components") +
+        ggplot2::aes(
+          x = scan_vars[,plot_component],
+          y = scan_vars[,sex_comp],
+          shape = `indicated sex`,
+          color = `discordant by sex`
+          )
+        ) +
+      ggplot2::xlab(
+        paste0(
+          "PC",
+          plot_component,
+          ": ",
+          pc_Comp,
+          "% total variance explained"
+          )
+        ) +
+      ggplot2::ylab(
+        paste0(
+          "PC",
+          sex_comp,
+          ": ",
+          pc_Sex,
+          "% total variance explained"
+          )
+        ) +
+      ggplot2::ggtitle(
+        "PCA Clustered Sex Discordance\n by Relevant Principal Components"
+        ) +
       sagethemes::scale_color_sage_d() +
       sagethemes::theme_sage() +
       ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
       ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1))
-  }else{
+  } else {
     plot_components <- ggplot2::ggplot(data = scan_vars) +
       ggplot2::geom_point(
-        ggplot2::aes(y=scan_vars[,plot_component], x=scan_vars[,sex_comp], shape = `indicated sex`, color = `discordant by sex`)
-      ) +
-      ggplot2::ylab(paste0( "PC", plot_component,": ", pc_Comp, "% total variance explained")) +
-      ggplot2::xlab(paste0("PC", sex_comp,": ", pc_Sex, "% total variance explained" )) +
-      ggplot2::ggtitle("PCA Clustered Sex Discordance\n by Relevant Principal Components") +
+        ggplot2::aes(
+          y = scan_vars[,plot_component],
+          x = scan_vars[,sex_comp],
+          shape = `indicated sex`,
+          color = `discordant by sex`
+          )
+        ) +
+      ggplot2::ylab(
+        paste0(
+          "PC",
+          plot_component,
+          ": ",
+          pc_Comp,
+          "% total variance explained"
+          )
+        ) +
+      ggplot2::xlab(
+        paste0(
+          "PC",
+          sex_comp,
+          ": ",
+          pc_Sex,
+          "% total variance explained"
+          )
+        ) +
+      ggplot2::ggtitle(
+        "PCA Clustered Sex Discordance\n by Relevant Principal Components"
+        ) +
       sagethemes::scale_color_sage_d() +
       sagethemes::theme_sage() +
       ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
@@ -1166,7 +1227,7 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
     gridExtra::arrangeGrob(
       plot_markers,
       plot_components,
-      nrow=1
+      nrow = 1
     )
   )
 
