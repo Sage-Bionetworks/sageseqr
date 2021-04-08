@@ -1,9 +1,9 @@
-#' Co-expression Histogram generation
+#' Co-expression histogram generation
 #'
-#' Visualize the pairwise gene correlation across all samples for 
-#' the cqn normalized expression data
+#' Visualize the correlation density (pairwise gene correlation) for normalized
+#' expression data across all samples.
 #'
-#'@param cqn_counts A counts data frame normalized by CQN.
+#'@inheritParams differential_expression
 #'@export
 plot_coexpression <- function( cqn_counts ){
   if( !(class(cqn_counts)=='cqn') ){
@@ -18,10 +18,10 @@ plot_coexpression <- function( cqn_counts ){
     message('Error: Input cqn_counts$E object not class c( \"matrix\" \"array\") ')
     return('Error: Input cqn_counts$E object not class c( \"matrix\" \"array\") ')
   }
-  
+
   Cor_counts <- as.data.frame(stats::cor(t(cqn_counts$E)))
   Plot_Cor_Counts <- tidyr::gather(Cor_counts)
-  
+
   return( ggplot2::ggplot( data=Plot_Cor_Counts, ggplot2::aes( x=value) ) +
             ggplot2::geom_histogram( bins = 90 ) +
             ggplot2::labs(
