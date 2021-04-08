@@ -7,26 +7,22 @@
 #'@export
 plot_coexpression <- function(cqn_counts) {
   if(!(class(cqn_counts)=='cqn')) {
-    message("Error: Input object not class cqn")
     return("Error: Input object not class cqn")
+    quit()
   }
   if(!exists("E", where=cqn_counts)) {
-    message(
-      "Error: Input cqn object does not contain normalized Expression Matrix"
-      )
     return(
       "Error: Input cqn object does not contain normalized Expression Matrix"
       )
+    quit()
   }
   if(!(
     class(cqn_counts$E)[1] == "matrix" && class(cqn_counts$E)[2] == "array")
     ) {
-    message(
-      'Error: Input cqn_counts$E object not class c( \"matrix\" \"array\")'
-      )
     return(
       'Error: Input cqn_counts$E object not class c( \"matrix\" \"array\")'
       )
+    quit()
   }
 
   cor_counts <- as.data.frame(stats::cor(t(cqn_counts$E)))
