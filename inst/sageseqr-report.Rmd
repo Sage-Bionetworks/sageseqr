@@ -79,7 +79,7 @@ knitr::kable(drake::readd(biotypes))
 
 Check distribution of correlation between genes.
 ```{r histogram}
-drake::readd(gene_coexpression) 
+drake::readd(gene_coexpression)
 ```
 
 # Identify Outliers
