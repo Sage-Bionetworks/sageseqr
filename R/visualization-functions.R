@@ -6,13 +6,13 @@
 #'@inheritParams differential_expression
 #'@export
 plot_coexpression <- function(cqn_counts) {
-  if(!(class(cqn_counts)=='cqn')) {
-    return("Error: Input object not class cqn")
+  if(!(class(cqn_counts) == 'cqn')) {
+    return("plot_coexpression: Input object not class cqn")
     quit()
   }
-  if(!exists("E", where=cqn_counts)) {
+  if(!exists("E", where = cqn_counts)) {
     return(
-      "Error: Input cqn object does not contain normalized Expression Matrix"
+      "plot_coexpression: Input cqn object does not contain normalized expression matrix"
       )
     quit()
   }
@@ -20,7 +20,7 @@ plot_coexpression <- function(cqn_counts) {
     class(cqn_counts$E)[1] == "matrix" && class(cqn_counts$E)[2] == "array")
     ) {
     return(
-      'Error: Input cqn_counts$E object not class c( \"matrix\" \"array\")'
+      "plot_coexpression: Input cqn_counts$E object not class c( \"matrix\" \"array\")"
       )
   }
 
