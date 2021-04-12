@@ -22,29 +22,32 @@ plot_coexpression <- function(cqn_counts) {
     return(
       'Error: Input cqn_counts$E object not class c( \"matrix\" \"array\")'
       )
-    quit()
   }
 
-  cor_counts <- as.data.frame(stats::cor(t(cqn_counts$E)))
-  plot_cor_counts <- tidyr::gather(cor_counts)
+  cor_counts <- stats::cor(t(cqn_counts$E))
+  make_breaks <- hist(cor_counts, plot = FALSE, breaks = breaks)
 
-  return(
-    ggplot2::ggplot(
-      data = plot_cor_counts,
-      ggplot2::aes(x = value)
-      ) +
-      ggplot2::geom_histogram(bins = 90) +
-      ggplot2::labs(
-        x = "Correlation Value",
-        y = "Frequency"
-        ) +
-      sagethemes::theme_sage() +
-      ggplot2::theme(
-        legend.title = ggplot2::element_blank(),
-        axis.text.x = ggplot2::element_text(size = 12),
-        axis.text.y = ggplot2::element_text(size = 12)
-        )
+  dat <- data.frame(xmin = head(make_breaks$breaks, -1L),
+                   xmax = tail(make_breaks$breaks, -1L),
+                   ymin = 0.0,
+                   ymax = make_breaks$counts)
+
+  p <- ggplot2::ggplot(
+    dat,
+    ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax)) +
+    geom_rect(size = 0.5, colour = "#FFFFFF", fill = "#F89C55") +
+    sagethemes::theme_sage() +
+    ggplot2::labs(
+      x = "Correlation Values",
+      y = "Frequency"
+    ) +
+    ggplot2::theme(
+      legend.title = ggplot2::element_blank(),
+      axis.text.x = ggplot2::element_text(size = 12),
+      axis.text.y = ggplot2::element_text(size = 12)
     )
+
+  return(p)
 }
 
 #' Compute principal component analysis (PCA) and plot correlations
