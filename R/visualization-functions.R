@@ -1,3 +1,59 @@
+#' Co-expression histogram generation
+#'
+#' Visualize the correlation density (pairwise gene correlation) for normalized
+#' expression data across all samples.
+#'
+#'@inheritParams differential_expression
+#'@export
+plot_coexpression <- function(cqn_counts) {
+  if(!(class(cqn_counts) == 'cqn')) {
+    return("plot_coexpression: Input object not class cqn")
+    quit()
+  }
+  if(!exists("E", where = cqn_counts)) {
+    return(
+      "plot_coexpression: Input cqn object does not contain normalized expression matrix"
+      )
+    quit()
+  }
+  if(!(
+    class(cqn_counts$E)[1] == "matrix" && class(cqn_counts$E)[2] == "array")
+    ) {
+    return(
+      "plot_coexpression: Input cqn_counts$E object not class c( \"matrix\" \"array\")"
+      )
+  }
+
+  cor_counts <- stats::cor(t(cqn_counts$E))
+  make_breaks <- graphics::hist(cor_counts, plot = FALSE)
+
+  dat <- data.frame(xmin = utils::head(make_breaks$breaks, -1L),
+                   xmax = utils::tail(make_breaks$breaks, -1L),
+                   ymin = 0.0,
+                   ymax = make_breaks$counts)
+
+  p <- ggplot2::ggplot(
+    dat,
+    ggplot2::aes(
+      xmin = .data$xmin,
+      xmax = .data$xmax,
+      ymin = .data$ymin,
+      ymax = .data$ymax)) +
+    ggplot2::geom_rect(size = 0.5, colour = "#FFFFFF", fill = "#F89C55") +
+    sagethemes::theme_sage() +
+    ggplot2::labs(
+      x = "Correlation Values",
+      y = "Frequency"
+    ) +
+    ggplot2::theme(
+      legend.title = ggplot2::element_blank(),
+      axis.text.x = ggplot2::element_text(size = 12),
+      axis.text.y = ggplot2::element_text(size = 12)
+    )
+
+  return(p)
+}
+
 #' Compute principal component analysis (PCA) and plot correlations
 #'
 #' Identify principal components (PCs) of normalized gene counts and correlate
