@@ -25,16 +25,20 @@ plot_coexpression <- function(cqn_counts) {
   }
 
   cor_counts <- stats::cor(t(cqn_counts$E))
-  make_breaks <- hist(cor_counts, plot = FALSE, breaks = breaks)
+  make_breaks <- graphics::hist(cor_counts, plot = FALSE)
 
-  dat <- data.frame(xmin = head(make_breaks$breaks, -1L),
-                   xmax = tail(make_breaks$breaks, -1L),
+  dat <- data.frame(xmin = utils::head(make_breaks$breaks, -1L),
+                   xmax = utils::tail(make_breaks$breaks, -1L),
                    ymin = 0.0,
                    ymax = make_breaks$counts)
 
   p <- ggplot2::ggplot(
     dat,
-    ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax)) +
+    ggplot2::aes(
+      xmin = .data$xmin,
+      xmax = .data$xmax,
+      ymin = .data$ymin,
+      ymax = .data$ymax)) +
     geom_rect(size = 0.5, colour = "#FFFFFF", fill = "#F89C55") +
     sagethemes::theme_sage() +
     ggplot2::labs(
