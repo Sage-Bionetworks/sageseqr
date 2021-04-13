@@ -39,7 +39,7 @@ plot_coexpression <- function(cqn_counts) {
       xmax = .data$xmax,
       ymin = .data$ymin,
       ymax = .data$ymax)) +
-    geom_rect(size = 0.5, colour = "#FFFFFF", fill = "#F89C55") +
+    ggplot2::geom_rect(size = 0.5, colour = "#FFFFFF", fill = "#F89C55") +
     sagethemes::theme_sage() +
     ggplot2::labs(
       x = "Correlation Values",
