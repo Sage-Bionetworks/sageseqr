@@ -12,6 +12,8 @@ Description: This workflow normalizes counts, performs model selection from know
     customizable threshold and performs differential expression analysis for repeated
     measures.
 License: MIT + file LICENSE
+URL: https://sage-bionetworks.github.io/sageseqr,
+    https://github.com/Sage-Bionetworks/sageseqr
 Encoding: UTF-8
 LazyData: true
 Suggests: 
@@ -21,7 +23,6 @@ biocViews:
 Imports:
     biomaRt,
     config,
-    CovariateAnalysis,
     cqn,
     data.table,
     drake,
@@ -29,33 +30,41 @@ Imports:
     edgeR,
     foreach,
     fs,
+    graphics,
     GenomicRanges,
     glue,
+    ggforce,
     ggplot2,
+    ggpubr,
+    gridExtra,
     gtools,
     IRanges,
     knitr,
     limma,
     magrittr,
     mclust,
+    mvIC,
     plyr,
     psych,
     purrr,
     RColorBrewer,
+    reshape2,
     rlang,
     rmarkdown,
     sagethemes,
+    stats,
     stringr,
     synapser,
     tidyr,
     tibble,
     utils,
     variancePartition (>= 1.19.11),
+    vcd,
     quantreg
 Additional_repositories:
     http://ran.synapse.org
 Remotes:
-    th1vairam/CovariateAnalysis@dev,
+    GabrielHoffman/mvIC@master,
     Sage-Bionetworks/sagethemes@main,
     GabrielHoffman/variancePartition
 VignetteBuilder:

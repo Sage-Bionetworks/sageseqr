@@ -90,76 +90,6 @@ clean_covariates <- function(md, factors, continuous, sample_identifier) {
     md
   }
 }
-#'Explore metadata by variable.
-#'
-#'This function produces boxplots from the variables provided.
-#'
-#'@inheritParams coerce_factors
-#'@param include_vars A vector of variables to visualize
-#'@param x_var Variable to plot on the x-axis.
-#'@importFrom rlang .data
-#'
-#'@export
-#'@return A boxplot with mutiple groups defined by the include_vars argument.
-boxplot_vars <- function(md, include_vars, x_var) {
-  sagethemes::import_lato()
-  df <- dplyr::select(md, !!include_vars, !!x_var) %>%
-    tidyr::pivot_longer(-!!x_var, names_to = "key", values_to = "value")
-  p <- ggplot2::ggplot(df, ggplot2::aes(x = .data[[x_var]],
-                                        y = .data$value,
-                                        group = .data[[x_var]])) +
-    ggplot2::geom_boxplot(ggplot2::aes(fill = .data[[x_var]])) +
-    ggplot2::facet_wrap(key ~ ., scales = "free") +
-    sagethemes::scale_fill_sage_d() +
-    sagethemes::theme_sage()
-  p
-}
-#' Explore metadata by gene expression on the sex chromosomes.
-#'
-#' This function plots expression of X and Y marker genes, XIST and UTY respectively, and
-#' colors each sample by the sex- or gender-specific labeling from the metadata. This is a
-#' handy check to determine if samples were swapped or mislabeled.
-#'
-#' @inheritParams collapse_duplicate_hgnc_symbol
-#' @inheritParams filter_genes
-#' @param sex_var Column name of the sex or gender-specific metadata.
-#' @export
-plot_sexcheck <- function(clean_metadata, count_df, biomart_results, sex_var) {
-  md <- tibble::rownames_to_column(clean_metadata, var = "sampleId") %>%
-    dplyr::select(.data$sampleId, !!sex_var)
-  counts <- tibble::rownames_to_column(count_df, var = "geneId")
-  results <- dplyr::select(biomart_results, .data$hgnc_symbol, .data$chromosome_name)
-  results <- dplyr::filter(results, .data$hgnc_symbol %in% c("XIST", "UTY"))
-  results <- tibble::rownames_to_column(results, var = "geneId")
-  results <- dplyr::left_join(results, counts)
-  results <- tidyr::pivot_longer(results,
-                                 -dplyr::all_of(c("geneId", "chromosome_name", "hgnc_symbol")),
-                                 names_to = "sampleId",
-                                 values_to = "counts(log)") %>%
-    dplyr::mutate(`counts(log)` = log(.data$`counts(log)`),
-                  `counts(log)` = ifelse(.data$`counts(log)` == -Inf, 0, .data$`counts(log)`))
-  results <- dplyr::left_join(results, md, "sampleId")
-  results <- tidyr::spread(results, key = .data$hgnc_symbol, value = .data$`counts(log)`) %>%
-    dplyr::mutate(UTY = ifelse(is.na(.data$UTY), 0, .data$UTY),
-                  XIST = ifelse(is.na(.data$XIST), 0, .data$XIST))
-  p <- ggplot2::ggplot(results, ggplot2::aes(x = .data$XIST, y = .data$UTY)) +
-    ggplot2::geom_point(ggplot2::aes(color = .data[[sex_var]])) +
-    sagethemes::scale_color_sage_d() +
-    sagethemes::theme_sage()
-  p <- list(plot = p,
-            sex_specific_counts = results)
-  p
-}
-#' Conditionally wrap plot_sexcheck for drake
-#'
-#' Work around to expose plot_sexcheck to testing and export but also leverage
-#' drakes function for skipping targets conditionally (see \code{"drake::cancel_if()"}).
-#' @inheritParams plot_sexcheck
-#' @export
-conditional_plot_sexcheck <- function(clean_metadata, count_df, biomart_results, sex_var) {
-  drake::cancel_if(is.null(sex_var))
-  plot_sexcheck(clean_metadata, count_df, biomart_results, sex_var)
-}
 #'Get available Ensembl dataset
 #'
 #'Helper function to search relative Ensembl datasets by partial organism names.
@@ -204,9 +134,9 @@ parse_counts <- function(count_df){
 #'and other metadata from Ensembl BioMart. Object returned contains gene Ids
 #'as rownames.
 #'
-#'@param count_df A counts data frame with sample identifiers as rownames.
+#'@param count_df A counts data frame with sample identifiers as column names
+#'and transcript Ids removed with \code{"sageseqr::convert_geneids"}.
 #'@inheritParams get_data
-#'@param gene_id Column name of gene Ids
 #'@param filters A character vector listing biomaRt query filters.
 #'(For a list of filters see \code{"biomaRt::listFilters()"})
 #'@param host An optional character vector specifying the release version.
@@ -216,8 +146,8 @@ parse_counts <- function(count_df){
 #'takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".
 #'@importFrom rlang .data
 #'@export
-get_biomart <- function(count_df, gene_id, synid, version, host, filters, organism) {
-  if (is.null(config::get("biomart")$synID)) {
+get_biomart <- function(count_df, synid, version, host, filters, organism) {
+  if (is.null(synid)) {
     # Get available datset from Ensembl
     ensembl <- biomart_obj(organism, host)
 
@@ -227,35 +157,54 @@ get_biomart <- function(count_df, gene_id, synid, version, host, filters, organi
     # Parse gene IDs to use in query
     gene_ids <- convert_geneids(count_df)
 
-    message(paste0("Downloading sequence",
-                   ifelse(length(gene_ids) > 1, "s", ""), " ..."))
+    message(
+      paste0(
+        "Downloading sequence",
+        ifelse(length(gene_ids) > 1, "s", ""),
+        " ..."
+        )
+      )
 
     if (length(gene_ids) > 100)
       message("This may take a few minutes ...")
 
-    attrs <- c(filters, "ensembl_exon_id", "chromosome_name", "exon_chrom_start", "exon_chrom_end")
-    coords <- biomaRt::getBM(filters = filters,
-                             attributes = attrs,
-                             values = gene_ids,
-                             mart = ensembl,
-                             useCache = FALSE)
+    attrs <- c(filters, "ensembl_exon_id", "chromosome_name",
+               "exon_chrom_start", "exon_chrom_end")
+    coords <- biomaRt::getBM(
+      filters = filters,
+      attributes = attrs,
+      values = gene_ids,
+      mart = ensembl,
+      useCache = FALSE
+      )
     gene_ids <- unique(coords[, filters])
 
     coords <- sapply(gene_ids, function(i) {
-      i.coords <- coords[coords[, 1] == i, 3:5]
-      g <- GenomicRanges::GRanges(i.coords[, 1], IRanges::IRanges(i.coords[, 2], i.coords[, 3]))
+      i.coords <- coords[
+        coords[, 1] == i,
+        c("chromosome_name", "exon_chrom_start", "exon_chrom_end")
+        ]
+      g <- GenomicRanges::GRanges(
+        i.coords[, 1], IRanges::IRanges(i.coords[, 2], i.coords[, 3])
+        )
       g
-    })
+      }
+    )
 
-    length <- plyr::ldply(coords[gene_ids], function(x) sum(IRanges::width(x)), .id = "ensembl_gene_id") %>%
+    length <- plyr::ldply(
+      coords[gene_ids],
+      function(x) sum(IRanges::width(x)), .id = "ensembl_gene_id"
+      ) %>%
       dplyr::rename(gene_length = .data$V1)
 
-    gc_content <- biomaRt::getBM(filters = filters,
-                                 attributes = c(filters, "hgnc_symbol", "percentage_gene_gc_content",
-                                                "gene_biotype", "chromosome_name"),
-                                 values = gene_ids,
-                                 mart = ensembl,
-                                 useCache = FALSE)
+    gc_content <- biomaRt::getBM(
+      filters = filters,
+      attributes = c(filters, "hgnc_symbol", "percentage_gene_gc_content",
+                     "gene_biotype", "chromosome_name"),
+      values = gene_ids,
+      mart = ensembl,
+      useCache = FALSE
+      )
 
     biomart_results <- dplyr::full_join(gc_content, length)
 
@@ -263,7 +212,9 @@ get_biomart <- function(count_df, gene_id, synid, version, host, filters, organi
     biomart_results <- collapse_duplicate_hgnc_symbol(biomart_results)
 
     # Biomart IDs as rownames
-    biomart_results <- tibble::column_to_rownames(biomart_results, var = gene_id)
+    biomart_results <- tibble::column_to_rownames(
+      biomart_results, var = filters
+      )
 
     biomart_results
   } else {
@@ -271,15 +222,19 @@ get_biomart <- function(count_df, gene_id, synid, version, host, filters, organi
     biomart_results <- get_data(synid, version)
 
     # Biomart IDs as rownames
-    biomart_results <- tibble::column_to_rownames(biomart_results, var = gene_id)
+    biomart_results <- tibble::column_to_rownames(
+      biomart_results, var = filters
+      )
 
     # Gene metadata required for count CQN
     required_variables <- c("gene_length", "percentage_gene_gc_content")
 
     if (!all(required_variables %in% colnames(biomart_results))) {
-      vars <- glue::glue_collapse(setdiff(required_variables, colnames(biomart_results)),
-                                  sep = ", ",
-                                  last = " and ")
+      vars <- glue::glue_collapse(
+        setdiff(required_variables, colnames(biomart_results)),
+        sep = ", ",
+        last = " and "
+        )
       message(glue::glue("Warning: {vars} missing from biomart object.
                          This information is required for Conditional
                          Quantile Normalization"))
@@ -311,39 +266,50 @@ collapse_duplicate_hgnc_symbol <- function(biomart_results){
 #' @inheritParams coerce_factors
 #' @inheritParams get_biomart
 #' @inheritParams simple_filter
-#' @param conditions Conditions to bin gene counts that correspond to variables in `md`.
+#' @param conditions Optional. Conditions to bin gene counts that correspond to
+#' variables in `md`.
 #' @param clean_metadata A data frame with sample identifiers as rownames and variables as
 #' factors or numeric as determined by \code{"sageseqr::clean_covariates()"}.
 #' @importFrom magrittr %>%
 #' @export
-filter_genes <- function(clean_metadata, count_df, conditions,
-                         cpm_threshold, conditions_threshold) {
+filter_genes <- function(clean_metadata, count_df,
+                         cpm_threshold, conditions_threshold,
+                         conditions = NULL) {
+
   if (class(conditions) == "list") {
     conditions <- unique(conditions[[1]])
   } else {
     conditions <- unique(conditions)
   }
 
-  if (!any(conditions %in% colnames(clean_metadata))) {
-    stop("Conditions are missing from the metadata.")
-  }
-
   # Check for extraneous rows
   count_df <- parse_counts(count_df)
 
-  split_data <- split(clean_metadata,
-                      f = as.list(clean_metadata[, conditions, drop = F]),
-                      drop = T)
+  if (!is.null(conditions)) {
+    if (!any(conditions %in% colnames(clean_metadata))) {
+      stop("Conditions are missing from the metadata.")
+    }
 
-  map_genes <- purrr::map(split_data, function(x) {
-    simple_filter(count_df[, rownames(x), drop = F],
-                  cpm_threshold,
-                  conditions_threshold)
+    split_data <- split(clean_metadata,
+                        f = as.list(clean_metadata[, conditions, drop = F]),
+                        drop = T)
+
+    map_genes <- purrr::map(split_data, function(x) {
+      simple_filter(count_df[, rownames(x), drop = F],
+                    cpm_threshold,
+                    conditions_threshold)
     })
 
-  genes_to_analyze <- unlist(map_genes) %>%
-    unique() %>%
-    sort()
+    genes_to_analyze <- unlist(map_genes) %>%
+      unique() %>%
+      sort()
+  } else {
+    genes_to_analyze <- simple_filter(
+      count_df,
+      cpm_threshold,
+      conditions_threshold
+    )
+  }
 
   processed_counts <- count_df[genes_to_analyze,]
 
@@ -444,20 +410,25 @@ mclust::mclustBIC
 #' effect. Additionally, variables are scaled to account for
 #' multiple variables that might have an order of magnitude difference.
 #'
-#' @param model_variables Vector of variables to include in the linear (mixed) model.
+#' @param model_variables Optional. Vector of variables to include in the linear (mixed) model.
+#' If not supplied, the model will include all variables in \code{md}.
 #' @param primary_variable Vector of variables that will be collapsed into a single
 #' fixed effect interaction term.
 #' @inheritParams coerce_factors
 #' @export
-build_formula <- function(md, model_variables, primary_variable) {
+build_formula <- function(md, primary_variable, model_variables = names(md)) {
 
   if (!(all(purrr::map_lgl(md, function(x) inherits(x, c("numeric", "factor")))))) {
     stop("Use sageseqr::clean_covariates() to coerce variables into factor and numeric types.")
   }
+  # Update metadata to reflect variable subset
+  md <- dplyr::select(md, dplyr::all_of(c(model_variables, primary_variable)))
+
   # Variables of factor or numeric class are required
-  col_type <- dplyr::select(md, dplyr::all_of(model_variables)) %>%
+  col_type <- dplyr::select(md, -primary_variable) %>%
     dplyr::summarise_all(class) %>%
     tidyr::pivot_longer(tidyr::everything(), names_to = "variable", values_to = "class")
+
   # Categorical or factor variables are modeled as a random effect by (1|variable)
   # Numeric variables are scaled to account for when the spread of data values differs
   # by an order of magnitude
@@ -479,11 +450,18 @@ build_formula <- function(md, model_variables, primary_variable) {
 
   object <- list(metadata = md %>%
                    tidyr::unite(!!interaction_term, dplyr::all_of(primary_variable), sep = "_"),
-                formula = glue::glue("~ {interaction_term}+",
-                                     glue::glue_collapse(formula, sep = "+")),
-                formula_non_intercept = glue::glue("~ 0+{interaction_term}+",
-                                                   glue::glue_collapse(formula, sep = "+")),
-                primary_variable = interaction_term
+                formula = formula(
+                  glue::glue("~ {interaction_term}+",
+                             glue::glue_collapse(formula, sep = "+")
+                             )
+                  ),
+                formula_non_intercept = formula(
+                  glue::glue("~ 0+{interaction_term}+",
+                             glue::glue_collapse(formula, sep = "+")
+                             )
+                  ),
+                primary_variable = interaction_term,
+                variables = unlist(formula)
   )
 
   # Resolve dropped class type of factor without losing samples as rownames
@@ -503,9 +481,9 @@ build_formula <- function(md, model_variables, primary_variable) {
 #' @inheritParams build_formula
 #' @inheritParams cqn
 #' @export
-differential_expression <- function(filtered_counts, cqn_counts, md, model_variables,
-                                    primary_variable, biomart_results) {
-  metadata_input <- build_formula(md, model_variables, primary_variable)
+differential_expression <- function(filtered_counts, cqn_counts, md, primary_variable,
+                                    biomart_results, model_variables = NULL) {
+  metadata_input <- build_formula(md, primary_variable, model_variables)
   gene_expression <- edgeR::DGEList(filtered_counts)
   gene_expression <- edgeR::calcNormFactors(gene_expression)
   voom_gene_expression <- variancePartition::voomWithDreamWeights(counts = gene_expression,
@@ -582,11 +560,257 @@ differential_expression <- function(filtered_counts, cqn_counts, md, model_varia
 #' @param conditions A list of conditions to test as `primary_variable`
 #' in \code{"sagseqr::differential_expression()"}.
 #' @inheritParams differential_expression
+#' @inheritParams build_formula
 #' @export
-wrap_de <- function(conditions, filtered_counts, cqn_counts, md, model_variables, biomart_results) {
+wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
+                    biomart_results, model_variables = NULL) {
   purrr::map(conditions,
-             function(x) differential_expression(filtered_counts, cqn_counts, md, model_variables,
-                                                 primary_variable = x, biomart_results))
+             function(x) differential_expression(filtered_counts, cqn_counts, md, primary_variable = x,
+                                                 biomart_results, model_variables))
 
 }
+#' Stepwise Regression
 #'
+#' This function performs multivariate forward stepwise regression evaluated by multivariate Bayesian Information
+#' Critera (BIC) by wrapping \code{"mvIC::mvForwardStepwise()"}.
+#'
+#' @inheritParams differential_expression
+#' @inheritParams build_formula
+#' @param skip Defaults to NULL. If TRUE, this step will be skipped in the
+#' Drake plan.
+#' @export
+stepwise_regression <- function(md, model_variables = NULL,
+                                primary_variable, cqn_counts,
+                                skip = NULL) {
+  # skip stepwise generation if skip = TRUE
+  if(isTRUE(skip)) {
+    return("Skipping stepwise regression model generation...")
+  } else {
+  metadata_input <- build_formula(md, model_variables, primary_variable)
+  model <- mvIC::mvForwardStepwise(exprObj = cqn_counts$E,
+                                   baseFormula = metadata_input$formula,
+                                   data = metadata_input$metadata,
+                                   variables = array(metadata_input$variables)
+  )
+
+  to_visualize <- model %>%
+    dplyr::select(.data$iter, .data$variable, .data$isAdded) %>%
+    dplyr::rename(iteration = .data$iter,
+                  `added to model` = .data$isAdded) %>%
+    dplyr::filter(.data$`added to model` == "yes")
+
+  model["to_visualize"] <- to_visualize
+
+  model
+  }
+}
+#' Summarize Biotypes
+#'
+#' Computes the fraction of genes of a particular biotype. The number of genes
+#' must be above 100 to be summarized.
+#'
+#' @inheritParams collapse_duplicate_hgnc_symbol
+#' @inheritParams cqn
+#' @export
+summarize_biotypes <- function(filtered_counts, biomart_results) {
+  biomart_results[rownames(filtered_counts),] %>%
+    dplyr::group_by(.data$gene_biotype) %>%
+    dplyr::summarise(fraction = dplyr::n()) %>%
+    dplyr::filter(.data$fraction > 100) %>%
+    dplyr::mutate(fraction = .data$fraction/dim(filtered_counts)[1])
+}
+#' Prepare output
+#'
+#' Store data in temporary files to prepare for Synapse upload.
+#' @param target The object to be stored.
+#' @param data_name An identifier to embed in the file name.
+#' @param rowname Optional. If applicable, the name of the variable to store
+#' rownames.
+#' @export
+prepare_results <- function(target, data_name, rowname = NULL) {
+  if (!is.null(rowname)) {
+    target <- tibble::rownames_to_column(target, rowname)
+  }
+
+  # the file name will contain the primary name of the target
+  tmp <- fs::file_temp(data_name, ext = ".tsv")
+
+  utils::write.table(
+    target,
+    file = tmp,
+    sep = "\t",
+    row.names = FALSE,
+    quote = FALSE
+    )
+  tmp
+}
+#' Store output to Synapse
+#'
+#' Store transformed data, markdown and html report to a Folder in Synapse.
+#'
+#' @param parent_id A Synapse Id that corresponds to a project or
+#' folder to store output.
+#' @param cqn_counts The drake target containing Conditional Quantile Normalized
+#'  (CQN) counts. Defaults to target name constrained by
+#'  \code{"sageseqr::rnaseq_plan()"}.
+#' @param clean_md The drake target containing the metadata data frame.
+#' Defaults to target name constrained by \code{"sageseqr::rnaseq_plan()"}.
+#' @param filtered_counts The drake target containing counts after low gene
+#' expression has been removed. Defaults to target name constrained by
+#'  \code{"sageseqr::rnaseq_plan()"}.
+#' @param biomart_results The drake target containing gene annotations from
+#' biomart. Defaults to target name constrained by
+#' \code{"sageseqr::rnaseq_plan()"}.
+#' @param rownames A list of variables to store rownames ordered by `metadata`,
+#' `filtered_counts`, `biomart_results`, `cqn_counts`. If not applicable,
+#' set as NULL.
+#' @param syn_names A list of human-readable names for the Synapse entities
+#' ordered
+#' by `metadata`, `filtered_counts`, `biomart_results`, `cqn_counts`.
+#' @param inputs A character vector of Synapse Ids to create provenance between
+#' output files and input files.
+#' @param activity_provenance A phrase to describe the data transformation for
+#' provenance.
+#' @param data_names A list of identifiers to embed in the file name ordered
+#' by `metadata`, `filtered_counts`, `biomart_results`, `cqn_counts`.
+#' @param config_file Optional. Path to configuration file.
+#' @inheritParams rnaseq_plan
+#' @export
+store_results <- function(clean_md = clean_md,
+                          filtered_counts = filtered_counts,
+                          biomart_results = biomart_results,
+                          cqn_counts = cqn_counts$counts,
+                          syn_names, data_names,
+                          parent_id, inputs, activity_provenance,
+                          rownames = NULL, config_file = NULL,
+                          report_name = NULL) {
+
+  # include sageseqr package version in Synapse provenance
+  ver <- utils::packageVersion("sageseqr")
+  description <- glue::glue(
+    "analyzed with sageseqr {ver}"
+    )
+
+  # nest drake targets in a list. Every time a new target is to-be stored, it
+  # must be added as an argument to this function and then added to this list.
+  targets <- list(clean_md, filtered_counts, biomart_results, cqn_counts)
+
+  mash <- list(
+    target = targets,
+    rowname = rownames,
+    data_name = data_names
+  )
+
+  file_location <- purrr::pmap(
+    mash,
+    prepare_results
+    )
+
+  mash <- list(
+    parent = parent_id,
+    syn_names = syn_names,
+    paths = file_location
+    )
+
+  file_to_upload <- purrr::pmap(
+    mash,
+    function(paths, parent, syn_names) synapser::File(
+      path = paths,
+      parent = parent,
+      name = syn_names
+      )
+  )
+
+  # nest input Synapse Ids to apply the same provenance to all files
+  inputs <- list(inputs)
+
+  mash <- list(
+    files = file_to_upload,
+    inputs = inputs,
+    activity_provenance = activity_provenance,
+    activity_description = description
+    )
+
+  for_provenance <- purrr::pmap(
+    mash,
+    function(
+      files, inputs, activity_provenance, activity_description
+      ) synapser::synStore(
+        obj = files,
+        used = inputs,
+        activityName = activity_provenance,
+        activityDescription = activity_description,
+        forceVersion = FALSE
+      )
+  )
+
+  if (!is.null(config_file)) {
+    file <- synapser::File(
+      path = config_file,
+      parent = parent_id,
+      name = "Configuration file"
+    )
+
+    config_provenance <- synapser::synStore(
+      obj = file,
+      activityName = activity_provenance
+      )
+
+    for_provenance <- append(for_provenance, config_provenance)
+  }
+
+  if (!is.null(report_name)) {
+    path <- glue::glue("{getwd()}/{report_name}.html")
+
+    used_ids <- unlist(
+      purrr::map(
+        for_provenance,
+        ~.x$get("id")
+        )
+    )
+
+    file <- synapser::File(
+      path = path,
+      parent = parent_id
+    )
+
+    markdown_provenance <- synapser::synStore(
+      obj = file,
+      used = used_ids,
+      activityName = activity_provenance,
+      activityDescription = description
+    )
+  }
+  message(glue::glue("Files uploaded to {parent_id}"))
+}
+#' Provenance helper
+#'
+#' Collapse Synapse Ids and version.
+#'
+#' @inheritParams rnaseq_plan
+#' @export
+provenance_helper <- function(metadata_id,  counts_id, metadata_version = NULL,
+                              counts_version = NULL, biomart_id = NULL,
+                              biomart_version = NULL) {
+
+  if (is.null(metadata_version)) {
+    ids <- metadata_id
+  } else {
+    ids <- glue::glue("{metadata_id}.{metadata_version}")
+  }
+
+  if (is.null(counts_version)) {
+    ids <- c(ids, counts_id)
+  } else {
+    ids <- c(ids, glue::glue("{counts_id}.{counts_version}"))
+  }
+
+  if (is.null(biomart_version) & is.null(biomart_id)) {
+    ids
+  } else if (is.null(biomart_version) & !is.null(biomart_id)) {
+    ids <- c(ids, biomart_id)
+  } else {
+    ids <- c(ids, glue::glue("{biomart_id}.{biomart_version}"))
+  }
+  ids
+}

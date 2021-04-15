@@ -4,12 +4,11 @@
 \alias{get_biomart}
 \title{Get Ensembl biomaRt object}
 \usage{
-get_biomart(count_df, gene_id, synid, version, host, filters, organism)
+get_biomart(count_df, synid, version, host, filters, organism)
 }
 \arguments{
-\item{count_df}{A counts data frame with sample identifiers as rownames.}
-
-\item{gene_id}{Column name of gene Ids}
+\item{count_df}{A counts data frame with sample identifiers as column names
+and transcript Ids removed with \code{"sageseqr::convert_geneids"}.}
 
 \item{synid}{A character vector with a Synapse Id.}
 

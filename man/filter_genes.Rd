@@ -7,22 +7,24 @@
 filter_genes(
   clean_metadata,
   count_df,
-  conditions,
   cpm_threshold,
-  conditions_threshold
+  conditions_threshold,
+  conditions = NULL
 )
 }
 \arguments{
 \item{clean_metadata}{A data frame with sample identifiers as rownames and variables as
 factors or numeric as determined by \code{"sageseqr::clean_covariates()"}.}
 
-\item{count_df}{A counts data frame with sample identifiers as rownames.}
-
-\item{conditions}{Conditions to bin gene counts that correspond to variables in `md`.}
+\item{count_df}{A counts data frame with sample identifiers as column names
+and transcript Ids removed with \code{"sageseqr::convert_geneids"}.}
 
 \item{cpm_threshold}{The minimum number of CPM allowed.}
 
 \item{conditions_threshold}{Percentage of samples that should contain the minimum CPM.}
+
+\item{conditions}{Optional. Conditions to bin gene counts that correspond to
+variables in `md`.}
 }
 \description{
 Filter genes with low expression. This function is more permissive by setting conditions

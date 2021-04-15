@@ -13,7 +13,6 @@ rnaseq_plan(
   sample_id_input,
   factor_input,
   continuous_input,
-  gene_id,
   biomart_id,
   biomart_version,
   host,
@@ -23,18 +22,27 @@ rnaseq_plan(
   cpm_threshold = 1,
   conditions_threshold = 0.5,
   x_var_for_plot,
-  sex_var
+  sex_var,
+  color,
+  shape,
+  size,
+  report_name,
+  skip_model,
+  parent_id,
+  rownames,
+  config_file
 )
 }
 \arguments{
-\item{metadata_id}{Synapse ID to clean metadata file with sample identifiers in a
-column and variables of interest as column names. There cannot be any missing values.}
+\item{metadata_id}{Synapse ID to clean metadata file with sample identifiers
+in a column and variables of interest as column names. There cannot be any
+missing values.}
 
-\item{metadata_version}{Optionally, include Synapse file version number. If omitted,
-current version will be downloaded.}
+\item{metadata_version}{Optionally, include Synapse file version number. If
+omitted, current version will be downloaded.}
 
-\item{counts_id}{Synapse ID to counts data frame with identifiers to the metadata as
-column names and gene ids in a column.}
+\item{counts_id}{Synapse ID to counts data frame with identifiers to the
+metadata as column names and gene ids in a column.}
 
 \item{counts_version}{Optionally, include Synapse file version number.}
 
@@ -47,8 +55,6 @@ in the metadata as column names.}
 
 \item{continuous_input}{Vector of continuous variables. Variables must be
 present in the metadata as column names.}
-
-\item{gene_id}{Column name of gene Ids}
 
 \item{biomart_id}{Synapse ID to biomart object.}
 
@@ -64,7 +70,8 @@ This specification is highly recommended for a reproducible workflow.
 \item{organism}{A character vector of the organism name. This argument
 takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".}
 
-\item{conditions}{Conditions to bin gene counts that correspond to variables in `md`.}
+\item{conditions}{Optional. Conditions to bin gene counts that correspond to
+variables in `md`.}
 
 \item{cpm_threshold}{The minimum number of CPM allowed.}
 
@@ -73,8 +80,30 @@ takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".}
 \item{x_var_for_plot}{Variable to separate groups for boxplot.}
 
 \item{sex_var}{Column name of the sex or gender-specific metadata.}
+
+\item{color}{Discrete variable in `clean_metadata` differentiated
+by color.}
+
+\item{shape}{Discrete variable in `clean_metadata` differentiated
+by shape.}
+
+\item{size}{Continuous variable in `clean_metadata` differentiated
+by size.}
+
+\item{report_name}{Name of output markdown file.}
+
+\item{skip_model}{If TRUE, does not run regression model.}
+
+\item{parent_id}{A Synapse Id that corresponds to a project or
+folder to store output.}
+
+\item{rownames}{A list of variables to store rownames ordered by `metadata`,
+`filtered_counts`, `biomart_results`, `cqn_counts`. If not applicable,
+set as NULL.}
+
+\item{config_file}{Optional. Path to configuration file.}
 }
 \description{
-This function wraps the \code{"drake::plan()"} and copies the R markdown report to the
-user's working directory.
+This function wraps the \code{"drake::plan()"} and copies the R markdown
+report to the user's working directory.
 }
