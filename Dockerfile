@@ -1,5 +1,5 @@
 # versioned base image
-FROM rocker/tidyverse:4.0.2
+FROM rocker/tidyverse:4.0.5
 
 # -- metadata --
 LABEL maintainer="Kelsey Montgomery <kelsey.montgomery@sagebase.org>"
