@@ -563,7 +563,7 @@ differential_expression <- function(filtered_counts, cqn_counts, md, primary_var
 #' @inheritParams build_formula
 #' @export
 wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
-                    biomart_results, model_variables = NULL) {
+                    biomart_results, model_variables = names(md)) {
   purrr::map(conditions,
              function(x) differential_expression(filtered_counts, cqn_counts, md, primary_variable = x,
                                                  biomart_results, model_variables))
@@ -579,8 +579,8 @@ wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
 #' @param skip Defaults to NULL. If TRUE, this step will be skipped in the
 #' Drake plan.
 #' @export
-stepwise_regression <- function(md, model_variables = NULL,
-                                primary_variable, cqn_counts,
+stepwise_regression <- function(md, primary_variable, cqn_counts,
+                                model_variables = names(md),
                                 skip = NULL) {
   # skip stepwise generation if skip = TRUE
   if(isTRUE(skip)) {
