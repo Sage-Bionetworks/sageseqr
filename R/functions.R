@@ -586,7 +586,7 @@ stepwise_regression <- function(md, primary_variable, cqn_counts,
   if(isTRUE(skip)) {
     return("Skipping stepwise regression model generation...")
   } else {
-  metadata_input <- build_formula(md, model_variables, primary_variable)
+  metadata_input <- build_formula(md, primary_variable, model_variables)
   model <- mvIC::mvForwardStepwise(exprObj = cqn_counts$E,
                                    baseFormula = metadata_input$formula,
                                    data = metadata_input$metadata,
