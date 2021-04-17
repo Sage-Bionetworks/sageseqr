@@ -593,7 +593,7 @@ stepwise_regression <- function(md, primary_variable, cqn_counts,
                                    variables = array(metadata_input$variables)
   )
 
-  to_visualize <- model %>%
+  to_visualize <- model$trace %>%
     dplyr::select(.data$iter, .data$variable, .data$isAdded) %>%
     dplyr::rename(iteration = .data$iter,
                   `added to model` = .data$isAdded) %>%
