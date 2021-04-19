@@ -599,9 +599,12 @@ stepwise_regression <- function(md, primary_variable, cqn_counts,
                   `added to model` = .data$isAdded) %>%
     dplyr::filter(.data$`added to model` == "yes")
 
-  model["to_visualize"] <- to_visualize
+  output <- list(
+    to_visualize = to_visualize,
+    formula = model$formula
+  )
 
-  model
+  return(output)
   }
 }
 #' Summarize Biotypes
