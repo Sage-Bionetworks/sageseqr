@@ -563,7 +563,7 @@ differential_expression <- function(filtered_counts, cqn_counts, md, primary_var
 #' @inheritParams build_formula
 #' @export
 wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
-                    biomart_results, model_variables = NULL) {
+                    biomart_results, model_variables = names(md)) {
   purrr::map(conditions,
              function(x) differential_expression(filtered_counts, cqn_counts, md, primary_variable = x,
                                                  biomart_results, model_variables))
@@ -579,29 +579,32 @@ wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
 #' @param skip Defaults to NULL. If TRUE, this step will be skipped in the
 #' Drake plan.
 #' @export
-stepwise_regression <- function(md, model_variables = NULL,
-                                primary_variable, cqn_counts,
+stepwise_regression <- function(md, primary_variable, cqn_counts,
+                                model_variables = names(md),
                                 skip = NULL) {
   # skip stepwise generation if skip = TRUE
   if(isTRUE(skip)) {
     return("Skipping stepwise regression model generation...")
   } else {
-  metadata_input <- build_formula(md, model_variables, primary_variable)
+  metadata_input <- build_formula(md, primary_variable, model_variables)
   model <- mvIC::mvForwardStepwise(exprObj = cqn_counts$E,
                                    baseFormula = metadata_input$formula,
                                    data = metadata_input$metadata,
                                    variables = array(metadata_input$variables)
   )
 
-  to_visualize <- model %>%
+  to_visualize <- model$trace %>%
     dplyr::select(.data$iter, .data$variable, .data$isAdded) %>%
     dplyr::rename(iteration = .data$iter,
                   `added to model` = .data$isAdded) %>%
     dplyr::filter(.data$`added to model` == "yes")
 
-  model["to_visualize"] <- to_visualize
+  output <- list(
+    to_visualize = to_visualize,
+    formula = model$formula
+  )
 
-  model
+  return(output)
   }
 }
 #' Summarize Biotypes

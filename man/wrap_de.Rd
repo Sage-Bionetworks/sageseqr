@@ -10,7 +10,7 @@ wrap_de(
   cqn_counts,
   md,
   biomart_results,
-  model_variables = NULL
+  model_variables = names(md)
 )
 }
 \arguments{
