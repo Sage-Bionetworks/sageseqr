@@ -1203,9 +1203,9 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
         x = .data$XIST,
         y = .data$UTY,
         shape = .data$`indicated sex`,
-        color = .data$`discordant by sex`,
-        alpha = 0.05
-      )
+        color = .data$`discordant by sex`
+      ),
+      alpha = 0.05
     ) +
     ggplot2::geom_text(
       ggplot2::aes(label = .data$label),
@@ -1239,9 +1239,9 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
           x = .data[[x_variable]],
           y = .data[[y_variable]],
           shape = .data$`indicated sex`,
-          color = .data$`discordant by sex`,
-          alpha = 0.05,
-        )
+          color = .data$`discordant by sex`
+        ),
+        alpha = 0.05
       ) +
       ggplot2::geom_text(
         ggplot2::aes(label = .data$label),
@@ -1290,9 +1290,9 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
           x = .data[[x_variable]],
           y = .data[[y_variable]],
           shape = .data$`indicated sex`,
-          color = .data$`discordant by sex`,
-          alpha = 0.05
-        )
+          color = .data$`discordant by sex`
+        ),
+        alpha = 0.05
       ) +
       ggplot2::geom_text(
         ggplot2::aes(label = .data$label),
