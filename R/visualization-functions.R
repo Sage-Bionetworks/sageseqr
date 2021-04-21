@@ -750,7 +750,7 @@ plot_sexcheck <- function(clean_metadata, count_df, biomart_results, sex_var) {
         )
       )
   results <- tidyr::pivot_wider(
-    dplyr::select(results, -chromosome_name, -geneId),
+    dplyr::select(results, -dplyr::all_of(c("chromosome_name", "geneId"))),
     names_from = "hgnc_symbol",
     values_from = "counts(log)"
     )
@@ -1197,18 +1197,18 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
 
   plot_markers <- ggplot2::ggplot(
     data = scan_vars,
-    ggplot2::aes(x = XIST, y = UTY)) +
+    ggplot2::aes(x = .data$XIST, y = .data$UTY)) +
     ggplot2::geom_point(
       ggplot2::aes(
-        x = XIST,
-        y = UTY,
-        shape = `indicated sex`,
-        color = `discordant by sex`,
+        x = .data$XIST,
+        y = .data$UTY,
+        shape = .data$`indicated sex`,
+        color = .data$`discordant by sex`,
         alpha = 0.05
       )
     ) +
     ggplot2::geom_text(
-      ggplot2::aes(label = label),
+      ggplot2::aes(label = .data$label),
       family = "Lato",
       size = 4,
       hjust = 0,
@@ -1238,8 +1238,8 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
         ggplot2::aes(
           x = .data[[x_variable]],
           y = .data[[y_variable]],
-          shape = `indicated sex`,
-          color = `discordant by sex`,
+          shape = .data$`indicated sex`,
+          color = .data$`discordant by sex`,
           alpha = 0.05,
         )
       ) +
@@ -1289,8 +1289,8 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
         ggplot2::aes(
           x = .data[[x_variable]],
           y = .data[[y_variable]],
-          shape = `indicated sex`,
-          color = `discordant by sex`,
+          shape = .data$`indicated sex`,
+          color = .data$`discordant by sex`,
           alpha = 0.05
         )
       ) +
