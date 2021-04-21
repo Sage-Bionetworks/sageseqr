@@ -136,9 +136,9 @@ Critera (BIC) by wrapping <code>"mvIC::mvForwardStepwise()"</code>.</p>
 
     <pre class="usage"><span class='fu'>stepwise_regression</span><span class='op'>(</span>
   <span class='va'>md</span>,
-  model_variables <span class='op'>=</span> <span class='cn'>NULL</span>,
   <span class='va'>primary_variable</span>,
   <span class='va'>cqn_counts</span>,
+  model_variables <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span><span class='op'>(</span><span class='va'>md</span><span class='op'>)</span>,
   skip <span class='op'>=</span> <span class='cn'>NULL</span>
 <span class='op'>)</span></pre>
 
@@ -150,11 +150,6 @@ Critera (BIC) by wrapping <code>"mvIC::mvForwardStepwise()"</code>.</p>
       <td><p>A data frame with sample identifiers in a column and relevant experimental covariates.</p></td>
     </tr>
     <tr>
-      <th>model_variables</th>
-      <td><p>Optional. Vector of variables to include in the linear (mixed) model.
-If not supplied, the model will include all variables in <code>md</code>.</p></td>
-    </tr>
-    <tr>
       <th>primary_variable</th>
       <td><p>Vector of variables that will be collapsed into a single
 fixed effect interaction term.</p></td>
@@ -162,6 +157,11 @@ fixed effect interaction term.</p></td>
     <tr>
       <th>cqn_counts</th>
       <td><p>A counts data frame normalized by CQN.</p></td>
+    </tr>
+    <tr>
+      <th>model_variables</th>
+      <td><p>Optional. Vector of variables to include in the linear (mixed) model.
+If not supplied, the model will include all variables in <code>md</code>.</p></td>
     </tr>
     <tr>
       <th>skip</th>
