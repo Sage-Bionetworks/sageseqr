@@ -1211,7 +1211,8 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
       ggplot2::aes(label = .data$label),
       family = "Lato",
       size = 4,
-      hjust = 0,
+      hjust = "inward",
+      vjust = "inward",
       na.rm = TRUE
     ) +
     ggplot2::xlab("Voom Normalized Log2 XIST Counts") +
@@ -1247,7 +1248,8 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
         ggplot2::aes(label = .data$label),
         family = "Lato",
         size = 4,
-        hjust = 0,
+        hjust = "inward",
+        vjust = "inward",
         na.rm = TRUE
       ) +
       ggplot2::xlab(
@@ -1298,7 +1300,8 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
         ggplot2::aes(label = .data$label),
         family = "Lato",
         size = 4,
-        hjust = 0,
+        hjust = "inward",
+        vjust = "inward",
         na.rm = TRUE
       ) +
       ggplot2::ylab(
