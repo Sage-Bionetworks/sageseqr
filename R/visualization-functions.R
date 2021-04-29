@@ -851,7 +851,7 @@ identify_outliers <- function(filtered_counts, clean_metadata,
     )
 
   p <- p + sagethemes::scale_color_sage_d() +
-    sagethemes::scale_fill_sage_c() +
+    sagethemes::theme_sage() +
     ggplot2::theme(legend.position = "right") +
     ggplot2::geom_text(
       ggplot2::aes(label = .data$label),
