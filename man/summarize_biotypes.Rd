@@ -9,7 +9,8 @@ summarize_biotypes(filtered_counts, biomart_results)
 \arguments{
 \item{filtered_counts}{A counts data frame with genes removed that have low expression.}
 
-\item{biomart_results}{Output of \code{"sageseqr::get_biomart()"}.}
+\item{biomart_results}{Output of \code{"sageseqr::get_biomart()"}. Gene Ids are
+stored as rownames.}
 }
 \description{
 Computes the fraction of genes of a particular biotype. The number of genes

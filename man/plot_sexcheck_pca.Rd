@@ -11,9 +11,10 @@ plot_sexcheck_pca(clean_metadata, count_df, biomart_results, sex_var)
 factors or numeric as determined by \code{"sageseqr::clean_covariates()"}.}
 
 \item{count_df}{A counts data frame with sample identifiers as column names
-and transcript Ids removed with \code{"sageseqr::convert_geneids"}.}
+and gene Ids are rownames.}
 
-\item{biomart_results}{Output of \code{"sageseqr::get_biomart()"}.}
+\item{biomart_results}{Output of \code{"sageseqr::get_biomart()"}. Gene Ids are
+stored as rownames.}
 
 \item{sex_var}{Column name of the sex or gender-specific metadata.}
 }

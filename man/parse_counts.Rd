@@ -8,7 +8,7 @@ parse_counts(count_df)
 }
 \arguments{
 \item{count_df}{A counts data frame with sample identifiers as column names
-and transcript Ids removed with \code{"sageseqr::convert_geneids"}.}
+and gene Ids are rownames.}
 }
 \description{
 The biomaRt query requires only gene identifiers to be passed as input. Some alignment

@@ -8,7 +8,7 @@ convert_geneids(count_df)
 }
 \arguments{
 \item{count_df}{A counts data frame with sample identifiers as column names
-and transcript Ids removed with \code{"sageseqr::convert_geneids"}.}
+and gene Ids are rownames.}
 }
 \description{
 Get gene Ids
