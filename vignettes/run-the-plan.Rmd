@@ -56,10 +56,10 @@ plan <- sageseqr::rnaseq_plan(
   skip_model = config::get("skip model"),
   parent_id = config::get("store output"),
   rownames = list(
-    config::get("counts")$`gene id`, 
     config::get("metadata")$`sample id`,
     config::get("counts")$`gene id`,
-    config::get("biomart results")$filters
+    config::get("biomart results")$filters,
+    config::get("counts")$`gene id`
     ),
   config_file = "config.yml"
 )
