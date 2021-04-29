@@ -1,5 +1,4 @@
 default:
-  analysis title: openSci
   counts:
     synID: syn22084837
     version:
@@ -27,5 +26,5 @@ default:
     shape: "batch"
     size: "ageofdeath"
   skip model: TRUE
-  report: "output-report"
+  report: "openSci"
   store output: syn23572479

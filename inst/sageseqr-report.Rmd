@@ -19,7 +19,7 @@ h1,h2,h3,h4,h5,h6{
 ```
 
 ```{r title, echo = FALSE}
-project <- config::get("analysis title")
+project <- config::get("report")
 ```
 ---
 title: `r project`
