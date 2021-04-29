@@ -51,9 +51,13 @@ x_var: A boxplot will visualize the distribution of continuous variables using
        the x_var as a dimension.
 conditions: Filtering low-expression genes is a common practice to improve
             sensitivity in detection of differentially expressed genes. Low
-            count genes that have less than 1 counts per million (cpm) in 50%
-            of the samples per the conditions provided here will be removed.
-            (e.g. ["diagnosis", "sex"])
+            count genes that have less than a user-defined threshold of counts 
+            per million (CPM) in a user-defined percentage of samples per the
+            conditions provided here will be removed. (e.g. ["diagnosis", "sex"])
+cpm threshold: The minium allowable CPM to keep a gene in the analysis.
+percent threshold: The percentage of samples that should contain the minimum number
+                   of CPM. If a condition is passed, the percentage will apply to 
+                   the samples in that sub-population. 
 sex check: The exact variable name that corresponds to reported gender or sex
            to check the distribution of x and y marker expression across
            samples.

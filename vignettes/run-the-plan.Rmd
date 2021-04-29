@@ -47,6 +47,8 @@ plan <- sageseqr::rnaseq_plan(
   host = config::get("biomart")$host,
   organism = config::get("biomart")$organism, 
   conditions = config::get("conditions"), 
+  cpm_threshold = config::get("cpm threshold"),
+  conditions_threshold = config::get("percent threshold"),
   x_var_for_plot = config::get("x_var"), 
   sex_var = config::get("sex check"), 
   color = config::get("dimensions")$color, 
