@@ -49,16 +49,29 @@ Visualize the distribution of data.
 drake::readd(boxplots)
 ```
 
-```{r boxplot_sex_chromosomes, results = "asis"}
+```{r boxplot_sex_chromosomes, results = "asis", fig.dim = c(5,5)}
 if (!is.null(config::get("sex check"))) {
   cat("Visualize gene expression of sex chromosomes using XIST 
       as a X-chromosome marker and UTY as a Y-chromosome marker.")
   drake::readd(sex_plot)$plot
+}
+```
+
+```{r sex_chromosome_pca, results = "asis",  fig.dim = c(10,5)}
+if (!is.null(config::get("sex check"))) {
    cat("Visualize gene expression across X and Y chromosomes by principal component analysis (PCA).")
    drake::readd(sex_plot_pca)$plot
 }
 ```
-Possible outliers, identified as 2 standard deviations from the mean of samples n split by `r config::get("sex check")`, are `r glue::glue_collapse(drake::readd(sex_plot_pca)$outliers, ", ", last = " and ")`.
+
+```{r outlier_list, results = "asis"}
+if (!is.null(drake::readd(sex_plot_pca)$outliers)) {
+  list <- glue::glue_collapse(drake::readd(sex_plot_pca)$outliers, ", ", last = " and ")
+  glue::glue("Possible outliers, identified as 2 standard deviations from the mean of samples n split by {config::get('sex check')} are {list}.")
+} else {
+  cat("No outliers identified.")
+}
+```
 
 Visualize the relationships between covariates.
 ```{r heatmap_covariates}
@@ -87,7 +100,7 @@ drake::readd(gene_coexpression)
 
 # Identify Outliers
 
-```{r plot_outliers}
+```{r plot_outliers,  fig.dim = c(5,5)}
 drake::readd(outliers)$plot
 ```
 Outliers, based on logCPM expression, are `r glue::glue_collapse(drake::readd(outliers)$outliers, ", ", last = " and ")`.

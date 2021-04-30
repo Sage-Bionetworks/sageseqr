@@ -20,6 +20,8 @@ default:
     sex-diagnosis interaction: ["diagnosis", "sex"]
     diagnosis: ["diagnosis"]
     sex: ["sex"]
+  cpm threshold: 1
+  percent threshold: 0.5
   sex check: sex
   dimensions:
     color: "diagnosis"
