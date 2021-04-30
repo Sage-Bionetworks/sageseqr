@@ -17,8 +17,6 @@ knitr::opts_chunk$set(
 A [configuration file](https://github.com/kelshmo/sageseqr/blob/master/config.yml) defines the inputs for the RNA-seq workflow. Update the default parameters to include the Synapse ID where your data is stored and to the factor and continuous variables you want to test in the covariate model selection. The full list of configurable options are:
 
 ```
-analysis title:   Required. The name of your project. This will become the name 
-                  of your output html file.
 counts:
   synID:          Required. Synapse ID to counts data frame with identifiers to 
                   the metadata as column names and gene ids in a column.
@@ -65,8 +63,9 @@ dimensions:       Required. Specify the PCA dimensions by variable name.
   color:
   shape:
   size:
-skip model:       Optional. If TRUE, the exploratory data report is run. Model selection and
+skip model:       Optional. If TRUE, the exploratory data report is run. Model selection
                   is not computed.
-report:           The output html report name.
+report:           Required. The name of your project. This will become the name of your 
+                  output html file.
 store output:     Required. Folder Synapse Id to store output on Synapse.
 ```
