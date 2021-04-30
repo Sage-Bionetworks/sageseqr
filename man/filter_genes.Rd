@@ -17,7 +17,7 @@ filter_genes(
 factors or numeric as determined by \code{"sageseqr::clean_covariates()"}.}
 
 \item{count_df}{A counts data frame with sample identifiers as column names
-and transcript Ids removed with \code{"sageseqr::convert_geneids"}.}
+and gene Ids are rownames.}
 
 \item{cpm_threshold}{The minimum number of CPM allowed.}
 

@@ -135,7 +135,7 @@ parse_counts <- function(count_df){
 #'as rownames.
 #'
 #'@param count_df A counts data frame with sample identifiers as column names
-#'and transcript Ids removed with \code{"sageseqr::convert_geneids"}.
+#'and gene Ids are rownames.
 #'@inheritParams get_data
 #'@param filters A character vector listing biomaRt query filters.
 #'(For a list of filters see \code{"biomaRt::listFilters()"})
@@ -247,7 +247,8 @@ get_biomart <- function(count_df, synid, version, host, filters, organism) {
 #'Count normalization requires Ensembl Ids to be unique. In rare cases, there are more
 #'than one HGNC symbol per gene Id. This function collapses the duplicate entries into
 #'a single entry by appending the HGNC symbols in a comma separated list.
-#'@param biomart_results Output of \code{"sageseqr::get_biomart()"}.
+#'@param biomart_results Output of \code{"sageseqr::get_biomart()"}. Gene Ids are
+#'stored as rownames.
 #'@importFrom rlang .data
 #'
 #'@export

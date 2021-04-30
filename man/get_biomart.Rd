@@ -8,7 +8,7 @@ get_biomart(count_df, synid, version, host, filters, organism)
 }
 \arguments{
 \item{count_df}{A counts data frame with sample identifiers as column names
-and transcript Ids removed with \code{"sageseqr::convert_geneids"}.}
+and gene Ids are rownames.}
 
 \item{synid}{A character vector with a Synapse Id.}
 

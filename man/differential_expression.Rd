@@ -23,7 +23,8 @@ differential_expression(
 \item{primary_variable}{Vector of variables that will be collapsed into a single
 fixed effect interaction term.}
 
-\item{biomart_results}{Output of \code{"sageseqr::get_biomart()"}.}
+\item{biomart_results}{Output of \code{"sageseqr::get_biomart()"}. Gene Ids are
+stored as rownames.}
 
 \item{model_variables}{Optional. Vector of variables to include in the linear (mixed) model.
 If not supplied, the model will include all variables in \code{md}.}
