@@ -86,7 +86,7 @@ corrplot::corrplot(correlation_input, col = col2(200), tl.col = "#000000")
 
 # Filter Genes
 
-Remove genes that have less than 1 counts per million (CPM) in at least 50% of samples per specified condition.
+Remove genes that have less than `r config::get("cpm threshold")` counts per million (CPM) in at least `r config::get("percent threshold")` of samples per specified condition.
 
 `r dim(drake::readd(filtered_counts))[1]` genes are used in this analysis.
 ```{r filter_genes}
@@ -100,7 +100,7 @@ drake::readd(gene_coexpression)
 
 # Identify Outliers
 
-```{r plot_outliers,  fig.dim = c(5,5)}
+```{r plot_outliers}
 drake::readd(outliers)$plot
 ```
 Outliers, based on logCPM expression, are `r glue::glue_collapse(drake::readd(outliers)$outliers, ", ", last = " and ")`.
