@@ -4,7 +4,12 @@
 \alias{build_formula}
 \title{Formula Builder}
 \usage{
-build_formula(md, primary_variable, model_variables = names(md))
+build_formula(
+  md,
+  primary_variable,
+  model_variables = NULL,
+  exclude_variables = NULL
+)
 }
 \arguments{
 \item{md}{A data frame with sample identifiers in a column and relevant experimental covariates.}
@@ -14,6 +19,8 @@ fixed effect interaction term.}
 
 \item{model_variables}{Optional. Vector of variables to include in the linear (mixed) model.
 If not supplied, the model will include all variables in \code{md}.}
+
+\item{exclude_variables}{Vector of variables to exclude from testing.}
 }
 \description{
 If a linear mixed model is used, all categorical variables must be

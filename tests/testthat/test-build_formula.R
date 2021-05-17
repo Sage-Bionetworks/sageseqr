@@ -10,13 +10,24 @@ metadata <- data.frame(
 output <- build_formula(
   metadata,
   primary_variable = "diagnosis",
-  model_variables = c("batch")
+  model_variables = "batch"
 )
 
 test_that("output data frame subset to primary and model variables.", {
-  expect_equal(colnames(output$metadata), c("diagnosis", "batch"))
+  expect_vector(colnames(output$metadata), c("diagnosis", "batch"))
 })
 
 test_that("output is formula.",{
   expect_equal(class(output$formula), "formula")
+})
+
+test_that("error if variables are both included and excluded",{
+  expect_error(
+    build_formula(
+      metadata,
+      primary_variable = "diagnosis",
+      model_variables = "batch",
+      exclude_variables = "batch"
+      )
+    )
 })
