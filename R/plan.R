@@ -19,7 +19,8 @@
 #' present in the metadata as column names.
 #' @param biomart_id Synapse ID to biomart object.
 #' @param biomart_version Optionally, include Synapse file version number.
-#' @param x_var_for_plot Variable to separate groups for boxplot.
+#' @param primary_variable Baseline variable for model selection and variable to
+#'  stratify groups in the boxplot.
 #' @param report_name Name of output markdown file.
 #' @inheritParams plot_sexcheck
 #' @inheritParams get_biomart
@@ -35,7 +36,7 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                         biomart_id, biomart_version, host, filters,
                         organism, conditions, cpm_threshold = 1,
                         conditions_threshold = 0.5,
-                        x_var_for_plot, sex_var, color, shape, size,
+                        primary_variable, sex_var, color, shape, size,
                         report_name, skip_model, parent_id,
                         rownames, config_file) {
   # Copies markdown to user's working directory
@@ -72,7 +73,7 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
     gene_coexpression = plot_coexpression(cqn_counts),
     boxplots = boxplot_vars(md = clean_md,
                             include_vars = !!continuous_input,
-                            x_var = !!x_var_for_plot),
+                            x_var = !!primary_variable),
     sex_plot = conditional_plot_sexcheck(clean_md,
                                          counts,
                                          biomart_results,
@@ -89,7 +90,7 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                                  !!size),
      model = stepwise_regression(
        clean_md,
-       primary_variable = !!x_var_for_plot,
+       primary_variable = !!primary_variable,
        cqn_counts = cqn_counts,
        skip = !!skip_model
         ),
