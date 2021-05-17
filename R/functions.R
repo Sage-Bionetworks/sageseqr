@@ -461,6 +461,9 @@ build_formula <- function(md, primary_variable, model_variables = names(md)) {
                              glue::glue_collapse(formula, sep = "+")
                              )
                   ),
+                formula_base_model = formula(
+                  glue::glue("~ {interaction_term}")
+                  ),
                 primary_variable = interaction_term,
                 variables = unlist(formula)
   )
@@ -589,7 +592,7 @@ stepwise_regression <- function(md, primary_variable, cqn_counts,
   } else {
   metadata_input <- build_formula(md, primary_variable, model_variables)
   model <- mvIC::mvForwardStepwise(exprObj = cqn_counts$E,
-                                   baseFormula = metadata_input$formula,
+                                   baseFormula = metadata_input$formula_base_model,
                                    data = metadata_input$metadata,
                                    variables = array(metadata_input$variables)
   )
