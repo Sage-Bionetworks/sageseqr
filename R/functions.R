@@ -611,11 +611,11 @@ stepwise_regression <- function(md, primary_variable, cqn_counts,
 
   to_visualize <- model$trace %>%
     dplyr::select(.data$iter, .data$variable, .data$delta,
-                  .data$score, .data$isAdded, .data$m) %>%
+                  .data$score, .data$isBest, .data$isAdded, .data$m) %>%
     dplyr::rename(iteration = .data$iter,
                   `best (tested against baseline)` = .data$isBest,
                   `added to model` = .data$isAdded,
-                  `(effective) number of parameters estimated` = m
+                  `(effective) number of parameters estimated` = .data$m
                   )
   to_include <- model$trace$variable[model$trace$isAdded == "yes"]
 
