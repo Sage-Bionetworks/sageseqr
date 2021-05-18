@@ -610,14 +610,17 @@ stepwise_regression <- function(md, primary_variable, cqn_counts,
   )
 
   to_visualize <- model$trace %>%
-    dplyr::select(.data$iter, .data$variable, .data$isAdded) %>%
+    dplyr::select(.data$iter, .data$variable, .data$delta,
+                  .data$score, .data$isAdded) %>%
     dplyr::rename(iteration = .data$iter,
-                  `added to model` = .data$isAdded) %>%
-    dplyr::filter(.data$`added to model` == "yes")
+                  `added to model` = .data$isAdded
+                  )
+  to_include <- model$trace$variable[model$trace$isAdded == "yes"]
 
   output <- list(
     to_visualize = to_visualize,
-    formula = model$formula
+    formula = model$formula,
+    variables_in_model = to_include
   )
 
   return(output)
