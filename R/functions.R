@@ -476,9 +476,7 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
                 formula_base_model = formula(
                   glue::glue("~ {interaction_term}")
                   ),
-                primary_variable = list(
-                  interaction_term = interaction_term,
-                  variables = primary_variable),
+                primary_variable = interaction_term,
                 variables = unlist(formula)
   )
 
@@ -596,6 +594,8 @@ wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
 #' @inheritParams build_formula
 #' @param skip Defaults to NULL. If TRUE, this step will be skipped in the
 #' Drake plan.
+#' @return Table with BIC criteria for exclusion or inclusion of variables in
+#' the model, linear (mixed) model formula and vector of variables to include.
 #' @export
 stepwise_regression <- function(md, primary_variable, cqn_counts,
                                 model_variables = names(md),
@@ -619,7 +619,12 @@ stepwise_regression <- function(md, primary_variable, cqn_counts,
                   `added to model` = .data$isAdded,
                   `(effective) number of parameters estimated` = .data$m
                   )
-  to_include <- model$trace$variable[model$trace$isAdded == "yes"]
+
+  # return vector of variables that map to the metadata columns. This requires
+  # some cleaning of extraneous characters. Do not include primary variable(s)
+
+  to_include <- model$trace$variable[model$trace$isAdded == "yes" & model$trace$iter != 0]
+  to_include <- gsub("\\)|\\(1\\||scale\\(", "", to_include)
 
   output <- list(
     to_visualize = to_visualize,
