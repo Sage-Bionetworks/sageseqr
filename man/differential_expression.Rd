@@ -10,7 +10,8 @@ differential_expression(
   md,
   primary_variable,
   biomart_results,
-  formula
+  model_variables = NULL,
+  exclude_variables = NULL
 )
 }
 \arguments{
@@ -26,7 +27,10 @@ fixed effect interaction term.}
 \item{biomart_results}{Output of \code{"sageseqr::get_biomart()"}. Gene Ids are
 stored as rownames.}
 
-\item{formula}{Specifies variables for the linear (mixed) model.}
+\item{model_variables}{Optional. Vector of variables to include in the linear (mixed) model.
+If not supplied, the model will include all variables in \code{md}.}
+
+\item{exclude_variables}{Vector of variables to exclude from testing.}
 }
 \description{
 Differential expression testing is performed with \code{"variancePartition::dream()"} to increase power

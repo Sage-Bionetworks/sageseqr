@@ -22,6 +22,7 @@ rnaseq_plan(
   cpm_threshold = 1,
   conditions_threshold = 0.5,
   primary_variable,
+  de_contrasts,
   sex_var,
   color,
   shape,
@@ -79,6 +80,8 @@ variables in `md`.}
 
 \item{primary_variable}{Baseline variable for model selection and variable to
 stratify groups in the boxplot.}
+
+\item{de_contrasts}{A list of variables to specify which groups to compare.}
 
 \item{sex_var}{Column name of the sex or gender-specific metadata.}
 
