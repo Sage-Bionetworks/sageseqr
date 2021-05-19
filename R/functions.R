@@ -498,7 +498,8 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
 #' @inheritParams cqn
 #' @export
 differential_expression <- function(filtered_counts, cqn_counts, md, primary_variable,
-                                    biomart_results, model_variables = NULL) {
+                                    biomart_results, model_variables = NULL,
+                                    exclude_variables = NULL) {
   metadata_input <- build_formula(md, primary_variable, model_variables)
   gene_expression <- edgeR::DGEList(filtered_counts)
   gene_expression <- edgeR::calcNormFactors(gene_expression)

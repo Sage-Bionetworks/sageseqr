@@ -22,6 +22,7 @@
 #' @param primary_variable Baseline variable for model selection and variable to
 #'  stratify groups in the boxplot.
 #' @param report_name Name of output markdown file.
+#' @param de_contrasts A list of variables to specify which groups to compare.
 #' @inheritParams plot_sexcheck
 #' @inheritParams get_biomart
 #' @inheritParams filter_genes
@@ -36,7 +37,7 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                         biomart_id, biomart_version, host, filters,
                         organism, conditions, cpm_threshold = 1,
                         conditions_threshold = 0.5,
-                        primary_variable, sex_var, color, shape, size,
+                        primary_variable, de_contrasts, sex_var, color, shape, size,
                         report_name, skip_model, parent_id,
                         rownames, config_file) {
   # Copies markdown to user's working directory
@@ -94,6 +95,14 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
        cqn_counts = cqn_counts,
        skip = !!skip_model
         ),
+    de = wrap_de(
+      conditions = !!de_contrasts,
+      filtered_counts = filtered_counts,
+      cqn_counts = cqn_counts,
+      md = clean_md,
+      biomart_results = biomart_results,
+      model_variables = model$variables_in_model
+    ),
     report = rmarkdown::render(
       drake::knitr_in("sageseqr-report.Rmd"),
       output_file = drake::file_out(
