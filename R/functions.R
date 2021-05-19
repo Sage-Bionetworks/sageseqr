@@ -438,7 +438,7 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
   # Update metadata to reflect variable subset
 
   # Variables of factor or numeric class are required
-  col_type <- dplyr::select(md, -primary_variable) %>%
+  col_type <- dplyr::select(md, -dplyr::all_of(primary_variable)) %>%
     dplyr::summarise_all(class) %>%
     tidyr::pivot_longer(tidyr::everything(), names_to = "variable", values_to = "class")
 
@@ -476,7 +476,9 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
                 formula_base_model = formula(
                   glue::glue("~ {interaction_term}")
                   ),
-                primary_variable = interaction_term,
+                primary_variable = list(
+                  interaction_term = interaction_term,
+                  variables = primary_variable),
                 variables = unlist(formula)
   )
 
