@@ -58,7 +58,7 @@ plan <- sageseqr::rnaseq_plan(
   rownames = list(
     config::get("metadata")$`sample id`,
     config::get("counts")$`gene id`,
-    config::get("biomart results")$filters,
+    config::get("biomart")$filters,
     config::get("counts")$`gene id`
     ),
   config_file = "config.yml"
