@@ -98,7 +98,7 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
     de = wrap_de(
       conditions = !!de_contrasts,
       filtered_counts = filtered_counts,
-      cqn_counts = cqn_counts,
+      cqn_counts = cqn_counts$E,
       md = clean_md,
       biomart_results = biomart_results,
       model_variables = model$variables_in_model
