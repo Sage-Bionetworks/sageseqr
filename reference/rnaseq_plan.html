@@ -151,7 +151,7 @@ report to the user's working directory.</p>
   <span class='va'>conditions</span>,
   cpm_threshold <span class='op'>=</span> <span class='fl'>1</span>,
   conditions_threshold <span class='op'>=</span> <span class='fl'>0.5</span>,
-  <span class='va'>x_var_for_plot</span>,
+  <span class='va'>primary_variable</span>,
   <span class='va'>sex_var</span>,
   <span class='va'>color</span>,
   <span class='va'>shape</span>,
@@ -242,8 +242,9 @@ variables in `md`.</p></td>
       <td><p>Percentage of samples that should contain the minimum CPM.</p></td>
     </tr>
     <tr>
-      <th>x_var_for_plot</th>
-      <td><p>Variable to separate groups for boxplot.</p></td>
+      <th>primary_variable</th>
+      <td><p>Baseline variable for model selection and variable to
+stratify groups in the boxplot.</p></td>
     </tr>
     <tr>
       <th>sex_var</th>

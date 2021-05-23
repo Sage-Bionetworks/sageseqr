@@ -140,7 +140,12 @@ effect. Additionally, variables are scaled to account for
 multiple variables that might have an order of magnitude difference.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>build_formula</span><span class='op'>(</span><span class='va'>md</span>, <span class='va'>primary_variable</span>, model_variables <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span><span class='op'>(</span><span class='va'>md</span><span class='op'>)</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>build_formula</span><span class='op'>(</span>
+  <span class='va'>md</span>,
+  <span class='va'>primary_variable</span>,
+  model_variables <span class='op'>=</span> <span class='cn'>NULL</span>,
+  exclude_variables <span class='op'>=</span> <span class='cn'>NULL</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -158,6 +163,10 @@ fixed effect interaction term.</p></td>
       <th>model_variables</th>
       <td><p>Optional. Vector of variables to include in the linear (mixed) model.
 If not supplied, the model will include all variables in <code>md</code>.</p></td>
+    </tr>
+    <tr>
+      <th>exclude_variables</th>
+      <td><p>Vector of variables to exclude from testing.</p></td>
     </tr>
     </table>
 
