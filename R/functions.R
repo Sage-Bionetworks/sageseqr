@@ -415,15 +415,27 @@ mclust::mclustBIC
 #' If not supplied, the model will include all variables in \code{md}.
 #' @param primary_variable Vector of variables that will be collapsed into a single
 #' fixed effect interaction term.
+#' @param exclude_variables Vector of variables to exclude from testing.
 #' @inheritParams coerce_factors
 #' @export
-build_formula <- function(md, primary_variable, model_variables = names(md)) {
-
+build_formula <- function(md, primary_variable, model_variables = NULL,
+                          exclude_variables = NULL) {
   if (!(all(purrr::map_lgl(md, function(x) inherits(x, c("numeric", "factor")))))) {
     stop("Use sageseqr::clean_covariates() to coerce variables into factor and numeric types.")
   }
+
+  if (!is.null(model_variables)) {
+    md <- dplyr::select(md, dplyr::all_of(c(model_variables, primary_variable)))
+  }
+
+  if (!is.null(exclude_variables)) {
+    if (exclude_variables %in% colnames(md)) {
+      stop("exclude_variables and model_variables are the same.")
+    }
+    md <- dplyr::select(md, -dplyr::all_of(exclude_variables))
+  }
+
   # Update metadata to reflect variable subset
-  md <- dplyr::select(md, dplyr::all_of(c(model_variables, primary_variable)))
 
   # Variables of factor or numeric class are required
   col_type <- dplyr::select(md, -primary_variable) %>%
@@ -460,6 +472,9 @@ build_formula <- function(md, primary_variable, model_variables = names(md)) {
                   glue::glue("~ 0+{interaction_term}+",
                              glue::glue_collapse(formula, sep = "+")
                              )
+                  ),
+                formula_base_model = formula(
+                  glue::glue("~ {interaction_term}")
                   ),
                 primary_variable = interaction_term,
                 variables = unlist(formula)
@@ -589,20 +604,25 @@ stepwise_regression <- function(md, primary_variable, cqn_counts,
   } else {
   metadata_input <- build_formula(md, primary_variable, model_variables)
   model <- mvIC::mvForwardStepwise(exprObj = cqn_counts$E,
-                                   baseFormula = metadata_input$formula,
+                                   baseFormula = metadata_input$formula_base_model,
                                    data = metadata_input$metadata,
                                    variables = array(metadata_input$variables)
   )
 
   to_visualize <- model$trace %>%
-    dplyr::select(.data$iter, .data$variable, .data$isAdded) %>%
+    dplyr::select(.data$iter, .data$variable, .data$delta,
+                  .data$score, .data$isBest, .data$isAdded, .data$m) %>%
     dplyr::rename(iteration = .data$iter,
-                  `added to model` = .data$isAdded) %>%
-    dplyr::filter(.data$`added to model` == "yes")
+                  `best (tested against baseline)` = .data$isBest,
+                  `added to model` = .data$isAdded,
+                  `(effective) number of parameters estimated` = .data$m
+                  )
+  to_include <- model$trace$variable[model$trace$isAdded == "yes"]
 
   output <- list(
     to_visualize = to_visualize,
-    formula = model$formula
+    formula = model$formula,
+    variables_in_model = to_include
   )
 
   return(output)

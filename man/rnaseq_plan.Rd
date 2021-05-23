@@ -21,7 +21,7 @@ rnaseq_plan(
   conditions,
   cpm_threshold = 1,
   conditions_threshold = 0.5,
-  x_var_for_plot,
+  primary_variable,
   sex_var,
   color,
   shape,
@@ -77,7 +77,8 @@ variables in `md`.}
 
 \item{conditions_threshold}{Percentage of samples that should contain the minimum CPM.}
 
-\item{x_var_for_plot}{Variable to separate groups for boxplot.}
+\item{primary_variable}{Baseline variable for model selection and variable to
+stratify groups in the boxplot.}
 
 \item{sex_var}{Column name of the sex or gender-specific metadata.}
 
