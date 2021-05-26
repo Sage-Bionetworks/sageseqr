@@ -23,6 +23,8 @@ rnaseq_plan(
   conditions_threshold = 0.5,
   primary_variable,
   de_contrasts,
+  log_fold_threshold,
+  p_value_threshold,
   sex_var,
   color,
   shape,
@@ -82,6 +84,13 @@ variables in `md`.}
 stratify groups in the boxplot.}
 
 \item{de_contrasts}{A list of variables to specify which groups to compare.}
+
+\item{log_fold_threshold}{Numeric. Significant genes are those with a log
+fold-change greater than this threshold}
+
+\item{p_value_threshold}{Numeric. P-values are adjusted by Benjamini and
+Hochberg (BH) false discovery rate (FDR). Significant genes are those with an
+adjusted p-value greater than this threshold.}
 
 \item{sex_var}{Column name of the sex or gender-specific metadata.}
 

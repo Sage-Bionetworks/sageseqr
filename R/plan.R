@@ -29,6 +29,7 @@
 #' @inheritParams identify_outliers
 #' @inheritParams store_results
 #' @inheritParams prepare_results
+#' @inheritParams differential_expression
 #' @param skip_model If TRUE, does not run regression model.
 #' @export
 rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
@@ -37,7 +38,8 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                         biomart_id, biomart_version, host, filters,
                         organism, conditions, cpm_threshold = 1,
                         conditions_threshold = 0.5,
-                        primary_variable, de_contrasts, sex_var, color, shape, size,
+                        primary_variable, de_contrasts, log_fold_threshold,
+                        p_value_threshold, sex_var, color, shape, size,
                         report_name, skip_model, parent_id,
                         rownames, config_file) {
   # Copies markdown to user's working directory
@@ -101,6 +103,8 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
       cqn_counts = cqn_counts$E,
       md = clean_md,
       biomart_results = biomart_results,
+      p_value_threshold = !!p_value_threshold,
+      log_fold_threshold = !!log_fold_threshold,
       model_variables = model$variables_in_model
     ),
     report = rmarkdown::render(

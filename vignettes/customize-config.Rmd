@@ -65,6 +65,10 @@ dimensions:       Required. Specify the PCA dimensions by variable name.
   size:
 skip model:       Optional. If TRUE, the exploratory data report is run. Model selection
                   is not computed.
+de log2FC:        The fold-change (FC) (absolute value of log2 ratio) of significant 
+                  differentially expressed (de) genes must exceed this value.
+de p-value threshold: The adjusted p-value of significant differentially expressed 
+                  (de) genes must exceed this value.
 de:
                   Required. 
 report:           Required. The name of your project. This will become the name of your 

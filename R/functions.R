@@ -492,13 +492,20 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
 #' effect. If you wish to test an interaction term, `primary_variable` can take multiple variable names.
 #'
 #' @param cqn_counts A counts data frame normalized by CQN.
+#' @param p_value_threshold Numeric. P-values are adjusted by Benjamini and
+#' Hochberg (BH) false discovery rate (FDR). Significant genes are those with an
+#' adjusted p-value greater than this threshold.
+#' @param log_fold_threshold Numeric. Significant genes are those with a log
+#' fold-change greater than this threshold
 #' @inheritParams cqn
 #' @inheritParams coerce_factors
 #' @inheritParams build_formula
 #' @inheritParams cqn
 #' @export
-differential_expression <- function(filtered_counts, cqn_counts, md, primary_variable,
-                                    biomart_results, model_variables = NULL,
+differential_expression <- function(filtered_counts, cqn_counts, md,
+                                    primary_variable, biomart_results,
+                                    p_value_threshold, log_fold_threshold,
+                                    model_variables = NULL,
                                     exclude_variables = NULL) {
   metadata_input <- build_formula(md, primary_variable, model_variables)
   gene_expression <- edgeR::DGEList(filtered_counts)
@@ -550,7 +557,7 @@ differential_expression <- function(filtered_counts, cqn_counts, md, primary_var
     dplyr::mutate(Comparison = gsub(metadata_input$primary_variable, "", .data$Comparison),
                   Direction = .data$logFC/abs(.data$logFC),
                   Direction = factor(.data$Direction, c(-1,1), c("-1" = "down", "1" = "up")),
-                  Direction = ifelse(.data$`adj.P.Val` > 0.5 | abs(.data$logFC) < log2(1.2),
+                  Direction = ifelse(.data$`adj.P.Val` > p_value_threshold | abs(.data$logFC) < log2(log_fold_threshold),
                                      "none",
                                      .data$Direction),
                   Direction = as.character(.data$Direction)
@@ -580,10 +587,21 @@ differential_expression <- function(filtered_counts, cqn_counts, md, primary_var
 #' @inheritParams build_formula
 #' @export
 wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
-                    biomart_results, model_variables = names(md)) {
-  purrr::map(conditions,
-             function(x) differential_expression(filtered_counts, cqn_counts, md, primary_variable = x,
-                                                 biomart_results, model_variables))
+                    biomart_results, p_value_threshold, log_fold_threshold,
+                    model_variables = names(md)) {
+  purrr::map(
+    conditions,
+    function(x) differential_expression(
+      filtered_counts,
+      cqn_counts,
+      md,
+      primary_variable = x,
+      biomart_results,
+      p_value_threshold,
+      log_fold_threshold,
+      model_variables
+      )
+    )
 
 }
 #' Stepwise Regression
