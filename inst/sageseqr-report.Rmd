@@ -112,7 +112,7 @@ Significant covariates are identified by the pearson correlation (p-value of 1%)
 ```{r pca_and_significant_covariates}
 drake::readd(
   significant_covariates_plot
-  )$plot
+  )$pc_results
 ```
 
 ```{r model}
