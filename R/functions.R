@@ -507,6 +507,10 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
                                     p_value_threshold, log_fold_threshold,
                                     model_variables = NULL,
                                     exclude_variables = NULL) {
+  # force order of samples in metadata to match order of samples in counts.
+  # Required by variancePartition
+  md <- md[match(colnames(filtered_counts),rownames(md)),]
+
   metadata_input <- build_formula(md, primary_variable, model_variables)
   gene_expression <- edgeR::DGEList(filtered_counts)
   gene_expression <- edgeR::calcNormFactors(gene_expression)
