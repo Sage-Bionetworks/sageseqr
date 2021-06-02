@@ -560,11 +560,11 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
   de <- data.table::rbindlist(de, idcol = "Comparison") %>%
     dplyr::mutate(Comparison = gsub(metadata_input$primary_variable, "", .data$Comparison),
                   Direction = .data$logFC/abs(.data$logFC),
-                  Direction = factor(.data$Direction, c(-1,1), c("-1" = "down", "1" = "up")),
+                  Direction = ifelse(.data$Direction == -1,"down", Direction),
+                  Direction = ifelse(.data$Direction == 1, "up", Direction),
                   Direction = ifelse(.data$`adj.P.Val` > p_value_threshold | abs(.data$logFC) < log2(log_fold_threshold),
                                      "none",
-                                     .data$Direction),
-                  Direction = as.character(.data$Direction)
+                                     .data$Direction)
     )
 
   # Join metadata from biomart to differential expression results
