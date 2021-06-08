@@ -16,7 +16,7 @@ wrap_de(
 )
 }
 \arguments{
-\item{conditions}{A list of conditions to test as `primary_variable`
+\item{conditions}{A named list of conditions to test as `primary_variable`
 in \code{"sagseqr::differential_expression()"}.}
 
 \item{filtered_counts}{A counts data frame with genes removed that have low expression.}
