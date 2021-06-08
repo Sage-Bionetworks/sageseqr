@@ -36,6 +36,10 @@ biomart. Defaults to target name constrained by
 (CQN) counts. Defaults to target name constrained by
 \code{"sageseqr::rnaseq_plan()"}.}
 
+\item{de_results}{The drake target containing differential expression gene
+lists. Defaults to target name constrained by
+\code{"sageseqr::rnaseq_plan()"}.}
+
 \item{syn_names}{A list of human-readable names for the Synapse entities
 ordered
 by `metadata`, `filtered_counts`, `biomart_results`, `cqn_counts`.}
