@@ -585,7 +585,7 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
 #'
 #' This function will pass multiple conditions to test to \code{"sagseqr::differential_expression()"}.
 #'
-#' @param conditions A list of conditions to test as `primary_variable`
+#' @param conditions A named list of conditions to test as `primary_variable`
 #' in \code{"sagseqr::differential_expression()"}.
 #' @inheritParams differential_expression
 #' @inheritParams build_formula
@@ -606,7 +606,6 @@ wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
       model_variables
       )
     )
-
 }
 #' Stepwise Regression
 #'
@@ -734,6 +733,7 @@ store_results <- function(clean_md = clean_md,
                           filtered_counts = filtered_counts,
                           biomart_results = biomart_results,
                           cqn_counts = cqn_counts$counts,
+                          de_results = de,
                           syn_names, data_names,
                           parent_id, inputs, activity_provenance,
                           rownames = NULL, config_file = NULL,
@@ -748,6 +748,9 @@ store_results <- function(clean_md = clean_md,
   # nest drake targets in a list. Every time a new target is to-be stored, it
   # must be added as an argument to this function and then added to this list.
   targets <- list(clean_md, filtered_counts, biomart_results, cqn_counts)
+
+  # append differential expression data frames already nested in list
+  targets <- append(targets, de_results)
 
   mash <- list(
     target = targets,
