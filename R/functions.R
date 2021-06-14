@@ -560,8 +560,8 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
   de <- data.table::rbindlist(de, idcol = "Comparison") %>%
     dplyr::mutate(Comparison = gsub(metadata_input$primary_variable, "", .data$Comparison),
                   Direction = .data$logFC/abs(.data$logFC),
-                  Direction = ifelse(.data$Direction == -1,"down", Direction),
-                  Direction = ifelse(.data$Direction == 1, "up", Direction),
+                  Direction = ifelse(.data$Direction == -1,"down", .data$Direction),
+                  Direction = ifelse(.data$Direction == 1, "up", .data$Direction),
                   Direction = ifelse(.data$`adj.P.Val` > p_value_threshold | abs(.data$logFC) < log2(log_fold_threshold),
                                      "none",
                                      .data$Direction)
@@ -713,6 +713,9 @@ prepare_results <- function(target, data_name, rowname = NULL) {
 #'  \code{"sageseqr::rnaseq_plan()"}.
 #' @param biomart_results The drake target containing gene annotations from
 #' biomart. Defaults to target name constrained by
+#' \code{"sageseqr::rnaseq_plan()"}.
+#' @param de_results The drake target containing differential expression gene
+#' lists. Defaults to target name constrained by
 #' \code{"sageseqr::rnaseq_plan()"}.
 #' @param rownames A list of variables to store rownames ordered by `metadata`,
 #' `filtered_counts`, `biomart_results`, `cqn_counts`. If not applicable,
