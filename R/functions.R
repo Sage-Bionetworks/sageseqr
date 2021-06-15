@@ -228,7 +228,6 @@ get_biomart <- function(count_df, synid, version, host, filters, organism) {
 
     # Gene metadata required for count CQN
     required_variables <- c("gene_length", "percentage_gene_gc_content")
-
     if (!all(required_variables %in% colnames(biomart_results))) {
       vars <- glue::glue_collapse(
         setdiff(required_variables, colnames(biomart_results)),
@@ -316,7 +315,6 @@ filter_genes <- function(clean_metadata, count_df,
 
   # Convert transcript Ids to gene Ids in counts with convert_geneids()
   rownames(processed_counts) <- convert_geneids(processed_counts)
-
   processed_counts
 }
 #' Filter genes with low expression
