@@ -20,56 +20,40 @@ knitr::opts_chunk$set(
 2. Specify the active configuration by setting `R_CONFIG_ACTIVE`.
 
 ```{r config-setup}
-Sys.setenv(R_CONFIG_ACTIVE = "default")
+profile_set <- "default"
+Sys.setenv(R_CONFIG_ACTIVE = profile_set)
 ```
 
 3. Load the `sageseqr` library and login to [Synapse](https://www.synapse.org/). `rnaseq_plan()` calls the arguments from the config file and creates the `drake` plan. Execute `drake::make(plan)` to compute. Run this code from your project root.
 
 ```{r run-plan}
 library(sageseqr)
-
 # Login to Synapse. Make a Synapse account and use synapser to login: https://r-docs.synapse.org/articles/manageSynapseCredentials.html
 synapser::synLogin()
 
 # Run the analysis
-plan <- sageseqr::rnaseq_plan(
-  metadata_id = config::get("metadata")$synID,
-  metadata_version = config::get("metadata")$version,
-  counts_id = config::get("counts")$synID,
-  counts_version = config::get("counts")$version,
-  gene_id_input = config::get("counts")$`gene id`,
-  sample_id_input = config::get("metadata")$`sample id`,
-  factor_input = config::get("factors"),
-  continuous_input = config::get("continuous"),
-  biomart_id = config::get("biomart")$synID,
-  biomart_version = config::get("biomart")$version,
-  filters = config::get("biomart")$filters,
-  host = config::get("biomart")$host,
-  organism = config::get("biomart")$organism, 
-  conditions = config::get("conditions"), 
-  cpm_threshold = config::get("cpm threshold"),
-  conditions_threshold = config::get("percent threshold"),
-  x_var_for_plot = config::get("x_var"), 
-  sex_var = config::get("sex check"), 
-  color = config::get("dimensions")$color, 
-  shape = config::get("dimensions")$shape,
-  size = config::get("dimensions")$size,
-  report_name = config::get("report"),
-  skip_model = config::get("skip model"),
-  parent_id = config::get("store output"),
-  rownames = list(
-    config::get("metadata")$`sample id`,
-    config::get("counts")$`gene id`,
-    config::get("biomart")$filters,
-    config::get("counts")$`gene id`
-    ),
-  config_file = "config.yml"
+replace_command <- paste('system( "sed ',
+                         paste0('s/INSERT_CONFIG_PROFILE_HERE/',
+                                profile_set,
+                                "/g"
+                                ),
+                         " ../_targets_template.R > ../_targets.R\")",
+                         sep = "'"
+                        )
+
+eval(parse( text=  
+     glue::glue(replace_command)
+ )
 )
 
-drake::make(
-  plan,
-  envir = getNamespace("sageseqr")
-    )
+setwd('../')
+targets::tar_manifest(fields="command")
+targets::tar_glimpse()
+
+#drake::make(
+#  plan,
+#  envir = getNamespace("sageseqr")
+#    )
 ```
 
 4. Visualize the results of your work. 

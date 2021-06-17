@@ -1,4 +1,3 @@
-
 #'Detect file type and download data
 #'
 #'This function takes synIds and version number to download any
