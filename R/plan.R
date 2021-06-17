@@ -47,29 +47,29 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
 
   #drake::drake_plan(
   list(
-    targets::tar_manifest(
+    targets::tar_target(
       import_metadata, 
       get_data(!!metadata_id,
                !!metadata_version)
     ),
-    targets::tar_manifest(
+    targets::tar_target(
       import_counts,
       get_data(!!counts_id,
                !!counts_version)
     ),
-    targets::tar_manifest(
+    targets::tar_target(
       counts,
       tibble::column_to_rownames(import_counts,
                                         var = !!gene_id_input)
     ),
-    targets::tar_manifest(
+    targets::tar_target(
       clean_md,
       clean_covariates(md = import_metadata,
                                 factors = !!factor_input,
                                 continuous = !!continuous_input,
                                 sample_identifier = !!sample_id_input)
     ),
-    targets::tar_manifest(
+    targets::tar_target(
       biomart_results,
       get_biomart(count_df = counts,
                                 synid = !!biomart_id,
@@ -78,7 +78,7 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                                 host = !!host,
                                 organism = !!organism)
     ),
-    targets::tar_manifest(
+    targets::tar_target(
       filtered_counts,
       filter_genes(clean_metadata = clean_md,
                                    count_df = counts,
@@ -86,52 +86,52 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                                    cpm_threshold = !!cpm_threshold,
                                    conditions_threshold = !!conditions_threshold)
     ),
-    targets::tar_manifest(
+    targets::tar_target(
       biotypes,
       summarize_biotypes(filtered_counts, biomart_results)
     ),
-    targets::tar_manifest(
+    targets::tar_target(
       cqn_counts,
       cqn(filtered_counts, biomart_results)
     ),
-    targets::tar_manifest(
+    targets::tar_target(
       gene_coexpression,
       plot_coexpression(cqn_counts)
     ),
     
-    targets::tar_manifest(
+    targets::tar_target(
       boxplots,
       boxplot_vars(md = clean_md,
                             include_vars = !!continuous_input,
                             x_var = !!primary_variable)
     ),
-    targets::tar_manifest(
+    targets::tar_target(
       sex_plot,
       conditional_plot_sexcheck(clean_md,
                                          counts,
                                          biomart_results,
                                          !!sex_var)
     ),
-    targets::tar_manifest(sex_plot_pca,
+    targets::tar_target(sex_plot_pca,
                           plot_sexcheck_pca(
                             clean_md,
                             counts,
                             biomart_results,
                             !!sex_var)
     ),                    
-    targets::tar_manifest(
+    targets::tar_target(
       correlation_plot,
       get_association_statistics(clean_md)
     ),
-    targets::tar_manifest(
+    targets::tar_target(
       significant_covariates_plot,
       run_pca_and_plot_correlations(cqn_counts$E,clean_md)
     ),
-    targets::tar_manifest(
+    targets::tar_target(
       outliers,
       identify_outliers(filtered_counts, clean_md, !!color, !!shape, !!size)
     ),
-    targets::tar_manifest(
+    targets::tar_target(
       model,
       stepwise_regression(
        clean_md,
@@ -140,7 +140,7 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
        skip = !!skip_model
         )
     ),
-    targets::tar_manifest(
+    targets::tar_target(
       report,
       rmarkdown::render(
         #drake::knitr_in("sageseqr-report.Rmd"),
@@ -154,7 +154,7 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                                 )
         )
     ),
-    targets::tar_manifest(
+    targets::tar_target(
       document_inputs,
       provenance_helper(
         !!metadata_id, !!counts_id,
@@ -162,7 +162,7 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
         !!biomart_id, !!biomart_version
       )
     ),
-    targets::tar_manifest(
+    targets::tar_target(
       Synapse,
       store_results(
         parent_id = !!parent_id,
