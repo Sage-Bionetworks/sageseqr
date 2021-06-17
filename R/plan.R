@@ -45,82 +45,141 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                   new_path = getwd())
   }
 
-  drake::drake_plan(
-    import_metadata = get_data(!!metadata_id,
-                               !!metadata_version),
-    import_counts = get_data(!!counts_id,
-                             !!counts_version),
-    counts = tibble::column_to_rownames(import_counts,
-                                        var = !!gene_id_input),
-    clean_md = clean_covariates(md = import_metadata,
+  #drake::drake_plan(
+  list(
+    targets::tar_manifest(
+      import_metadata, 
+      get_data(!!metadata_id,
+               !!metadata_version)
+    ),
+    targets::tar_manifest(
+      import_counts,
+      get_data(!!counts_id,
+               !!counts_version)
+    ),
+    targets::tar_manifest(
+      counts,
+      tibble::column_to_rownames(import_counts,
+                                        var = !!gene_id_input)
+    ),
+    targets::tar_manifest(
+      clean_md,
+      clean_covariates(md = import_metadata,
                                 factors = !!factor_input,
                                 continuous = !!continuous_input,
-                                sample_identifier = !!sample_id_input),
-    biomart_results = get_biomart(count_df = counts,
+                                sample_identifier = !!sample_id_input)
+    ),
+    targets::tar_manifest(
+      biomart_results,
+      get_biomart(count_df = counts,
                                 synid = !!biomart_id,
                                 version = !!biomart_version,
                                 filters = !!filters,
                                 host = !!host,
-                                organism = !!organism),
-    filtered_counts = filter_genes(clean_metadata = clean_md,
+                                organism = !!organism)
+    ),
+    targets::tar_manifest(
+      filtered_counts,
+      filter_genes(clean_metadata = clean_md,
                                    count_df = counts,
                                    conditions = !!conditions,
                                    cpm_threshold = !!cpm_threshold,
-                                   conditions_threshold = !!conditions_threshold),
-    biotypes = summarize_biotypes(filtered_counts, biomart_results),
-    cqn_counts = cqn(filtered_counts,
-                     biomart_results),
-    gene_coexpression = plot_coexpression(cqn_counts),
-    boxplots = boxplot_vars(md = clean_md,
+                                   conditions_threshold = !!conditions_threshold)
+    ),
+    targets::tar_manifest(
+      biotypes,
+      summarize_biotypes(filtered_counts, biomart_results)
+    ),
+    targets::tar_manifest(
+      cqn_counts,
+      cqn(filtered_counts, biomart_results)
+    ),
+    targets::tar_manifest(
+      gene_coexpression,
+      plot_coexpression(cqn_counts)
+    ),
+    
+    targets::tar_manifest(
+      boxplots,
+      boxplot_vars(md = clean_md,
                             include_vars = !!continuous_input,
-                            x_var = !!primary_variable),
-    sex_plot = conditional_plot_sexcheck(clean_md,
+                            x_var = !!primary_variable)
+    ),
+    targets::tar_manifest(
+      sex_plot,
+      conditional_plot_sexcheck(clean_md,
                                          counts,
                                          biomart_results,
-                                         !!sex_var),
-    sex_plot_pca = plot_sexcheck_pca(
-      clean_md,
-      counts,
-      biomart_results,
-      !!sex_var),
-    correlation_plot = get_association_statistics(clean_md),
-    significant_covariates_plot = run_pca_and_plot_correlations(cqn_counts$E,
-                                                                clean_md),
-    outliers = identify_outliers(filtered_counts, clean_md, !!color, !!shape,
-                                 !!size),
-     model = stepwise_regression(
+                                         !!sex_var)
+    ),
+    targets::tar_manifest(sex_plot_pca,
+                          plot_sexcheck_pca(
+                            clean_md,
+                            counts,
+                            biomart_results,
+                            !!sex_var)
+    ),                    
+    targets::tar_manifest(
+      correlation_plot,
+      get_association_statistics(clean_md)
+    ),
+    targets::tar_manifest(
+      significant_covariates_plot,
+      run_pca_and_plot_correlations(cqn_counts$E,clean_md)
+    ),
+    targets::tar_manifest(
+      outliers,
+      identify_outliers(filtered_counts, clean_md, !!color, !!shape, !!size)
+    ),
+    targets::tar_manifest(
+      model,
+      stepwise_regression(
        clean_md,
        primary_variable = !!primary_variable,
        cqn_counts = cqn_counts,
        skip = !!skip_model
-        ),
-    report = rmarkdown::render(
-      drake::knitr_in("sageseqr-report.Rmd"),
-      output_file = drake::file_out(
-        !!glue::glue("{getwd()}/{report_name}.html")
-        ),
-      output_dir = "."
-      ),
-    document_inputs = provenance_helper(
-      !!metadata_id, !!counts_id,
-      !!metadata_version, !!counts_version,
-      !!biomart_id, !!biomart_version
+        )
     ),
-    Synapse = store_results(
-      parent_id = !!parent_id,
-      cqn_counts = cqn_counts$counts,
-      clean_md = clean_md,
-      filtered_counts = filtered_counts,
-      biomart_results = biomart_results,
-      rownames = !!rownames,
-      syn_names = list("Covariates", "Filtered counts (greater than 1cpm)",
-                   "BioMart query results", "Normalized counts (CQN)"),
-      data_names = list("clean_md", "filtered_counts", "biomart_results",
-                        "cqn_counts"),
+    targets::tar_manifest(
+      report,
+      rmarkdown::render(
+        #drake::knitr_in("sageseqr-report.Rmd"),
+        #output_file = drake::file_out(
+          #!!glue::glue("{getwd()}/{report_name}.html")
+          #),
+        input,
+        tarchetypes::tar_render(name="sageseqr-report.Rmd",
+                                path=glue::glue("{getwd()}", 
+                                                '/inst/sageseqr-report.Rmd')
+                                )
+        )
+    ),
+    targets::tar_manifest(
+      document_inputs,
+      provenance_helper(
+        !!metadata_id, !!counts_id,
+        !!metadata_version, !!counts_version,
+        !!biomart_id, !!biomart_version
+      )
+    ),
+    targets::tar_manifest(
+      Synapse,
+      store_results(
+        parent_id = !!parent_id,
+        cqn_counts = cqn_counts$counts,
+        clean_md = clean_md,
+        filtered_counts = filtered_counts,
+        biomart_results = biomart_results,
+        rownames = !!rownames,
+        syn_names = list("Covariates", "Filtered counts (greater than 1cpm)",
+                         "BioMart query results", "Normalized counts (CQN)"),
+        data_names = list("clean_md", "filtered_counts", "biomart_results",
+                          "cqn_counts"),
       inputs = document_inputs,
       activity_provenance = "Analyze RNA-seq data with sageseqr pkg",
       config_file = !!config_file,
       report_name = !!report_name
       )
     )
-  }
+  )
+}
