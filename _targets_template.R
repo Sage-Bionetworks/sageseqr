@@ -1,3 +1,8 @@
+library(sageseqr)
+
+# Login to Synapse. Make a Synapse account and use synapser to login: https://r-docs.synapse.org/articles/manageSynapseCredentials.html
+synapser::synLogin()
+
 #Set the cofiguration profile here:
 Sys.setenv(R_CONFIG_ACTIVE = "INSERT_CONFIG_PROFILE_HERE")
 
@@ -109,7 +114,6 @@ list(
   targets::tar_target(
     report,
     rmarkdown::render(
-      input,
       tarchetypes::tar_render(name="sageseqr-report.Rmd",
                               path=glue::glue("{getwd()}", 
                                               '/inst/sageseqr-report.Rmd')

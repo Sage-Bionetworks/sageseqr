@@ -48,7 +48,8 @@ eval(parse( text=
 
 setwd('../')
 targets::tar_manifest(fields="command")
-targets::tar_glimpse()
+
+targets::tar_make()
 
 #drake::make(
 #  plan,
@@ -59,9 +60,8 @@ targets::tar_glimpse()
 4. Visualize the results of your work. 
 
 ```{r visualize}
-drake::vis_drake_graph(
-  plan,
-  envir = getNamespace("sageseqr"),
+setwd('../')
+targets::tar_glimpse(
   targets_only = TRUE
-  )
+)
 ```
