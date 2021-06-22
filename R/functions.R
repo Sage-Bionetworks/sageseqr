@@ -676,15 +676,15 @@ prepare_results <- function(target, data_name, rowname = NULL) {
 #' folder to store output.
 #' @param cqn_counts The targets target containing Conditional Quantile Normalized
 #'  (CQN) counts. Defaults to target name constrained by
-#'  \code{"sageseqr::rnaseq_plan()"}.
+#'  \code{"targets::tar_make"}.
 #' @param clean_md The targets target containing the metadata data frame.
-#' Defaults to target name constrained by \code{"sageseqr::rnaseq_plan()"}.
+#' Defaults to target name constrained by \code{"targets::tar_make"}.
 #' @param filtered_counts The targets target containing counts after low gene
 #' expression has been removed. Defaults to target name constrained by
-#'  \code{"sageseqr::rnaseq_plan()"}.
+#'  \code{"targets::tar_make()"}.
 #' @param biomart_results The targets target containing gene annotations from
 #' biomart. Defaults to target name constrained by
-#' \code{"sageseqr::rnaseq_plan()"}.
+#' \code{"targets::tar_make"}.
 #' @param rownames A list of variables to store rownames ordered by `metadata`,
 #' `filtered_counts`, `biomart_results`, `cqn_counts`. If not applicable,
 #' set as NULL.
@@ -698,7 +698,7 @@ prepare_results <- function(target, data_name, rowname = NULL) {
 #' @param data_names A list of identifiers to embed in the file name ordered
 #' by `metadata`, `filtered_counts`, `biomart_results`, `cqn_counts`.
 #' @param config_file Optional. Path to configuration file.
-#' @inheritParams rnaseq_plan
+#' @param report_name Name of output markdown file.
 #' @export
 store_results <- function(clean_md = clean_md,
                           filtered_counts = filtered_counts,
@@ -810,8 +810,16 @@ store_results <- function(clean_md = clean_md,
 #' Provenance helper
 #'
 #' Collapse Synapse Ids and version.
-#'
-#' @inheritParams rnaseq_plan
+#' @param metadata_id Synapse ID to clean metadata file with sample identifiers
+#' in a column and variables of interest as column names. There cannot be any
+#' missing values.
+#' @param counts_id Synapse ID to counts data frame with identifiers to the
+#' metadata as column names and gene ids in a column.
+#' @param metadata_version Optionally, include Synapse file version number. If
+#' omitted, current version will be downloaded.
+#' @param counts_version Optionally, include Synapse file version number.
+#' @param biomart_id Synapse ID to biomart object.
+#' @param biomart_version Optionally, include Synapse file version number.
 #' @export
 provenance_helper <- function(metadata_id,  counts_id, metadata_version = NULL,
                               counts_version = NULL, biomart_id = NULL,

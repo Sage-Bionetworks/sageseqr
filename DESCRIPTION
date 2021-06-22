@@ -26,7 +26,6 @@ Imports:
     config,
     cqn,
     data.table,
-    drake,
     dplyr,
     edgeR,
     foreach,
