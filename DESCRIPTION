@@ -7,12 +7,12 @@ Authors@R:
            role = c("aut", "cre"),
            email = "kelsey.montgomery@sagebase.org",
            comment = c(ORCID = "0000-0002-0126-8944")),
-      person(given = "Sage Bionetworks",
-             role = "cph"),
       person(given = "Jake",
            family = "Gockley",
            role = c("aut"),
-           email = "jake.gockley@sagebase.org")
+           email = "jake.gockley@sagebase.org"),
+      person(given = "Sage Bionetworks",
+             role = "cph")
            )
 Description: This workflow normalizes counts, performs model selection from known 
     covariates using multivariate regression, automates outlier analysis using a 
