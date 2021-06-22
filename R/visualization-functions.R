@@ -767,7 +767,7 @@ plot_sexcheck <- function(clean_metadata, count_df, biomart_results, sex_var) {
             sex_specific_counts = results)
   p
 }
-#' Conditionally wrap plot_sexcheck for drake
+#' Conditionally wrap plot_sexcheck for targets
 #'
 #' Work around to expose plot_sexcheck to testing and export but also leverage
 #' targets function for skipping targets conditionally (see \code{"targets::tar_cancel()"}).
@@ -775,7 +775,6 @@ plot_sexcheck <- function(clean_metadata, count_df, biomart_results, sex_var) {
 #' @inheritParams get_biomart
 #' @export
 conditional_plot_sexcheck <- function(clean_metadata, count_df, biomart_results, sex_var) {
-  #drake::cancel_if(is.null(sex_var))
   targets::tar_cancel(is.null(sex_var))
   plot_sexcheck(clean_metadata, count_df, biomart_results, sex_var)
 }

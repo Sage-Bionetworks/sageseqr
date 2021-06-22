@@ -1,3 +1,5 @@
+_targets.R
+_targets/
 vignettes/sageseqr-report.Rmd
 sageseqr-report.Rmd
 .Rhistory

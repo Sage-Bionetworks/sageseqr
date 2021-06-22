@@ -113,12 +113,10 @@ list(
   ),
   targets::tar_target(
     report,
-    rmarkdown::render(
       tarchetypes::tar_render(name="sageseqr-report.Rmd",
                               path=glue::glue("{getwd()}", 
                                               '/inst/sageseqr-report.Rmd')
       )
-    )
   ),
   targets::tar_target(
     document_inputs,

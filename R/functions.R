@@ -593,7 +593,7 @@ wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
 #' @inheritParams differential_expression
 #' @inheritParams build_formula
 #' @param skip Defaults to NULL. If TRUE, this step will be skipped in the
-#' Drake plan.
+#' targets plan.
 #' @export
 stepwise_regression <- function(md, primary_variable, cqn_counts,
                                 model_variables = names(md),
@@ -674,15 +674,15 @@ prepare_results <- function(target, data_name, rowname = NULL) {
 #'
 #' @param parent_id A Synapse Id that corresponds to a project or
 #' folder to store output.
-#' @param cqn_counts The drake target containing Conditional Quantile Normalized
+#' @param cqn_counts The targets target containing Conditional Quantile Normalized
 #'  (CQN) counts. Defaults to target name constrained by
 #'  \code{"sageseqr::rnaseq_plan()"}.
-#' @param clean_md The drake target containing the metadata data frame.
+#' @param clean_md The targets target containing the metadata data frame.
 #' Defaults to target name constrained by \code{"sageseqr::rnaseq_plan()"}.
-#' @param filtered_counts The drake target containing counts after low gene
+#' @param filtered_counts The targets target containing counts after low gene
 #' expression has been removed. Defaults to target name constrained by
 #'  \code{"sageseqr::rnaseq_plan()"}.
-#' @param biomart_results The drake target containing gene annotations from
+#' @param biomart_results The targets target containing gene annotations from
 #' biomart. Defaults to target name constrained by
 #' \code{"sageseqr::rnaseq_plan()"}.
 #' @param rownames A list of variables to store rownames ordered by `metadata`,
@@ -715,7 +715,7 @@ store_results <- function(clean_md = clean_md,
     "analyzed with sageseqr {ver}"
     )
 
-  # nest drake targets in a list. Every time a new target is to-be stored, it
+  # nest targets targets in a list. Every time a new target is to-be stored, it
   # must be added as an argument to this function and then added to this list.
   targets <- list(clean_md, filtered_counts, biomart_results, cqn_counts)
 

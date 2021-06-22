@@ -1,8 +1,8 @@
 ---
-title: "Run the drake plan"
+title: "Run the targets plan"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Run the drake plan}
+  %\VignetteIndexEntry{Run the targets plan}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -24,7 +24,7 @@ profile_set <- "default"
 Sys.setenv(R_CONFIG_ACTIVE = profile_set)
 ```
 
-3. Load the `sageseqr` library and login to [Synapse](https://www.synapse.org/). `rnaseq_plan()` calls the arguments from the config file and creates the `drake` plan. Execute `drake::make(plan)` to compute. Run this code from your project root.
+3. Load the `sageseqr` library and login to [Synapse](https://www.synapse.org/). `rnaseq_plan()` calls the arguments from the config file and creates the `targets` plan. Execute `targets::make()` to compute. Run this code from your project root.
 
 ```{r run-plan}
 library(sageseqr)
@@ -37,7 +37,7 @@ replace_command <- paste('system( "sed ',
                                 profile_set,
                                 "/g"
                                 ),
-                         " ../_targets_template.R > ../_targets.R\")",
+                         " ../R/_targets_template.R > ../_targets.R\")",
                          sep = "'"
                         )
 
@@ -51,10 +51,6 @@ targets::tar_manifest(fields="command")
 
 targets::tar_make()
 
-#drake::make(
-#  plan,
-#  envir = getNamespace("sageseqr")
-#    )
 ```
 
 4. Visualize the results of your work. 
