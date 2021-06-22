@@ -2,11 +2,18 @@ Package: sageseqr
 Title: Identify differentially expressed genes counts data
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "Kelsey",
+    c(person(given = "Kelsey",
            family = "Montgomery",
            role = c("aut", "cre"),
            email = "kelsey.montgomery@sagebase.org",
-           comment = c(ORCID = "0000-0002-0126-8944"))
+           comment = c(ORCID = "0000-0002-0126-8944")),
+      person(given = "Sage Bionetworks",
+             role = "cph"),
+      person(given = "Jake",
+           family = "Gockley",
+           role = c("aut"),
+           email = "jake.gockley@sagebase.org")
+           )
 Description: This workflow normalizes counts, performs model selection from known 
     covariates using multivariate regression, automates outlier analysis using a 
     customizable threshold and performs differential expression analysis for repeated
