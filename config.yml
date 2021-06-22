@@ -30,3 +30,4 @@ default:
   skip model: TRUE
   report: "openSci"
   store output: syn23572479
+  residuals: ["syn123", "syn456", "syn678"]
