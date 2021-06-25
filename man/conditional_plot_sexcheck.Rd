@@ -2,7 +2,7 @@
 % Please edit documentation in R/visualization-functions.R
 \name{conditional_plot_sexcheck}
 \alias{conditional_plot_sexcheck}
-\title{Conditionally wrap plot_sexcheck for drake}
+\title{Conditionally wrap plot_sexcheck for targets}
 \usage{
 conditional_plot_sexcheck(clean_metadata, count_df, biomart_results, sex_var)
 }
@@ -20,5 +20,5 @@ stored as rownames.}
 }
 \description{
 Work around to expose plot_sexcheck to testing and export but also leverage
-drakes function for skipping targets conditionally (see \code{"drake::cancel_if()"}).
+targets function for skipping targets conditionally (see \code{"targets::tar_cancel()"}).
 }

@@ -593,7 +593,7 @@ wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
 #' @inheritParams differential_expression
 #' @inheritParams build_formula
 #' @param skip Defaults to NULL. If TRUE, this step will be skipped in the
-#' Drake plan.
+#' targets plan.
 #' @export
 stepwise_regression <- function(md, primary_variable, cqn_counts,
                                 model_variables = names(md),
@@ -674,17 +674,17 @@ prepare_results <- function(target, data_name, rowname = NULL) {
 #'
 #' @param parent_id A Synapse Id that corresponds to a project or
 #' folder to store output.
-#' @param cqn_counts The drake target containing Conditional Quantile Normalized
+#' @param cqn_counts The targets target containing Conditional Quantile Normalized
 #'  (CQN) counts. Defaults to target name constrained by
-#'  \code{"sageseqr::rnaseq_plan()"}.
-#' @param clean_md The drake target containing the metadata data frame.
-#' Defaults to target name constrained by \code{"sageseqr::rnaseq_plan()"}.
-#' @param filtered_counts The drake target containing counts after low gene
+#'  \code{"targets::tar_make"}.
+#' @param clean_md The targets target containing the metadata data frame.
+#' Defaults to target name constrained by \code{"targets::tar_make"}.
+#' @param filtered_counts The targets target containing counts after low gene
 #' expression has been removed. Defaults to target name constrained by
-#'  \code{"sageseqr::rnaseq_plan()"}.
-#' @param biomart_results The drake target containing gene annotations from
+#'  \code{"targets::tar_make()"}.
+#' @param biomart_results The targets target containing gene annotations from
 #' biomart. Defaults to target name constrained by
-#' \code{"sageseqr::rnaseq_plan()"}.
+#' \code{"targets::tar_make"}.
 #' @param rownames A list of variables to store rownames ordered by `metadata`,
 #' `filtered_counts`, `biomart_results`, `cqn_counts`. If not applicable,
 #' set as NULL.
@@ -698,7 +698,7 @@ prepare_results <- function(target, data_name, rowname = NULL) {
 #' @param data_names A list of identifiers to embed in the file name ordered
 #' by `metadata`, `filtered_counts`, `biomart_results`, `cqn_counts`.
 #' @param config_file Optional. Path to configuration file.
-#' @inheritParams rnaseq_plan
+#' @param report_name Name of output markdown file.
 #' @export
 store_results <- function(clean_md = clean_md,
                           filtered_counts = filtered_counts,
@@ -715,7 +715,7 @@ store_results <- function(clean_md = clean_md,
     "analyzed with sageseqr {ver}"
     )
 
-  # nest drake targets in a list. Every time a new target is to-be stored, it
+  # nest targets targets in a list. Every time a new target is to-be stored, it
   # must be added as an argument to this function and then added to this list.
   targets <- list(clean_md, filtered_counts, biomart_results, cqn_counts)
 
@@ -810,8 +810,16 @@ store_results <- function(clean_md = clean_md,
 #' Provenance helper
 #'
 #' Collapse Synapse Ids and version.
-#'
-#' @inheritParams rnaseq_plan
+#' @param metadata_id Synapse ID to clean metadata file with sample identifiers
+#' in a column and variables of interest as column names. There cannot be any
+#' missing values.
+#' @param counts_id Synapse ID to counts data frame with identifiers to the
+#' metadata as column names and gene ids in a column.
+#' @param metadata_version Optionally, include Synapse file version number. If
+#' omitted, current version will be downloaded.
+#' @param counts_version Optionally, include Synapse file version number.
+#' @param biomart_id Synapse ID to biomart object.
+#' @param biomart_version Optionally, include Synapse file version number.
 #' @export
 provenance_helper <- function(metadata_id,  counts_id, metadata_version = NULL,
                               counts_version = NULL, biomart_id = NULL,
