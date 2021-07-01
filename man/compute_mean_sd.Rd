@@ -4,15 +4,22 @@
 \alias{compute_mean_sd}
 \title{Compute mean and standard deviation by gene feature}
 \usage{
-compute_mean_sd(clean_metadata, count_df)
+compute_mean_sd(clean_metadata, sample_identifier, count_df, gene_id_input)
 }
 \arguments{
 \item{clean_metadata}{A data frame with sample identifiers as rownames and variables as
 factors or numeric as determined by \code{"sageseqr::clean_covariates()"}.}
 
+\item{sample_identifier}{The name of the column with the sample identifiers that map to the gene counts data frame.}
+
 \item{count_df}{A counts data frame with sample identifiers as column names
 and gene Ids are rownames.}
+
+\item{gene_id_input}{Column name of the gene ids in the counts_id file.}
+}
+\value{
+A data frame with columns feature, n, mean and sd.
 }
 \description{
-Compute mean and standard deviation by gene feature
+Subsets counts matrix to include samples in `clean_metadata` for computation.
 }

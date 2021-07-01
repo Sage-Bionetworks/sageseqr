@@ -824,11 +824,11 @@ provenance_helper <- function(metadata_id,  counts_id, metadata_version = NULL,
 #'
 #' @inheritParams filter_genes
 #' @inheritParams simple_filter
+#' @inheritParams clean_covariates
+#' @param gene_id_input Column name of the gene ids in the counts_id file.
 #' @return A data frame with columns feature, n, mean and sd.
 #' @export
-compute_mean_sd <- function(clean_metadata, count_df) {
-  clean_metadata <- tibble::rownames_to_column(clean_metadata, "sampleID")
-  count_df <- tibble::rownames_to_column(count_df, "feature")
+compute_mean_sd <- function(clean_metadata, sample_identifier, count_df, gene_id_input) {
   # function to compute rowwise mean and sd, remove missing values
   f_byrow <- function(x) {
     tibble::tibble(
@@ -836,7 +836,7 @@ compute_mean_sd <- function(clean_metadata, count_df) {
       sd = sd(x, na.rm = TRUE))
   }
   # subset expression matrix to include relevant samples
-  subset <- count_df[,clean_metadata$sampleID]
+  subset <- count_df[,clean_metadata[[sample_identifier]]]
   # compute row means and standard deviation
   compute <- subset %>%
     # capture row elements with ... and concatenate into a vector
@@ -848,7 +848,7 @@ compute_mean_sd <- function(clean_metadata, count_df) {
     tidyr::unnest(cols = c(out))
   # output a data frame with gene features, n, mean, and sd
   dat <- data.frame(
-    feature = count_df$feature,
+    feature = count_df[[gene_id_input]],
     n = dim(clean_metadata)[1]
   )
   dplyr::bind_cols(dat, compute)
