@@ -20,8 +20,8 @@ test_that("function runs and computation is correct", {
   dat <- compute_mean_sd(metadata, "sampleID", counts_df, "feature")
   #drop gene feature to test row means and row sds
   test <- counts_df[,-1]
-  expect_equal(colnames(dat), c("feature", "n", "mean", "sd"))
-  expect_equal(sd(test[1,], na.rm = TRUE), dat$sd[1])
-  expect_equal(rowMeans(test, na.rm = TRUE), dat$mean)
-  expect_equal(dim(metadata)[1], 8)
+  testthat::expect_equal(colnames(dat), c("feature", "n", "mean", "sd"))
+  testthat::expect_equal(sd(test[1,], na.rm = TRUE), dat$sd[1])
+  testthat::expect_equal(rowMeans(test, na.rm = TRUE), dat$mean)
+  testthat::expect_equal(dim(metadata)[1], 8)
 })
