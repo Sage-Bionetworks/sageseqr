@@ -841,7 +841,7 @@ compute_mean_sd <- function(clean_metadata, sample_identifier, count_df, gene_id
   compute <- subset %>%
     # capture row elements with ... and concatenate into a vector
     dplyr::transmute(
-      out = purrr::pmap(
+      out = furrr::future_pmap(
         ., ~ f_byrow(c(...))
       )
     ) %>%
