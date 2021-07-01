@@ -818,3 +818,38 @@ provenance_helper <- function(metadata_id,  counts_id, metadata_version = NULL,
   }
   ids
 }
+#' Compute mean and standard deviation by gene feature
+#'
+#' Subsets counts matrix to include samples in `clean_metadata` for computation.
+#'
+#' @inheritParams filter_genes
+#' @inheritParams simple_filter
+#' @return A data frame with columns feature, n, mean and sd.
+#' @export
+compute_mean_sd <- function(clean_metadata, count_df) {
+  clean_metadata <- tibble::rownames_to_column(clean_metadata, "sampleID")
+  count_df <- tibble::rownames_to_column(count_df, "feature")
+  # function to compute rowwise mean and sd, remove missing values
+  f_byrow <- function(x) {
+    tibble::tibble(
+      mean = mean(x, na.rm = TRUE),
+      sd = sd(x, na.rm = TRUE))
+  }
+  # subset expression matrix to include relevant samples
+  subset <- count_df[,clean_metadata$sampleID]
+  # compute row means and standard deviation
+  compute <- subset %>%
+    # capture row elements with ... and concatenate into a vector
+    dplyr::transmute(
+      out = purrr::pmap(
+        ., ~ f_byrow(c(...))
+      )
+    ) %>%
+    tidyr::unnest(cols = c(out))
+  # output a data frame with gene features, n, mean, and sd
+  dat <- data.frame(
+    feature = count_df$feature,
+    n = dim(clean_metadata)[1]
+  )
+  dplyr::bind_cols(dat, compute)
+}
