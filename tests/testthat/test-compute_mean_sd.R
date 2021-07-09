@@ -25,3 +25,27 @@ test_that("function runs and computation is correct", {
   testthat::expect_equal(rowMeans(test, na.rm = TRUE), dat$mean)
   testthat::expect_equal(dim(metadata)[1], 8)
 })
+
+metadata <- data.frame(
+  batch = c("1", "2", "1", "2", "1", "2", "1", "2"),
+  diagnosis = c("dx", "dx", "ct", "ct", "dx", "dx", "ct", "ct"),
+  sex = c("M", "F", "M", "F", "M", "F", "M", "F"),
+  RIN = c(5, 5, 5, 5, 5, 5, 5, 5),
+  sampleID = c("S1", "S2", "S3", "S4", "S5", "S6", "S7", "S12"),
+  stringsAsFactors = FALSE
+)
+
+counts <- data.frame(matrix(
+  sample(seq(0, 100, by = 0.01), size = 16),
+  ncol = 8,
+  dimnames = list(c("ENSG00000229807.12", "ENSG00000183878.12"),
+                  c("S1", "S2", "S3", "S4",  "S5", "S6", "S7", "S8"))
+))
+
+counts_df <- tibble::rownames_to_column(counts, "feature")
+
+test_that("message when metadata does not map to counts", {
+  testthat::expect_warning(
+    dat <- compute_mean_sd(metadata, "sampleID", counts_df, "feature")
+    )
+})

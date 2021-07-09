@@ -835,8 +835,26 @@ compute_mean_sd <- function(clean_metadata, sample_identifier, count_df, gene_id
       mean = mean(x, na.rm = TRUE),
       sd = sd(x, na.rm = TRUE))
   }
+  # add a check that all samples in the metadata are represented in the counts
+  if (!(all(clean_metadata[[sample_identifier]] %in% colnames(count_df)))) {
+    dropped <- clean_metadata[[sample_identifier]][
+      !clean_metadata[[sample_identifier]] %in% colnames(count_df)
+      ]
+    dropped <- glue::glue_collapse(dropped, sep = ",")
+    warning(
+      glue::glue(
+        "Not all samples in the metadata are present in the counts matrix. {dropped} is/are not analyzed."
+        )
+      )
+    samples <- clean_metadata[[sample_identifier]][
+      clean_metadata[[sample_identifier]] %in% colnames(count_df)
+    ]
+  } else{
+    samples <- clean_metadata[[sample_identifier]]
+  }
+
   # subset expression matrix to include relevant samples
-  subset <- count_df[,clean_metadata[[sample_identifier]]]
+  subset <- count_df[,samples]
   # compute row means and standard deviation
   compute <- subset %>%
     # capture row elements with ... and concatenate into a vector
@@ -846,10 +864,60 @@ compute_mean_sd <- function(clean_metadata, sample_identifier, count_df, gene_id
       )
     ) %>%
     tidyr::unnest(cols = c(out))
+
   # output a data frame with gene features, n, mean, and sd
   dat <- data.frame(
     feature = count_df[[gene_id_input]],
     n = dim(clean_metadata)[1]
   )
   dplyr::bind_cols(dat, compute)
+}
+#' Meta-analysis
+#'
+#'@inheritParams build_formula
+#'@inheritParams compute_mean_sd
+meta_express <- function(clean_metadata, sample_identifier, count_df,
+                         gene_id_input, primary_variable, group_variables
+                         ) {
+  vars <- c(primary_variable, group_variables)
+  #compute mean and standard deviation by gene for grouped variables of interest
+  by_gene <- clean_metadata %>%
+    dplyr::group_by_at(vars(dplyr::one_of(vars))) %>%
+    dplyr::group_modify(
+      ~ compute_mean_sd(
+        .,
+        sample_identifier,
+        count_df,
+        gene_id_input
+        )
+      )
+
+  # metacont accepts an experimental and control group. identify all possible
+  # combinations of comparing the primary_variable
+  # primary_variable needs to be character
+  vec <- clean_metadata[[primary_variable]]
+  comparisons <- gtools::combinations(
+    n = length(unique(vec)),
+    r = 2,
+    v = unique(vec)
+    )
+
+  # collapse group_variables into one variable
+  # metadata <- build_formula(
+  #   clean_metadata,
+  #   group_variables,
+  #   colnames(clean_metadata[!(colnames(clean_metadata) %in% group_variables)])
+  #   )
+  # map over meta() for each condition
+  meta <- function(comparison_values, by_gene, metadata, primary_variable) {
+    # subset both metadata and expression matrix to include comparison_values
+    # only
+    # metadata <- metadata[metadata[[primary_variable]] %in% comparison_values,]
+    # by_gene <- by_gene[]
+    # experiment_group <- by_gene
+    #metacont can only accept one label for studLabel (e.g. Tissue in this
+    # example) Need to collapse all other model var categories.
+
+  }
+
 }
