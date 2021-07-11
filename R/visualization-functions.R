@@ -1363,7 +1363,7 @@ plot_volcano <- function(de, p_value_threshold, log_fold_threshold, gene_list) {
   tmp <- de %>%
     dplyr::filter(adj.P.Val <= p_value_threshold) %>%
     dplyr::select(ensemble_gene_id, Comparison) %>%
-    group_by(Comparison) %>%
+    dplyr::group_by(Comparison) %>%
     dplyr::summarise(
       "FDR_{p_value_threshold}" := length(unique(ensembl_gene_id))
     )
@@ -1373,11 +1373,11 @@ plot_volcano <- function(de, p_value_threshold, log_fold_threshold, gene_list) {
       abs(logFC) >= log2(log_fold_threshold)
     ) %>%
     dplyr::select(ensembl_gene_id, Comparison) %>%
-    group_by(Comparison) %>%
+    dplyr::group_by(Comparison) %>%
     dplyr::summarise(
       "FDR_{p_value_threshold}_FC_{log_fold_threshold}" := length(unique(ensembl_gene_id))
     )
-  knitr::kable(full_join(tmp,tmp1))
+  knitr::kable(dplyr::full_join(tmp,tmp1))
 
   plotdata <- de %>%
     mutate(label = ifelse(
