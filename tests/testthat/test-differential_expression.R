@@ -9,9 +9,10 @@ metadata <- data.frame(
 )
 
 counts <- data.frame(matrix(
-  sample(0:100, size = 16),
+  sample(0:100, size = 32),
   ncol = 8,
-  dimnames = list(c("ENSG00000229807.12", "ENSG00000183878.12"),
+  dimnames = list(c("ENSG00000229807.12", "ENSG00000183878.12",
+                    "ENSG00000239807.12", "ENSG00000259807.12"),
                   c("S1", "S2", "S3", "S4",  "S5", "S6", "S7", "S8"))
 ))
 
