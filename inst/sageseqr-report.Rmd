@@ -125,3 +125,7 @@ knitr::kable(summary$to_visualize)
 as.character(summary$formula)[2]
 }
 ```
+
+```{r differential_expression}
+drake::readd(plot_de_volcano)
+```
