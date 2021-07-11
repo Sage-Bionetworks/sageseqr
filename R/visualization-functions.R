@@ -1387,7 +1387,10 @@ plot_volcano <- function(de, p_value_threshold, log_fold_threshold, gene_list) {
     )
 
   p = ggplot2::ggplot(
-    plotdata, ggplot2::aes(y = -log10(adj.P.Val), x = logFC, color = Direction)
+    plotdata, ggplot2::aes(
+      y = -log10(.data$adj.P.Val),
+      x = .data$logFC,
+      color = .data$Direction)
   ) + ggplot2::geom_point()
   p = p + ggplot2::scale_color_manual(values = c('red','grey','green'))
   p = p + ggrepel::geom_text_repel(
