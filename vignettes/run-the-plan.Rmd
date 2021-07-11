@@ -67,7 +67,8 @@ plan <- sageseqr::rnaseq_plan(
     config::get("biomart results")$filters
     ),
   config_file = "config.yml",
-  force_model = config::get("force model with")
+  force_model = config::get("force model with"), 
+  gene_list = config::get("visualization gene list")
 )
 
 drake::make(

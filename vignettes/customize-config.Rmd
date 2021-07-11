@@ -69,8 +69,10 @@ de log2FC:        The fold-change (FC) (absolute value of log2 ratio) of signifi
                   differentially expressed (de) genes must exceed this value.
 de p-value threshold: The adjusted p-value of significant differentially expressed 
                   (de) genes must exceed this value.
-de:
-                  Required. 
+de contrasts:     Required. Variable in the metadata to define comparisons between 
+                  groups.
+  <any named list:> If there are multiple comparisons, set them up as nested lists.
+visualization gene list: Label this list of genes in the volcano plot.
 report:           Required. The name of your project. This will become the name of your 
                   output html file.
 store output:     Required. Folder Synapse Id to store output on Synapse.
