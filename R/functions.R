@@ -903,6 +903,9 @@ pairwise_meta <- function(comparison_values, by_gene, primary_variable) {
                "zval.fixed", "pval.fixed", "TE.random", "seTE.random",
                "lower.random", "upper.random", "zval.random", "pval.random",
                "Q", "tau", "H", "I2")])
+
+    # move bind_cols logic here.
+
   }
   # subset summaries by gene to relevant comparison_values
   to_analyze <- by_gene[by_gene[[primary_variable]] %in% comparison_values,]
@@ -911,12 +914,17 @@ pairwise_meta <- function(comparison_values, by_gene, primary_variable) {
   # split pairwise comparisons into experimental and control data frames
   experimental <- split[[1]]
   control <- split[[2]]
+
+  # add assert functions here that dims match
+
   # parallelize meta-analysis over every gene
+  # try pmap
   m <- furrr::future_map2_dfr(
     experimental$data,
     control$data,
     ~wrap_meta(.x, .y)
   )
+  # create index column
   # bind gene features and other metadata
   feature_vars <- colnames(by_gene)[
     !colnames(by_gene) %in% c(primary_variable, "data")
