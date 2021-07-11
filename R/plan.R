@@ -111,7 +111,7 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
         log_fold_threshold = !!log_fold_threshold,
         model_variables = model$variables_in_model
       ),
-      trigger = trigger(condition = is.na(force_model))
+      trigger = trigger(condition = is.na(!!force_model))
     ),
     de_2 = target(
       command = wrap_de(
@@ -122,9 +122,9 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
         biomart_results = biomart_results,
         p_value_threshold = !!p_value_threshold,
         log_fold_threshold = !!log_fold_threshold,
-        model_variables = force_model
+        model_variables = !!force_model
       ),
-      trigger = trigger(condition = !is.na(force_model))
+      trigger = trigger(condition = !is.na(!!force_model))
     ),
     report = rmarkdown::render(
       drake::knitr_in("sageseqr-report.Rmd"),
