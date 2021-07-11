@@ -33,7 +33,8 @@ rnaseq_plan(
   skip_model,
   parent_id,
   rownames,
-  config_file
+  config_file,
+  force_model
 )
 }
 \arguments{
@@ -115,6 +116,9 @@ folder to store output.}
 set as NULL.}
 
 \item{config_file}{Optional. Path to configuration file.}
+
+\item{force_model}{A vector of variables to include in the differential
+expression model if you want to skip the output of the stepwise regression.}
 }
 \description{
 This function wraps the \code{"drake::plan()"} and copies the R markdown

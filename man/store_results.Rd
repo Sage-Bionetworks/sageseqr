@@ -9,7 +9,7 @@ store_results(
   filtered_counts = filtered_counts,
   biomart_results = biomart_results,
   cqn_counts = cqn_counts$counts,
-  de_results = de,
+  de_results,
   syn_names,
   data_names,
   parent_id,

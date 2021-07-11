@@ -1350,3 +1350,57 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
   )
   return(p)
 }
+#' Volcano plot differential expression results'
+#'
+#' The plot colors genes where the adjusted p-value exceed the `p_value_threshold`
+#' and the `log_fold_threshold`. Optionally, provide a list of genes to label in
+#' the plot via `gene_list`.
+#'
+#' @param gene_list A vector of genes to label in the volcano plot.
+#' @inheritParams differential_expression
+#'
+plot_volcano <- function(de, p_value_threshold, log_fold_threshold, gene_list) {
+  tmp <- de %>%
+    dplyr::filter(adj.P.Val <= p_value_threshold) %>%
+    dplyr::select(ensemble_gene_id, Comparison) %>%
+    group_by(Comparison) %>%
+    dplyr::summarise(
+      "FDR_{p_value_threshold}" := length(unique(ensembl_gene_id))
+    )
+  tmp1 <- de %>%
+    dplyr::filter(
+      adj.P.Val <= p_value_threshold,
+      abs(logFC) >= log2(log_fold_threshold)
+    ) %>%
+    dplyr::select(ensembl_gene_id, Comparison) %>%
+    group_by(Comparison) %>%
+    dplyr::summarise(
+      "FDR_{p_value_threshold}_FC_{log_fold_threshold}" := length(unique(ensembl_gene_id))
+    )
+  knitr::kable(full_join(tmp,tmp1))
+
+  plotdata <- de %>%
+    mutate(label = ifelse(
+      .data$hgnc_symbol %in% gene_list,
+      .data$hgnc_symbol,
+      NA)
+    )
+
+  p = ggplot2::ggplot(
+    plotdata, ggplot2::aes(y = -log10(adj.P.Val), x = logFC, color = Direction)
+  ) + ggplot2::geom_point()
+  p = p + ggplot2::scale_color_manual(values = c('red','grey','green'))
+  p = p + ggrepel::geom_text_repel(
+    ggplot2::aes(label = .data$label),
+    family = "Lato",
+    size = 4,
+    color = "black",
+    hjust = "inward",
+    vjust = "inward",
+    na.rm = TRUE,
+    max.overlaps = 20
+  ) + sagethemes::theme_sage()
+  p = p + ggplot2::labs(x = expression(log[2]~FC))
+  p = p + ggplot2::facet_grid(.~Comparison, scales = 'fixed')
+  p
+}

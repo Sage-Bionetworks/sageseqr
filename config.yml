@@ -25,6 +25,7 @@ default:
     shape: "batch"
     size: "ageofdeath"
   skip model: TRUE
+  force model with: ["sex", "diagnosis", "batch"]
   de log2FC: 1.5
   de p-value threshold: 0.05
   de contrasts:
