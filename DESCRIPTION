@@ -44,6 +44,7 @@ Imports:
     ggforce,
     ggplot2,
     ggpubr,
+    ggrepel,
     gridExtra,
     gtools,
     IRanges,

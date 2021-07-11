@@ -22,6 +22,9 @@ rnaseq_plan(
   cpm_threshold = 1,
   conditions_threshold = 0.5,
   primary_variable,
+  de_contrasts,
+  log_fold_threshold,
+  p_value_threshold,
   sex_var,
   color,
   shape,
@@ -30,7 +33,9 @@ rnaseq_plan(
   skip_model,
   parent_id,
   rownames,
-  config_file
+  config_file,
+  force_model,
+  gene_list
 )
 }
 \arguments{
@@ -80,6 +85,15 @@ variables in `md`.}
 \item{primary_variable}{Baseline variable for model selection and variable to
 stratify groups in the boxplot.}
 
+\item{de_contrasts}{A list of variables to specify which groups to compare.}
+
+\item{log_fold_threshold}{Numeric. Significant genes are those with a log
+fold-change greater than this threshold}
+
+\item{p_value_threshold}{Numeric. P-values are adjusted by Benjamini and
+Hochberg (BH) false discovery rate (FDR). Significant genes are those with an
+adjusted p-value greater than this threshold.}
+
 \item{sex_var}{Column name of the sex or gender-specific metadata.}
 
 \item{color}{Discrete variable in `clean_metadata` differentiated
@@ -103,6 +117,11 @@ folder to store output.}
 set as NULL.}
 
 \item{config_file}{Optional. Path to configuration file.}
+
+\item{force_model}{Optional. A vector of variables to include in the differential
+expression model if you want to skip the output of the stepwise regression.}
+
+\item{gene_list}{Optional. A vector of genes to label in the volcano plot.}
 }
 \description{
 This function wraps the \code{"drake::plan()"} and copies the R markdown

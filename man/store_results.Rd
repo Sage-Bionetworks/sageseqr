@@ -9,6 +9,7 @@ store_results(
   filtered_counts = filtered_counts,
   biomart_results = biomart_results,
   cqn_counts = cqn_counts$counts,
+  de_results,
   syn_names,
   data_names,
   parent_id,
@@ -33,6 +34,10 @@ biomart. Defaults to target name constrained by
 
 \item{cqn_counts}{The drake target containing Conditional Quantile Normalized
 (CQN) counts. Defaults to target name constrained by
+\code{"sageseqr::rnaseq_plan()"}.}
+
+\item{de_results}{The drake target containing differential expression gene
+lists. Defaults to target name constrained by
 \code{"sageseqr::rnaseq_plan()"}.}
 
 \item{syn_names}{A list of human-readable names for the Synapse entities

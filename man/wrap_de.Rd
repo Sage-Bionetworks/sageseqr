@@ -10,11 +10,13 @@ wrap_de(
   cqn_counts,
   md,
   biomart_results,
+  p_value_threshold,
+  log_fold_threshold,
   model_variables = names(md)
 )
 }
 \arguments{
-\item{conditions}{A list of conditions to test as `primary_variable`
+\item{conditions}{A named list of conditions to test as `primary_variable`
 in \code{"sagseqr::differential_expression()"}.}
 
 \item{filtered_counts}{A counts data frame with genes removed that have low expression.}
@@ -25,6 +27,13 @@ in \code{"sagseqr::differential_expression()"}.}
 
 \item{biomart_results}{Output of \code{"sageseqr::get_biomart()"}. Gene Ids are
 stored as rownames.}
+
+\item{p_value_threshold}{Numeric. P-values are adjusted by Benjamini and
+Hochberg (BH) false discovery rate (FDR). Significant genes are those with an
+adjusted p-value greater than this threshold.}
+
+\item{log_fold_threshold}{Numeric. Significant genes are those with a log
+fold-change greater than this threshold}
 
 \item{model_variables}{Optional. Vector of variables to include in the linear (mixed) model.
 If not supplied, the model will include all variables in \code{md}.}
