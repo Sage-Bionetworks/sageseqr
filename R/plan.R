@@ -139,7 +139,7 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
       !!biomart_id, !!biomart_version
     ),
     plot_de_volcano = target(
-      plot_volano(
+      plot_volcano(
         data,
         p_value_threshold = !!p_value_threshold,
         log_fold_threshold = !!log_fold_threshold,
