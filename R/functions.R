@@ -753,7 +753,7 @@ store_results <- function(clean_md = clean_md,
   targets <- list(clean_md, filtered_counts, biomart_results, cqn_counts)
 
   # append differential expression data frames already nested in list
-  targets <- append(targets, de_results)
+  targets <- append(targets, list(de_results))
 
   mash <- list(
     target = targets,
