@@ -67,8 +67,9 @@ skip model:       Optional. If TRUE, the exploratory data report is run. Model s
                   is not computed.
 force model with: Optional. Force differential expression with this user defined model
                   instead of the output of stepwise regression.
-de log2FC:        The fold-change (FC) (absolute value of log2 ratio) of significant 
-                  differentially expressed (de) genes must exceed this value.
+de FC:            The fold-change (FC) of significant differentially expressed 
+                  (de) genes must exceed this value. This value will be transformed
+                  into log2 FC.
 de p-value threshold: The adjusted p-value of significant differentially expressed 
                   (de) genes must exceed this value.
 de contrasts:     Required. Variable in the metadata to define comparisons between 

@@ -26,7 +26,7 @@ default:
     size: "ageofdeath"
   skip model: TRUE
   force model with: ["sex", "diagnosis", "batch"]
-  de log2FC: 1.5
+  de FC: 1.5
   de p-value threshold: 0.05
   visualization gene list: ["LCN2", "TRIM69"]
   de contrasts:
