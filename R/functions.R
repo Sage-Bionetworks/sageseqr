@@ -438,7 +438,7 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
   # Update metadata to reflect variable subset
 
   # Variables of factor or numeric class are required
-  col_type <- dplyr::select(md, -primary_variable) %>%
+  col_type <- dplyr::select(md, -dplyr::all_of(primary_variable)) %>%
     dplyr::summarise_all(class) %>%
     tidyr::pivot_longer(tidyr::everything(), names_to = "variable", values_to = "class")
 
@@ -492,13 +492,25 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
 #' effect. If you wish to test an interaction term, `primary_variable` can take multiple variable names.
 #'
 #' @param cqn_counts A counts data frame normalized by CQN.
+#' @param p_value_threshold Numeric. P-values are adjusted by Benjamini and
+#' Hochberg (BH) false discovery rate (FDR). Significant genes are those with an
+#' adjusted p-value greater than this threshold.
+#' @param log_fold_threshold Numeric. Significant genes are those with a log
+#' fold-change greater than this threshold
 #' @inheritParams cqn
 #' @inheritParams coerce_factors
 #' @inheritParams build_formula
 #' @inheritParams cqn
 #' @export
-differential_expression <- function(filtered_counts, cqn_counts, md, primary_variable,
-                                    biomart_results, model_variables = NULL) {
+differential_expression <- function(filtered_counts, cqn_counts, md,
+                                    primary_variable, biomart_results,
+                                    p_value_threshold, log_fold_threshold,
+                                    model_variables = NULL,
+                                    exclude_variables = NULL) {
+  # force order of samples in metadata to match order of samples in counts.
+  # Required by variancePartition
+  md <- md[match(colnames(filtered_counts),rownames(md)),]
+
   metadata_input <- build_formula(md, primary_variable, model_variables)
   gene_expression <- edgeR::DGEList(filtered_counts)
   gene_expression <- edgeR::calcNormFactors(gene_expression)
@@ -548,11 +560,11 @@ differential_expression <- function(filtered_counts, cqn_counts, md, primary_var
   de <- data.table::rbindlist(de, idcol = "Comparison") %>%
     dplyr::mutate(Comparison = gsub(metadata_input$primary_variable, "", .data$Comparison),
                   Direction = .data$logFC/abs(.data$logFC),
-                  Direction = factor(.data$Direction, c(-1,1), c("-1" = "down", "1" = "up")),
-                  Direction = ifelse(.data$`adj.P.Val` > 0.5 | abs(.data$logFC) < log2(1.2),
+                  Direction = ifelse(.data$Direction == -1,"down", .data$Direction),
+                  Direction = ifelse(.data$Direction == 1, "up", .data$Direction),
+                  Direction = ifelse(.data$`adj.P.Val` > p_value_threshold | abs(.data$logFC) < log2(log_fold_threshold),
                                      "none",
-                                     .data$Direction),
-                  Direction = as.character(.data$Direction)
+                                     .data$Direction)
     )
 
   # Join metadata from biomart to differential expression results
@@ -573,17 +585,27 @@ differential_expression <- function(filtered_counts, cqn_counts, md, primary_var
 #'
 #' This function will pass multiple conditions to test to \code{"sagseqr::differential_expression()"}.
 #'
-#' @param conditions A list of conditions to test as `primary_variable`
+#' @param conditions A named list of conditions to test as `primary_variable`
 #' in \code{"sagseqr::differential_expression()"}.
 #' @inheritParams differential_expression
 #' @inheritParams build_formula
 #' @export
 wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
-                    biomart_results, model_variables = names(md)) {
-  purrr::map(conditions,
-             function(x) differential_expression(filtered_counts, cqn_counts, md, primary_variable = x,
-                                                 biomart_results, model_variables))
-
+                    biomart_results, p_value_threshold, log_fold_threshold,
+                    model_variables = names(md)) {
+  purrr::map(
+    conditions,
+    function(x) differential_expression(
+      filtered_counts,
+      cqn_counts,
+      md,
+      primary_variable = x,
+      biomart_results,
+      p_value_threshold,
+      log_fold_threshold,
+      model_variables
+      )
+    )
 }
 #' Stepwise Regression
 #'
@@ -594,6 +616,8 @@ wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
 #' @inheritParams build_formula
 #' @param skip Defaults to NULL. If TRUE, this step will be skipped in the
 #' Drake plan.
+#' @return Table with BIC criteria for exclusion or inclusion of variables in
+#' the model, linear (mixed) model formula and vector of variables to include.
 #' @export
 stepwise_regression <- function(md, primary_variable, cqn_counts,
                                 model_variables = names(md),
@@ -617,7 +641,12 @@ stepwise_regression <- function(md, primary_variable, cqn_counts,
                   `added to model` = .data$isAdded,
                   `(effective) number of parameters estimated` = .data$m
                   )
-  to_include <- model$trace$variable[model$trace$isAdded == "yes"]
+
+  # return vector of variables that map to the metadata columns. This requires
+  # some cleaning of extraneous characters. Do not include primary variable(s)
+
+  to_include <- model$trace$variable[model$trace$isAdded == "yes" & model$trace$iter != 0]
+  to_include <- gsub("\\)|\\(1\\||scale\\(", "", to_include)
 
   output <- list(
     to_visualize = to_visualize,
@@ -685,6 +714,9 @@ prepare_results <- function(target, data_name, rowname = NULL) {
 #' @param biomart_results The drake target containing gene annotations from
 #' biomart. Defaults to target name constrained by
 #' \code{"sageseqr::rnaseq_plan()"}.
+#' @param de_results The drake target containing differential expression gene
+#' lists. Defaults to target name constrained by
+#' \code{"sageseqr::rnaseq_plan()"}.
 #' @param rownames A list of variables to store rownames ordered by `metadata`,
 #' `filtered_counts`, `biomart_results`, `cqn_counts`. If not applicable,
 #' set as NULL.
@@ -704,6 +736,7 @@ store_results <- function(clean_md = clean_md,
                           filtered_counts = filtered_counts,
                           biomart_results = biomart_results,
                           cqn_counts = cqn_counts$counts,
+                          de_results,
                           syn_names, data_names,
                           parent_id, inputs, activity_provenance,
                           rownames = NULL, config_file = NULL,
@@ -718,6 +751,9 @@ store_results <- function(clean_md = clean_md,
   # nest drake targets in a list. Every time a new target is to-be stored, it
   # must be added as an argument to this function and then added to this list.
   targets <- list(clean_md, filtered_counts, biomart_results, cqn_counts)
+
+  # append differential expression data frames already nested in list
+  targets <- append(targets, list(de_results))
 
   mash <- list(
     target = targets,

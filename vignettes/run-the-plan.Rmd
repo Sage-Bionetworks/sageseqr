@@ -49,7 +49,10 @@ plan <- sageseqr::rnaseq_plan(
   conditions = config::get("conditions"), 
   cpm_threshold = config::get("cpm threshold"),
   conditions_threshold = config::get("percent threshold"),
-  x_var_for_plot = config::get("x_var"), 
+  primary_variable = config::get("x_var"), 
+  de_contrasts = config::get("de contrasts"),
+  log_fold_threshold = config::get("de FC"),
+  p_value_threshold = config::get("de p-value threshold"),
   sex_var = config::get("sex check"), 
   color = config::get("dimensions")$color, 
   shape = config::get("dimensions")$shape,
@@ -63,7 +66,9 @@ plan <- sageseqr::rnaseq_plan(
     config::get("biomart")$filters,
     config::get("counts")$`gene id`
     ),
-  config_file = "config.yml"
+  config_file = "config.yml",
+  force_model = config::get("force model with"), 
+  gene_list = config::get("visualization gene list")
 )
 
 drake::make(

@@ -26,6 +26,10 @@ If not supplied, the model will include all variables in \code{md}.}
 \item{skip}{Defaults to NULL. If TRUE, this step will be skipped in the
 Drake plan.}
 }
+\value{
+Table with BIC criteria for exclusion or inclusion of variables in
+the model, linear (mixed) model formula and vector of variables to include.
+}
 \description{
 This function performs multivariate forward stepwise regression evaluated by multivariate Bayesian Information
 Critera (BIC) by wrapping \code{"mvIC::mvForwardStepwise()"}.
