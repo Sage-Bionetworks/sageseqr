@@ -138,6 +138,8 @@
   <span class='va'>cqn_counts</span>,
   <span class='va'>md</span>,
   <span class='va'>biomart_results</span>,
+  <span class='va'>p_value_threshold</span>,
+  <span class='va'>log_fold_threshold</span>,
   model_variables <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span><span class='op'>(</span><span class='va'>md</span><span class='op'>)</span>
 <span class='op'>)</span></pre>
 
@@ -146,7 +148,7 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>conditions</th>
-      <td><p>A list of conditions to test as `primary_variable`
+      <td><p>A named list of conditions to test as `primary_variable`
 in <code>"sagseqr::differential_expression()"</code>.</p></td>
     </tr>
     <tr>
@@ -165,6 +167,17 @@ in <code>"sagseqr::differential_expression()"</code>.</p></td>
       <th>biomart_results</th>
       <td><p>Output of <code>"sageseqr::get_biomart()"</code>. Gene Ids are
 stored as rownames.</p></td>
+    </tr>
+    <tr>
+      <th>p_value_threshold</th>
+      <td><p>Numeric. P-values are adjusted by Benjamini and
+Hochberg (BH) false discovery rate (FDR). Significant genes are those with an
+adjusted p-value greater than this threshold.</p></td>
+    </tr>
+    <tr>
+      <th>log_fold_threshold</th>
+      <td><p>Numeric. Significant genes are those with a log
+fold-change greater than this threshold</p></td>
     </tr>
     <tr>
       <th>model_variables</th>

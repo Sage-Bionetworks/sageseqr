@@ -142,7 +142,10 @@ effect. If you wish to test an interaction term, `primary_variable` can take mul
   <span class='va'>md</span>,
   <span class='va'>primary_variable</span>,
   <span class='va'>biomart_results</span>,
-  model_variables <span class='op'>=</span> <span class='cn'>NULL</span>
+  <span class='va'>p_value_threshold</span>,
+  <span class='va'>log_fold_threshold</span>,
+  model_variables <span class='op'>=</span> <span class='cn'>NULL</span>,
+  exclude_variables <span class='op'>=</span> <span class='cn'>NULL</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -171,9 +174,24 @@ fixed effect interaction term.</p></td>
 stored as rownames.</p></td>
     </tr>
     <tr>
+      <th>p_value_threshold</th>
+      <td><p>Numeric. P-values are adjusted by Benjamini and
+Hochberg (BH) false discovery rate (FDR). Significant genes are those with an
+adjusted p-value greater than this threshold.</p></td>
+    </tr>
+    <tr>
+      <th>log_fold_threshold</th>
+      <td><p>Numeric. Significant genes are those with a log
+fold-change greater than this threshold</p></td>
+    </tr>
+    <tr>
       <th>model_variables</th>
       <td><p>Optional. Vector of variables to include in the linear (mixed) model.
 If not supplied, the model will include all variables in <code>md</code>.</p></td>
+    </tr>
+    <tr>
+      <th>exclude_variables</th>
+      <td><p>Vector of variables to exclude from testing.</p></td>
     </tr>
     </table>
 

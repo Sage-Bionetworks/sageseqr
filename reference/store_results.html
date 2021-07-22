@@ -137,6 +137,7 @@
   filtered_counts <span class='op'>=</span> <span class='va'>filtered_counts</span>,
   biomart_results <span class='op'>=</span> <span class='va'>biomart_results</span>,
   cqn_counts <span class='op'>=</span> <span class='va'>cqn_counts</span><span class='op'>$</span><span class='va'>counts</span>,
+  <span class='va'>de_results</span>,
   <span class='va'>syn_names</span>,
   <span class='va'>data_names</span>,
   <span class='va'>parent_id</span>,
@@ -171,6 +172,12 @@ biomart. Defaults to target name constrained by
       <th>cqn_counts</th>
       <td><p>The drake target containing Conditional Quantile Normalized
 (CQN) counts. Defaults to target name constrained by
+<code>"sageseqr::rnaseq_plan()"</code>.</p></td>
+    </tr>
+    <tr>
+      <th>de_results</th>
+      <td><p>The drake target containing differential expression gene
+lists. Defaults to target name constrained by
 <code>"sageseqr::rnaseq_plan()"</code>.</p></td>
     </tr>
     <tr>
