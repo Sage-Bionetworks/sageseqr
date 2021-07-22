@@ -10,8 +10,8 @@ meta_express(
   count_df,
   gene_id_input,
   primary_variable,
-  group_variables,
-  collapse_condition
+  group_variables = NULL,
+  collapse_condition = NULL
 )
 }
 \arguments{
@@ -29,13 +29,13 @@ and gene Ids are rownames.}
 the `primary_variable` will make up the experimental and control groups of
 \code{"meta::metacont()"}.}
 
-\item{group_variables}{These variables are referenced when computing summary
-statistics for every gene. Therefore, a gene feature will have an observation
-for each group of variables (i.e. each gene feature across unique tissue
-types, sex and diagnosis).}
+\item{group_variables}{These variables, in addition to the `primary_variable`,
+are referenced when computing summary statistics for every gene. Therefore,
+a gene feature will have an observation for each group of variables (i.e.
+each gene feature by sex).}
 
-\item{collapse_condition}{Compute one estimate across the `collapse_condition`
-which is a variabel in `clean_metadata`.}
+\item{collapse_condition}{Compute one estimate for the meta-analysis across
+the `collapse_condition` which is a variable in `clean_metadata`.}
 }
 \description{
 Meta-analysis by standardized mean difference with the Hedges' g method

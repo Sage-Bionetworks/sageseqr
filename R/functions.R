@@ -832,7 +832,8 @@ compute_mean_sd <- function(clean_metadata, sample_identifier, count_df, gene_id
   # function to compute rowwise mean and sd, remove missing values
   f_byrow <- function(x) {
     tibble::tibble(
-      mean = mean(x, na.rm = TRUE),
+      n = length(x),
+      mean = mean(as.numeric(x), na.rm = TRUE),
       sd = sd(x, na.rm = TRUE))
   }
   # add a check that all samples in the metadata are represented in the counts
@@ -846,31 +847,33 @@ compute_mean_sd <- function(clean_metadata, sample_identifier, count_df, gene_id
         "Not all samples in the metadata are present in the counts matrix. {dropped} is/are not analyzed."
         )
       )
-    samples <- clean_metadata[[sample_identifier]][
-      clean_metadata[[sample_identifier]] %in% colnames(count_df)
-    ]
+    # character vector required to subset matrix
+    samples <- as.character(
+      clean_metadata[[sample_identifier]][
+        clean_metadata[[sample_identifier]] %in% colnames(count_df)
+        ]
+      )
   } else{
-    samples <- clean_metadata[[sample_identifier]]
+    samples <- as.character(clean_metadata[[sample_identifier]])
   }
 
-  # subset expression matrix to include relevant samples
-  subset <- count_df[,samples]
-  # compute row means and standard deviation
-  compute <- subset %>%
-    # capture row elements with ... and concatenate into a vector
-    dplyr::transmute(
-      out = furrr::future_pmap(
-        ., ~ f_byrow(c(...))
-      )
-    ) %>%
-    tidyr::unnest(cols = c(out))
+  # create index of gene features
+  index <- dplyr::select(count_df, dplyr::one_of(gene_id_input))
 
-  # output a data frame with gene features, n, mean, and sd
-  dat <- data.frame(
-    feature = count_df[[gene_id_input]],
-    n = dim(clean_metadata)[1]
-  )
-  dplyr::bind_cols(dat, compute)
+  # compute row means and standard deviation
+  compute <- furrr::future_pmap_dfr(index, function(...) {
+    # capture row elements with ...
+    index <- list(...) %>% tibble::as_tibble()
+    # drop feature column so observations are numeric only
+    one_row <- index %>%
+      dplyr::inner_join(count_df) %>%
+      dplyr::select(-dplyr::one_of(gene_id_input))
+
+    out <- f_byrow(one_row)
+    # output a data frame with gene features, n, mean, and sd
+    return(dplyr::bind_cols(index, out))
+    })
+  return(compute)
 }
 #'Apply metacont() between two comparison groups
 #'
@@ -881,81 +884,74 @@ compute_mean_sd <- function(clean_metadata, sample_identifier, count_df, gene_id
 #'
 #' @param comparison_values A vector of two values to compare from
 #'`primary_variable`.
-#' @param by_gene A grouped data frame with
+#' @param by_gene A grouped data frame with summary statistics computed on each gene
+#' per condition nested. Required columns are n, mean and sd.
+#' @param index A data frame where every row contains a unique gene feature and
+#' other metadata to serve as the index for comparing summary statistics across
+#' groups defined by `primary_variable`.
 #' @inheritParams meta_express
-#'
-#' @export
-pairwise_meta <- function(comparison_values, by_gene, primary_variable) {
-  # wrap metacont() to return relevant components for each gene feature
-  wrap_meta <- function(df1, df2){
+pairwise_meta <- function(comparison_values, by_gene, primary_variable, index) {
+  assertthat::assert_that(length(comparison_values) == 2)
+
+  # subset by_gene to data matching comparison_values
+  input <- by_gene[by_gene[[primary_variable]] %in% comparison_values,]
+
+  # wrap metacont() to return relevant statistics for each gene feature. Gene
+  # feature corresponds to values in index
+  output <- furrr::future_pmap_dfr(index, function(...) {
+    index <- list(...) %>% tibble::as_tibble()
+    df <- purrr::map(
+      comparison_values,
+      function(c) {
+        index %>% dplyr::inner_join(input) %>% filter(.data[[primary_variable]] == c)
+        }
+      )
     m <- meta::metacont(
-      n.e = df1$n,
-      mean.e = df1$mean,
-      sd.e = df1$sd,
-      n.c = df2$n,
-      mean.c = df2$mean,
-      sd.c = df2$sd,
+      n.e = df[[1]]$data[[1]]$n,
+      mean.e = df[[1]]$data[[1]]$mean,
+      sd.e = df[[1]]$data[[1]]$sd,
+      n.c = df[[2]]$data[[1]]$n,
+      mean.c = df[[2]]$data[[1]]$mean,
+      sd.c = df[[2]]$data[[1]]$sd,
       sm = "SMD",
       method.smd = "Hedges",
       method.tau = "REML"
     )
-    return(m[c("TE.fixed", "seTE.fixed", "lower.fixed", "upper.fixed",
-               "zval.fixed", "pval.fixed", "TE.random", "seTE.random",
-               "lower.random", "upper.random", "zval.random", "pval.random",
-               "Q", "tau", "H", "I2")])
-
-    # move bind_cols logic here.
-
-  }
-  # subset summaries by gene to relevant comparison_values
-  to_analyze <- by_gene[by_gene[[primary_variable]] %in% comparison_values,]
-  split <- dplyr::group_by(to_analyze, .data[[primary_variable]]) %>%
-    dplyr::group_split()
-  # split pairwise comparisons into experimental and control data frames
-  experimental <- split[[1]]
-  control <- split[[2]]
-
-  # add assert functions here that dims match
-
-  # parallelize meta-analysis over every gene
-  # try pmap
-  m <- furrr::future_map2_dfr(
-    experimental$data,
-    control$data,
-    ~wrap_meta(.x, .y)
+    return(
+      bind_cols(
+        index,
+        m[c("TE.fixed", "seTE.fixed", "lower.fixed",
+            "upper.fixed", "zval.fixed", "pval.fixed",
+            "TE.random", "seTE.random", "lower.random",
+            "upper.random", "zval.random", "pval.random",
+            "Q", "tau", "H", "I2")]
+        )
+      )
+    }
   )
-  # create index column
-  # bind gene features and other metadata
-  feature_vars <- colnames(by_gene)[
-    !colnames(by_gene) %in% c(primary_variable, "data")
-  ]
-  gene_features <- dplyr::bind_rows(split) %>%
-    dplyr::select(!!!feature_vars) %>%
-    dplyr::distinct()
-  output <- dplyr::bind_cols(gene_features, m)
-  output
-}
+    return(output)
+  }
 #' Meta-analysis of continuous outcome data
 #'
 #' Meta-analysis by standardized mean difference with the Hedges' g method
 #' (1981).
 #'
-#' @param group_variables These variables are referenced when computing summary
-#' statistics for every gene. Therefore, a gene feature will have an observation
-#' for each group of variables (i.e. each gene feature across unique tissue
-#' types, sex and diagnosis).
+#' @param group_variables These variables, in addition to the `primary_variable`,
+#' are referenced when computing summary statistics for every gene. Therefore,
+#' a gene feature will have an observation for each group of variables (i.e.
+#' each gene feature by sex).
 #' @param primary_variable The primary meta-analysis condition. The values of
 #' the `primary_variable` will make up the experimental and control groups of
 #' \code{"meta::metacont()"}.
-#' @param collapse_condition Compute one estimate across the `collapse_condition`
-#' which is a variabel in `clean_metadata`.
+#' @param collapse_condition Compute one estimate for the meta-analysis across
+#' the `collapse_condition` which is a variable in `clean_metadata`.
 #' @inheritParams compute_mean_sd
 #' @export
 meta_express <- function(clean_metadata, sample_identifier, count_df,
-                         gene_id_input, primary_variable, group_variables,
-                         collapse_condition
+                         gene_id_input, primary_variable, group_variables = NULL,
+                         collapse_condition = NULL
                          ) {
-  vars <- c(primary_variable, group_variables)
+  vars <- c(primary_variable, group_variables, collapse_condition)
   #compute mean and standard deviation by gene for grouped variables of interest
   by_gene <- clean_metadata %>%
     dplyr::group_by_at(vars(dplyr::one_of(vars))) %>%
@@ -989,24 +985,30 @@ meta_express <- function(clean_metadata, sample_identifier, count_df,
 
   # map over pairwise_meta() for each condition but also need to
   # group_by(feature, other_metadata)
-  group_variables <- group_variables[!group_variables %in% collapse_condition]
-  multi_groups <- syms(group_variables)
+  vars <- vars[!vars %in% collapse_condition]
+  multi_groups <- syms(vars)
   by_gene <- by_gene %>%
     dplyr::group_by(.data[[gene_id_input]], !!!multi_groups) %>%
-    tidyr::nest() %>%
-    # required for each group to be ordered since furrr will map over rows with
-    # metacont()
-    dplyr::arrange(.data[[gene_id_input]], .by_group = TRUE)
+    tidyr::nest()
+
+  index <- by_gene[,c(gene_id_input, group_variables)] %>%
+    dplyr::distinct()
 
   # map pairwise_meta
   by_primary_variable_values <- furrr::future_map(
     comparisons,
-    ~pairwise_meta(
+    ~ pairwise_meta(
       .,
       by_gene,
-      primary_variable
+      primary_variable,
+      index
       )
     )
-  by_primary_variable_values
-  # ADJUST PVALS
+  # adjust p-values
+  output <- dplyr::mutate(
+    by_primary_variable_values,
+    fdr.fixed = p.adjust(pval.fixed, method = 'fdr'),
+    fdr.random = p.adjust(pval.random, method = 'fdr')
+    )
+  output
 }

@@ -18,15 +18,16 @@ dat <- tibble::tribble(~tissue, ~diagnosis, ~sex, ~feature, ~n, ~mean, ~sd,
                "cbe", "other", "f", "ENSG00000237973", 72, 1.78, 0.7,
                "pf", "ct", "f", "ENSG00000237973", 57, -1.67, 0.3
 )
-
-# pairwise_meta requires a constrained format when gene feature statistics are
-# nested by groups
-input <- dat %>%
-  dplyr::group_by(feature,sex,diagnosis) %>%
+# pairwise_meta() requires a constrained format where summary statistics are
+# grouped by a condition of interest
+input <- dplyr::group_by(dat, diagnosis, sex, feature) %>%
   tidyr::nest() %>%
   dplyr::arrange(feature, .by_group = TRUE)
 
-meta_stats <- pairwise_meta(c("dx", "ct"), input, "diagnosis")
+index <- input[,c("sex", "feature")] %>%
+  dplyr::distinct()
+
+meta_stats <- pairwise_meta(c("dx", "ct"), input, "diagnosis", index)
 
 test_that("expect dimensions of output to be 3", {
   expect_equal(3, dim(meta_stats)[1])
@@ -34,4 +35,10 @@ test_that("expect dimensions of output to be 3", {
 
 test_that("columns of output match expectations", {
   expect_equal(colnames(meta_stats)[1:2], c("sex", "feature"))
+})
+
+test_that("fails when more than two comparison_values are passed",{
+  expect_error(
+    pairwise_meta(c("dx", "ct", "ct"), input, diagnosis, index)
+  )
 })

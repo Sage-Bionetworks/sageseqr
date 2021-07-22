@@ -4,17 +4,22 @@
 \alias{pairwise_meta}
 \title{Apply metacont() between two comparison groups}
 \usage{
-pairwise_meta(comparison_values, by_gene, primary_variable)
+pairwise_meta(comparison_values, by_gene, primary_variable, index)
 }
 \arguments{
 \item{comparison_values}{A vector of two values to compare from
 `primary_variable`.}
 
-\item{by_gene}{A grouped data frame with}
+\item{by_gene}{A grouped data frame with summary statistics computed on each gene
+per condition nested. Required columns are n, mean and sd.}
 
 \item{primary_variable}{The primary meta-analysis condition. The values of
 the `primary_variable` will make up the experimental and control groups of
 \code{"meta::metacont()"}.}
+
+\item{index}{A data frame where every row contains a unique gene feature and
+other metadata to serve as the index for comparing summary statistics across
+groups defined by `primary_variable`.}
 }
 \description{
 \code{"sageseqr::meta_express()"} wraps \code{"sageseqr::pairwise_meta()"}
