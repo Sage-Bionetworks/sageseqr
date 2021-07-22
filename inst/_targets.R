@@ -1,6 +1,7 @@
 library(sageseqr)
 
-# Login to Synapse. Make a Synapse account and use synapser to login: https://r-docs.synapse.org/articles/manageSynapseCredentials.html
+# Login to Synapse. Make a Synapse account and use synapser to login:
+# https://r-docs.synapse.org/articles/manageSynapseCredentials.html
 synapser::synLogin()
 
 #Set the cofiguration profile here:
@@ -14,7 +15,7 @@ if (!file.exists("sageseqr-report.Rmd")) {
 #Build Plan
 list(
   targets::tar_target(
-    import_metadata, 
+    import_metadata,
     get_data(!!config::get("metadata")$synID,
              !!config::get("metadata")$version)
   ),
@@ -64,7 +65,7 @@ list(
     gene_coexpression,
     plot_coexpression(cqn_counts)
   ),
-  
+
   targets::tar_target(
     boxplots,
     boxplot_vars(md = clean_md,
@@ -84,7 +85,7 @@ list(
                         counts,
                         biomart_results,
                         !!config::get("sex check"))
-  ),                    
+  ),
   targets::tar_target(
     correlation_plot,
     get_association_statistics(clean_md)
@@ -95,10 +96,10 @@ list(
   ),
   targets::tar_target(
     outliers,
-    identify_outliers(filtered_counts, 
-                      clean_md, 
-                      !!config::get("dimensions")$color, 
-                      !!config::get("dimensions")$shape, 
+    identify_outliers(filtered_counts,
+                      clean_md,
+                      !!config::get("dimensions")$color,
+                      !!config::get("dimensions")$shape,
                       !!config::get("dimensions")$size
                      )
   ),
@@ -114,7 +115,7 @@ list(
   targets::tar_target(
     report,
       tarchetypes::tar_render(name="sageseqr-report.Rmd",
-                              path=glue::glue("{getwd()}", 
+                              path=glue::glue("{getwd()}",
                                               '/inst/sageseqr-report.Rmd')
       )
   ),
@@ -150,5 +151,5 @@ list(
       report_name = !!config::get("report")
     )
   )
-  
+
 )
