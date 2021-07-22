@@ -846,3 +846,24 @@ provenance_helper <- function(metadata_id,  counts_id, metadata_version = NULL,
   }
   ids
 }
+#' Initialize differential expression analysis workflow
+#'
+#' The `sageseqr` package provides a `targets` workflow to string together the
+#' data processing and computational steps of RNA-seq differential expression
+#' analysis. This funciton copies a markdown document and _targets.R file to your
+#' working directory. The _targets.R file in your working directory is required
+#' for the workflow to run.
+#'
+start_de <- function() {
+  # copy sageseqr-report.Rmd markdown to working directory
+  if (!file.exists("sageseqr-report.Rmd")) {
+    fs::file_copy(system.file("sageseqr-report.Rmd", package = "sageseqr"),
+                  new_path = getwd())
+  }
+
+  # copy _targets.R file to working directory
+  if (!file.exists("_targets.R")) {
+    fs::file_copy(system.file("_targets.R", package = "sageseqr"),
+                  new_path = getwd())
+  }
+}

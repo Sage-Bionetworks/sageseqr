@@ -24,39 +24,24 @@ profile_set <- "default"
 Sys.setenv(R_CONFIG_ACTIVE = profile_set)
 ```
 
-3. Load the `sageseqr` library and login to [Synapse](https://www.synapse.org/). `rnaseq_plan()` calls the arguments from the config file and creates the `targets` plan. Execute `targets::make()` to compute. Run this code from your project root.
+3. Load the `sageseqr` library and login to [Synapse](https://www.synapse.org/). `start_de()` copies the `targets` plan to your working directory. Execute `targets::make()` to compute. Run this code from your project root.
 
 ```{r run-plan}
 library(sageseqr)
 # Login to Synapse. Make a Synapse account and use synapser to login: https://r-docs.synapse.org/articles/manageSynapseCredentials.html
 synapser::synLogin()
 
-# Run the analysis
-replace_command <- paste('system( "sed ',
-                         paste0('s/INSERT_CONFIG_PROFILE_HERE/',
-                                profile_set,
-                                "/g"
-                                ),
-                         " ../R/_targets_template.R > ../_targets.R\")",
-                         sep = "'"
-                        )
-
-eval(parse( text=  
-     glue::glue(replace_command)
- )
-)
-
-setwd('../')
-targets::tar_manifest(fields="command")
-
+# gather the dependencies
+start_de()
+# inspect the steps of the workflow
+targets::tar_manifest()
+# run the analysis
 targets::tar_make()
-
 ```
 
 4. Visualize the results of your work. 
 
 ```{r visualize}
-setwd('../')
 targets::tar_glimpse(
   targets_only = TRUE
 )
