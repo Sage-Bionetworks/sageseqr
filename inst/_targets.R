@@ -131,6 +131,22 @@ list(
       )
     ),
   tar_target(
+    selected_model,
+    if(is.null(get("force model with"))) {model$variables_in_model} else {get("force model with")}
+  ),
+  tar_target(
+    de,
+    wrap_de(
+      conditions = get("de contrasts"),
+      filtered_counts,
+      cqn_counts,
+      clean_md,
+      biomart_results,
+      p_value_threshold = get("de p-value threshold"),
+      log_fold_threshold = get("de FC")
+      )
+    ),
+  tar_target(
     report,
       tarchetypes::tar_render(
         name = "sageseqr-report.Rmd",
@@ -158,6 +174,7 @@ list(
       clean_md = clean_md,
       filtered_counts = filtered_counts,
       biomart_results = biomart_results,
+      de_results = de,
       rownames = !!list(
         config::get("metadata")$`sample id`,
         config::get("counts")$`gene id`,
@@ -170,7 +187,8 @@ list(
         ),
       data_names = list(
         "clean_md", "filtered_counts",
-        "biomart_results", "cqn_counts"
+        "biomart_results", "cqn_counts",
+        names(de)
         ),
       inputs = document_inputs,
       activity_provenance = "Analyze RNA-seq data with sageseqr pkg",
