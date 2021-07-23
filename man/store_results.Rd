@@ -37,8 +37,7 @@ biomart. Defaults to target name constrained by
 \code{"targets::tar_make"}.}
 
 \item{de_results}{The drake target containing differential expression gene
-lists. Defaults to target name constrained by
-\code{"sageseqr::rnaseq_plan()"}.}
+lists. Defaults to target name constrained by}
 
 \item{syn_names}{A list of human-readable names for the Synapse entities
 ordered
