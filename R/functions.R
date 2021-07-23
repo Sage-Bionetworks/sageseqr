@@ -889,6 +889,7 @@ provenance_helper <- function(metadata_id,  counts_id, metadata_version = NULL,
 #' working directory. The _targets.R file in your working directory is required
 #' for the workflow to run.
 #'
+#' @export
 start_de <- function() {
   # copy sageseqr-report.Rmd markdown to working directory
   if (!file.exists("sageseqr-report.Rmd")) {
