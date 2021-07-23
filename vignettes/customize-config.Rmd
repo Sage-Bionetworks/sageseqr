@@ -51,7 +51,7 @@ conditions:       Optional. Filtering low-expression genes is a common practice 
                   sensitivity in detection of differentially expressed genes. Low
                   count genes that have less than a user-defined threshold of counts 
                   per million (CPM) in a user-defined percentage of samples per the
-                  conditions provided here will be removed. (e.g. ["diagnosis", "sex"])
+                  conditions provided here will be removed. (e.g. ["diagnosis", "sex"]). 
 cpm threshold:    Optional. The minium allowable CPM to keep a gene in the analysis.
 percent threshold:Optional. The percentage of samples that should contain the minimum number
                   of CPM. If a condition is passed, the percentage will apply to 
@@ -65,6 +65,17 @@ dimensions:       Required. Specify the PCA dimensions by variable name.
   size:
 skip model:       Optional. If TRUE, the exploratory data report is run. Model selection
                   is not computed.
+force model with: Optional. Force differential expression with this user defined model
+                  instead of the output of stepwise regression.
+de FC:            The fold-change (FC) of significant differentially expressed 
+                  (de) genes must exceed this value. This value will be transformed
+                  into log2 FC.
+de p-value threshold: The adjusted p-value of significant differentially expressed 
+                  (de) genes must exceed this value.
+de contrasts:     Required. Variable in the metadata to define comparisons between 
+                  groups.
+  <any named list:> If there are multiple comparisons, set them up as nested lists.
+visualization gene list: Label this list of genes in the volcano plot.
 report:           Required. The name of your project. This will become the name of your 
                   output html file.
 store output:     Required. Folder Synapse Id to store output on Synapse.

@@ -112,7 +112,7 @@ Significant covariates are identified by the pearson correlation (p-value of 1%)
 ```{r pca_and_significant_covariates}
 targets::tar_read(
   significant_covariates_plot
-  )$plot
+  )$pc_results
 ```
 
 ```{r model}
@@ -124,4 +124,8 @@ summary <- targets::tar_read(model)
 knitr::kable(summary$to_visualize)
 as.character(summary$formula)[2]
 }
+```
+
+```{r differential_expression}
+drake::readd(plot_de_volcano)
 ```
