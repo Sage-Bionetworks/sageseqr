@@ -502,6 +502,14 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
 #' @inheritParams build_formula
 #' @inheritParams cqn
 #' @export
+#' @return A named list with \code{"variancePartition::voomWithDreamWeights()"}
+#'  normalized counts, contrasts from \code{"variancePartition::getContrasts()"},
+#'  linear mixed model fits from \code{"variancePartition::dream()"}, differential
+#'  expression results from \code{"limma::topTable()"} and gene feature-specific
+#'  metadata, the response variable, the model formula fit to compute differential
+#'  expression results.
+#'  The list names are: \code{"list(voom_object, contrasts_to_plot, fits, differential_expression,
+#'  primary_variable, formula)"}
 differential_expression <- function(filtered_counts, cqn_counts, md,
                                     primary_variable, biomart_results,
                                     p_value_threshold, log_fold_threshold,
@@ -728,7 +736,8 @@ prepare_results <- function(target, data_name, rowname = NULL) {
 #' @param activity_provenance A phrase to describe the data transformation for
 #' provenance.
 #' @param data_names A list of identifiers to embed in the file name ordered
-#' by `metadata`, `filtered_counts`, `biomart_results`, `cqn_counts`.
+#' by `clean_md`, `filtered_counts`, `biomart_results`, `cqn_counts`,
+#' `de_results`.
 #' @param config_file Optional. Path to configuration file.
 #' @inheritParams rnaseq_plan
 #' @export
@@ -736,7 +745,7 @@ store_results <- function(clean_md = clean_md,
                           filtered_counts = filtered_counts,
                           biomart_results = biomart_results,
                           cqn_counts = cqn_counts$counts,
-                          de_results,
+                          de_results = de$differential_expression,
                           syn_names, data_names,
                           parent_id, inputs, activity_provenance,
                           rownames = NULL, config_file = NULL,
