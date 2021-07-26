@@ -25,12 +25,16 @@
 #' @param force_model Optional. A vector of variables to include in the differential
 #' expression model if you want to skip the output of the stepwise regression.
 #' @param gene_list Optional. A vector of genes to label in the volcano plot.
+#' @param de_contrasts Required. Variables in the metadata to define comparisons
+#' between groups.
 #' @inheritParams plot_sexcheck
 #' @inheritParams get_biomart
 #' @inheritParams filter_genes
 #' @inheritParams identify_outliers
 #' @inheritParams store_results
 #' @inheritParams prepare_results
+#' @inheritParams differential_expression
+#'
 #' @param skip_model If TRUE, does not run regression model.
 #' @export
 rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
@@ -40,7 +44,8 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                         organism, conditions, cpm_threshold = 1,
                         conditions_threshold = 0.5,
                         primary_variable, sex_var, color, shape, size,
-                        report_name, skip_model, parent_id,
+                        report_name, skip_model, de_contrasts, log_fold_threshold,
+                        p_value_threshold, parent_id,
                         rownames, config_file, gene_list, force_model = NULL) {
   # Copies markdown to user's working directory
   if (!file.exists("sageseqr-report.Rmd")) {
