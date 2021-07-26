@@ -9,7 +9,7 @@ store_results(
   filtered_counts = filtered_counts,
   biomart_results = biomart_results,
   cqn_counts = cqn_counts$counts,
-  de_results,
+  de_results = de$differential_expression,
   syn_names,
   data_names,
   parent_id,
@@ -45,7 +45,8 @@ ordered
 by `metadata`, `filtered_counts`, `biomart_results`, `cqn_counts`.}
 
 \item{data_names}{A list of identifiers to embed in the file name ordered
-by `metadata`, `filtered_counts`, `biomart_results`, `cqn_counts`.}
+by `clean_md`, `filtered_counts`, `biomart_results`, `cqn_counts`,
+`de_results`.}
 
 \item{parent_id}{A Synapse Id that corresponds to a project or
 folder to store output.}

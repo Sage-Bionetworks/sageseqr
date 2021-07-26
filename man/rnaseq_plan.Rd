@@ -30,7 +30,9 @@ rnaseq_plan(
   skip_model,
   parent_id,
   rownames,
-  config_file
+  config_file,
+  gene_list,
+  force_model = NULL
 )
 }
 \arguments{
@@ -103,6 +105,11 @@ folder to store output.}
 set as NULL.}
 
 \item{config_file}{Optional. Path to configuration file.}
+
+\item{gene_list}{Optional. A vector of genes to label in the volcano plot.}
+
+\item{force_model}{Optional. A vector of variables to include in the differential
+expression model if you want to skip the output of the stepwise regression.}
 }
 \description{
 This function wraps the \code{"drake::plan()"} and copies the R markdown
