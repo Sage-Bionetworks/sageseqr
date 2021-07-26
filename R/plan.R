@@ -138,10 +138,31 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
       de_results = de$differential_expression,
       biomart_results = biomart_results,
       rownames = !!rownames,
-      syn_names = list("Covariates", "Filtered counts (greater than 1cpm)",
-                    "BioMart query results", "Normalized counts (CQN)"),
-      data_names = append(list("clean_md", "filtered_counts", "biomart_results",
-                        "cqn_counts"), as.list(names(de$differential_expression))),
+      syn_names = append(
+        list(
+          "Covariates",
+          "Filtered counts (greater than 1cpm)",
+          "BioMart query results",
+          "Normalized counts (CQN)"
+          ),
+        as.list(
+          glue::glue(
+            "Differential Expression({names(de$differential_expression)})")
+          )
+      ),
+      data_names = append(
+        list(
+          "clean_md",
+          "filtered_counts",
+          "biomart_results",
+          "cqn_counts"
+          ),
+        as.list(
+          names(
+            de$differential_expression
+            )
+          )
+        ),
       inputs = document_inputs,
       activity_provenance = "Analyze RNA-seq data with sageseqr pkg",
       config_file = !!config_file,
