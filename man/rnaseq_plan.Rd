@@ -28,6 +28,9 @@ rnaseq_plan(
   size,
   report_name,
   skip_model,
+  de_contrasts,
+  log_fold_threshold,
+  p_value_threshold,
   parent_id,
   rownames,
   config_file,
@@ -96,6 +99,16 @@ by size.}
 \item{report_name}{Name of output markdown file.}
 
 \item{skip_model}{If TRUE, does not run regression model.}
+
+\item{de_contrasts}{Required. Variables in the metadata to define comparisons
+between groups.}
+
+\item{log_fold_threshold}{Numeric. Significant genes are those with a log
+fold-change greater than this threshold}
+
+\item{p_value_threshold}{Numeric. P-values are adjusted by Benjamini and
+Hochberg (BH) false discovery rate (FDR). Significant genes are those with an
+adjusted p-value greater than this threshold.}
 
 \item{parent_id}{A Synapse Id that corresponds to a project or
 folder to store output.}
