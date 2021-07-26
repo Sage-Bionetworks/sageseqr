@@ -1357,23 +1357,26 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
 #' the plot via `gene_list`.
 #'
 #' @param gene_list A vector of genes to label in the volcano plot.
+#' @param de Differential expression results from
+#' \code{"sageseqr::differential_expression()"} output object named
+#' "differential_expression".
 #' @inheritParams differential_expression
 #'
 plot_volcano <- function(de, p_value_threshold, log_fold_threshold, gene_list) {
   tmp <- de %>%
-    dplyr::filter(adj.P.Val <= p_value_threshold) %>%
-    dplyr::select(ensemble_gene_id, Comparison) %>%
-    dplyr::group_by(Comparison) %>%
+    dplyr::filter(.datat$adj.P.Val <= p_value_threshold) %>%
+    dplyr::select(.data$ensemble_gene_id, Comparison) %>%
+    dplyr::group_by(.data$Comparison) %>%
     dplyr::summarise(
       "FDR_{p_value_threshold}" := length(unique(ensembl_gene_id))
     )
   tmp1 <- de %>%
     dplyr::filter(
-      adj.P.Val <= p_value_threshold,
+      .data$adj.P.Val <= p_value_threshold,
       abs(logFC) >= log2(log_fold_threshold)
     ) %>%
-    dplyr::select(ensembl_gene_id, Comparison) %>%
-    dplyr::group_by(Comparison) %>%
+    dplyr::select(.data$ensembl_gene_id, .data$Comparison) %>%
+    dplyr::group_by(.data$Comparison) %>%
     dplyr::summarise(
       "FDR_{p_value_threshold}_FC_{log_fold_threshold}" := length(unique(ensembl_gene_id))
     )
