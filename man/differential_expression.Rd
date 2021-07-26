@@ -41,6 +41,16 @@ If not supplied, the model will include all variables in \code{md}.}
 
 \item{exclude_variables}{Vector of variables to exclude from testing.}
 }
+\value{
+A named list with \code{"variancePartition::voomWithDreamWeights()"}
+ normalized counts, contrasts from \code{"variancePartition::getContrasts()"},
+ linear mixed model fits from \code{"variancePartition::dream()"}, differential
+ expression results from \code{"limma::topTable()"} and gene feature-specific
+ metadata, the response variable, the model formula fit to compute differential
+ expression results.
+ The list names are: \code{"list(voom_object, contrasts_to_plot, fits, differential_expression,
+ primary_variable, formula)"}
+}
 \description{
 Differential expression testing is performed with \code{"variancePartition::dream()"} to increase power
 and decrease false positives for repeated measure designs. The `primary_variable` is modeled as a fixed
