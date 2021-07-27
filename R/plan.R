@@ -137,7 +137,7 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
     ),
     Synapse = store_results(
       parent_id = !!parent_id,
-      cqn_counts = cqn_counts$counts,
+      cqn_counts = cqn_counts$E,
       clean_md = clean_md,
       filtered_counts = filtered_counts,
       de_results = de$differential_expression,

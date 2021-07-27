@@ -744,7 +744,7 @@ prepare_results <- function(target, data_name, rowname = NULL) {
 store_results <- function(clean_md = clean_md,
                           filtered_counts = filtered_counts,
                           biomart_results = biomart_results,
-                          cqn_counts = cqn_counts$counts,
+                          cqn_counts = cqn_counts$E,
                           de_results = de$differential_expression,
                           syn_names, data_names,
                           parent_id, inputs, activity_provenance,
