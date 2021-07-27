@@ -117,12 +117,14 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
       log_fold_threshold = !!log_fold_threshold,
       model_variables = selected_model
       ),
-    plot_de_volcano = plot_volcano(
+    plot_de_volcano = purrr::map(
       de$differential_expression,
-      p_value_threshold = !!p_value_threshold,
-      log_fold_threshold = !!log_fold_threshold,
-      gene_list = !!gene_list
-      ),
+      function(x) plot_volcano(
+        x,
+        p_value_threshold = !!p_value_threshold,
+        log_fold_threshold = !!log_fold_threshold,
+        gene_list = !!gene_list
+        ),
     report = rmarkdown::render(
       drake::knitr_in("sageseqr-report.Rmd"),
       output_file = drake::file_out(
