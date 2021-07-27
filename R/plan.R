@@ -117,7 +117,7 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
       log_fold_threshold = !!log_fold_threshold,
       model_variables = selected_model
       ),
-    plot_de_volcano = plot_volano(
+    plot_de_volcano = plot_volcano(
       de$differential_expression,
       p_value_threshold = !!p_value_threshold,
       log_fold_threshold = !!log_fold_threshold,
