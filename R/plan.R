@@ -124,7 +124,8 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
         p_value_threshold = !!p_value_threshold,
         log_fold_threshold = !!log_fold_threshold,
         gene_list = !!gene_list
-        ),
+        )
+      ),
     report = rmarkdown::render(
       drake::knitr_in("sageseqr-report.Rmd"),
       output_file = drake::file_out(
