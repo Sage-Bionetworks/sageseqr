@@ -143,7 +143,7 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
       cqn_counts = cqn_counts$E,
       clean_md = clean_md,
       filtered_counts = filtered_counts,
-      de_results = de$differential_expression,
+      de_results = de,
       biomart_results = biomart_results,
       rownames = !!rownames,
       syn_names = append(
@@ -155,7 +155,7 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
           ),
         as.list(
           glue::glue(
-            "Differential Expression({names(de$differential_expression)})")
+            "Differential Expression({names(de)})")
           )
       ),
       data_names = append(
