@@ -244,17 +244,14 @@ get_biomart <- function(count_df, synid, version, host, filters, organism) {
 }
 
 
-#'Check for Duplicated SampleIDs or Missing/Additional Samples/Metadata
+#'Check for SampleID Inconsistencies in Counts Matrix and Metadata
 #'
 #'Subsequent steps assume unique SampleIDs are present within both the counts matrix
 #'and the metadata. This function checks for duplicated SampleIDs in both the counts
 #'matrix and metadata before then ensuring each sample in the counts matrix has a 
-#'corresponding line in the metadata, and vice versa. Additional samples within the
-#'metadata will return a warning, while additional samples in the counts matrix will
-#'return an error.
-#'@param count_df A counts data frame with sample identifiers as column names
-#'and gene Ids are rownames.
-#'@param md  A data frame with sample identifiers as row names
+#'corresponding line in the metadata, and vice versa. 
+#'@inheritParams get_biomart
+#'@param md A data frame with sample identifiers as row names and relevant experimental covariates.
 #'@export
 check_mismatch <- function(md, count_df) {
   # Isolate the SampleID's from the metadata and counts matrix
