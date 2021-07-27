@@ -103,7 +103,7 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
       skip = !!skip_model
       ),
     selected_model = if(!is.null(!!force_model)) {
-      force_model
+      !!force_model
     } else {
         model$variables_in_model
     },
