@@ -167,7 +167,7 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
           ),
         as.list(
           names(
-            de$differential_expression
+            de
             )
           )
         ),
