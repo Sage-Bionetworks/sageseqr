@@ -13,7 +13,7 @@ ENV CRYPTOGRAPHY_DONT_BUILD_RUST=true
 # install required packages
 RUN apt-get update -y\
 && apt-get install -y dpkg-dev zlib1g-dev libssl-dev libffi-dev\
-&& apt-get install -y curl libcurl4-openssl-dev libglpk-dev\
+&& apt-get install -y curl libcurl4-openssl-dev libglpk-dev libxt6\
 && apt-get install -y git\
 && R -e "remotes::install_github('Sage-Bionetworks/sageseqr')"\
 && R -e "install.packages('visNetwork')"
