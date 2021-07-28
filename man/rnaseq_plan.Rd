@@ -28,9 +28,14 @@ rnaseq_plan(
   size,
   report_name,
   skip_model,
+  de_contrasts,
+  log_fold_threshold,
+  p_value_threshold,
   parent_id,
   rownames,
-  config_file
+  config_file,
+  gene_list,
+  force_model = NULL
 )
 }
 \arguments{
@@ -95,6 +100,16 @@ by size.}
 
 \item{skip_model}{If TRUE, does not run regression model.}
 
+\item{de_contrasts}{Required. Variables in the metadata to define comparisons
+between groups.}
+
+\item{log_fold_threshold}{Numeric. Significant genes are those with a log
+fold-change greater than this threshold}
+
+\item{p_value_threshold}{Numeric. P-values are adjusted by Benjamini and
+Hochberg (BH) false discovery rate (FDR). Significant genes are those with an
+adjusted p-value greater than this threshold.}
+
 \item{parent_id}{A Synapse Id that corresponds to a project or
 folder to store output.}
 
@@ -103,6 +118,11 @@ folder to store output.}
 set as NULL.}
 
 \item{config_file}{Optional. Path to configuration file.}
+
+\item{gene_list}{Optional. A vector of genes to label in the volcano plot.}
+
+\item{force_model}{Optional. A vector of variables to include in the differential
+expression model if you want to skip the output of the stepwise regression.}
 }
 \description{
 This function wraps the \code{"drake::plan()"} and copies the R markdown

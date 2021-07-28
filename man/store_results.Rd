@@ -8,8 +8,9 @@ store_results(
   clean_md = clean_md,
   filtered_counts = filtered_counts,
   biomart_results = biomart_results,
-  cqn_counts = cqn_counts$counts,
-  de_results,
+  cqn_counts = cqn_counts$E,
+  de_results = de,
+  report = report,
   syn_names,
   data_names,
   parent_id,
@@ -40,12 +41,16 @@ biomart. Defaults to target name constrained by
 lists. Defaults to target name constrained by
 \code{"sageseqr::rnaseq_plan()"}.}
 
+\item{report}{The drake target containing the rendered markdown as html.
+Defaults to target names constrained by \code{"sageseqr::rnaseq_plan()"}.}
+
 \item{syn_names}{A list of human-readable names for the Synapse entities
 ordered
 by `metadata`, `filtered_counts`, `biomart_results`, `cqn_counts`.}
 
 \item{data_names}{A list of identifiers to embed in the file name ordered
-by `metadata`, `filtered_counts`, `biomart_results`, `cqn_counts`.}
+by `clean_md`, `filtered_counts`, `biomart_results`, `cqn_counts`,
+`de_results`.}
 
 \item{parent_id}{A Synapse Id that corresponds to a project or
 folder to store output.}

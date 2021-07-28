@@ -502,6 +502,14 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
 #' @inheritParams build_formula
 #' @inheritParams cqn
 #' @export
+#' @return A named list with \code{"variancePartition::voomWithDreamWeights()"}
+#'  normalized counts, contrasts from \code{"variancePartition::getContrasts()"},
+#'  linear mixed model fits from \code{"variancePartition::dream()"}, differential
+#'  expression results from \code{"limma::topTable()"} and gene feature-specific
+#'  metadata, the response variable, the model formula fit to compute differential
+#'  expression results.
+#'  The list names are: \code{"list(voom_object, contrasts_to_plot, fits, differential_expression,
+#'  primary_variable, formula)"}
 differential_expression <- function(filtered_counts, cqn_counts, md,
                                     primary_variable, biomart_results,
                                     p_value_threshold, log_fold_threshold,
@@ -717,6 +725,8 @@ prepare_results <- function(target, data_name, rowname = NULL) {
 #' @param de_results The drake target containing differential expression gene
 #' lists. Defaults to target name constrained by
 #' \code{"sageseqr::rnaseq_plan()"}.
+#' @param report The drake target containing the rendered markdown as html.
+#' Defaults to target names constrained by \code{"sageseqr::rnaseq_plan()"}.
 #' @param rownames A list of variables to store rownames ordered by `metadata`,
 #' `filtered_counts`, `biomart_results`, `cqn_counts`. If not applicable,
 #' set as NULL.
@@ -728,15 +738,17 @@ prepare_results <- function(target, data_name, rowname = NULL) {
 #' @param activity_provenance A phrase to describe the data transformation for
 #' provenance.
 #' @param data_names A list of identifiers to embed in the file name ordered
-#' by `metadata`, `filtered_counts`, `biomart_results`, `cqn_counts`.
+#' by `clean_md`, `filtered_counts`, `biomart_results`, `cqn_counts`,
+#' `de_results`.
 #' @param config_file Optional. Path to configuration file.
 #' @inheritParams rnaseq_plan
 #' @export
 store_results <- function(clean_md = clean_md,
                           filtered_counts = filtered_counts,
                           biomart_results = biomart_results,
-                          cqn_counts = cqn_counts$counts,
-                          de_results,
+                          cqn_counts = cqn_counts$E,
+                          de_results = de,
+                          report = report,
                           syn_names, data_names,
                           parent_id, inputs, activity_provenance,
                           rownames = NULL, config_file = NULL,
@@ -746,14 +758,25 @@ store_results <- function(clean_md = clean_md,
   ver <- utils::packageVersion("sageseqr")
   description <- glue::glue(
     "analyzed with sageseqr {ver}"
-    )
+  )
 
   # nest drake targets in a list. Every time a new target is to-be stored, it
   # must be added as an argument to this function and then added to this list.
-  targets <- list(clean_md, filtered_counts, biomart_results, cqn_counts)
+  targets <- list(
+    clean_md,
+    filtered_counts,
+    biomart_results,
+    as.data.frame(cqn_counts)
+  )
+
+  # parse differential expression gene list
+  de_results <- purrr::map(de_results, function(x) x$differential_expression)
 
   # append differential expression data frames already nested in list
-  targets <- append(targets, list(de_results))
+  targets <- append(targets, de_results)
+
+  # append null rownames for differential expression object
+  rownames <- append(rownames, rep(list(NULL), length(de_results)))
 
   mash <- list(
     target = targets,

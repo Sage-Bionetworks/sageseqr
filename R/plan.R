@@ -22,12 +22,19 @@
 #' @param primary_variable Baseline variable for model selection and variable to
 #'  stratify groups in the boxplot.
 #' @param report_name Name of output markdown file.
+#' @param force_model Optional. A vector of variables to include in the differential
+#' expression model if you want to skip the output of the stepwise regression.
+#' @param gene_list Optional. A vector of genes to label in the volcano plot.
+#' @param de_contrasts Required. Variables in the metadata to define comparisons
+#' between groups.
 #' @inheritParams plot_sexcheck
 #' @inheritParams get_biomart
 #' @inheritParams filter_genes
 #' @inheritParams identify_outliers
 #' @inheritParams store_results
 #' @inheritParams prepare_results
+#' @inheritParams differential_expression
+#'
 #' @param skip_model If TRUE, does not run regression model.
 #' @export
 rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
@@ -37,8 +44,9 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                         organism, conditions, cpm_threshold = 1,
                         conditions_threshold = 0.5,
                         primary_variable, sex_var, color, shape, size,
-                        report_name, skip_model, parent_id,
-                        rownames, config_file) {
+                        report_name, skip_model, de_contrasts, log_fold_threshold,
+                        p_value_threshold, parent_id,
+                        rownames, config_file, gene_list, force_model = NULL) {
   # Copies markdown to user's working directory
   if (!file.exists("sageseqr-report.Rmd")) {
     fs::file_copy(system.file("sageseqr-report.Rmd", package = "sageseqr"),
@@ -88,12 +96,36 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                                                                 clean_md),
     outliers = identify_outliers(filtered_counts, clean_md, !!color, !!shape,
                                  !!size),
-     model = stepwise_regression(
-       clean_md,
-       primary_variable = !!primary_variable,
-       cqn_counts = cqn_counts,
-       skip = !!skip_model
-        ),
+    model = stepwise_regression(
+      clean_md,
+      primary_variable = !!primary_variable,
+      cqn_counts = cqn_counts,
+      skip = !!skip_model
+      ),
+    selected_model = if(!is.null(!!force_model)) {
+      !!force_model
+    } else {
+        model$variables_in_model
+    },
+    de = wrap_de(
+      conditions = !!de_contrasts,
+      filtered_counts = filtered_counts,
+      cqn_counts = cqn_counts$E,
+      md = clean_md,
+      biomart_results = biomart_results,
+      p_value_threshold = !!p_value_threshold,
+      log_fold_threshold = !!log_fold_threshold,
+      model_variables = selected_model
+      ),
+    plot_de_volcano = purrr::map(
+      de$differential_expression,
+      function(x) plot_volcano(
+        x,
+        p_value_threshold = !!p_value_threshold,
+        log_fold_threshold = !!log_fold_threshold,
+        gene_list = !!gene_list
+        )
+      ),
     report = rmarkdown::render(
       drake::knitr_in("sageseqr-report.Rmd"),
       output_file = drake::file_out(
@@ -108,15 +140,38 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
     ),
     Synapse = store_results(
       parent_id = !!parent_id,
-      cqn_counts = cqn_counts$counts,
+      cqn_counts = cqn_counts$E,
       clean_md = clean_md,
       filtered_counts = filtered_counts,
+      de_results = de,
+      report = report,
       biomart_results = biomart_results,
       rownames = !!rownames,
-      syn_names = list("Covariates", "Filtered counts (greater than 1cpm)",
-                    "BioMart query results", "Normalized counts (CQN)"),
-      data_names = list("clean_md", "filtered_counts", "biomart_results",
-                        "cqn_counts"),
+      syn_names = append(
+        list(
+          "Covariates",
+          "Filtered counts (greater than 1cpm)",
+          "BioMart query results",
+          "Normalized counts (CQN)"
+          ),
+        as.list(
+          glue::glue(
+            "Differential Expression ({names(de)})")
+          )
+      ),
+      data_names = append(
+        list(
+          "clean_md",
+          "filtered_counts",
+          "biomart_results",
+          "cqn_counts"
+          ),
+        as.list(
+          names(
+            de
+            )
+          )
+        ),
       inputs = document_inputs,
       activity_provenance = "Analyze RNA-seq data with sageseqr pkg",
       config_file = !!config_file,
