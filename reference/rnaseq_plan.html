@@ -158,9 +158,14 @@ report to the user's working directory.</p>
   <span class='va'>size</span>,
   <span class='va'>report_name</span>,
   <span class='va'>skip_model</span>,
+  <span class='va'>de_contrasts</span>,
+  <span class='va'>log_fold_threshold</span>,
+  <span class='va'>p_value_threshold</span>,
   <span class='va'>parent_id</span>,
   <span class='va'>rownames</span>,
-  <span class='va'>config_file</span>
+  <span class='va'>config_file</span>,
+  <span class='va'>gene_list</span>,
+  force_model <span class='op'>=</span> <span class='cn'>NULL</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -274,6 +279,22 @@ by size.</p></td>
       <td><p>If TRUE, does not run regression model.</p></td>
     </tr>
     <tr>
+      <th>de_contrasts</th>
+      <td><p>Required. Variables in the metadata to define comparisons
+between groups.</p></td>
+    </tr>
+    <tr>
+      <th>log_fold_threshold</th>
+      <td><p>Numeric. Significant genes are those with a log
+fold-change greater than this threshold</p></td>
+    </tr>
+    <tr>
+      <th>p_value_threshold</th>
+      <td><p>Numeric. P-values are adjusted by Benjamini and
+Hochberg (BH) false discovery rate (FDR). Significant genes are those with an
+adjusted p-value greater than this threshold.</p></td>
+    </tr>
+    <tr>
       <th>parent_id</th>
       <td><p>A Synapse Id that corresponds to a project or
 folder to store output.</p></td>
@@ -287,6 +308,15 @@ set as NULL.</p></td>
     <tr>
       <th>config_file</th>
       <td><p>Optional. Path to configuration file.</p></td>
+    </tr>
+    <tr>
+      <th>gene_list</th>
+      <td><p>Optional. A vector of genes to label in the volcano plot.</p></td>
+    </tr>
+    <tr>
+      <th>force_model</th>
+      <td><p>Optional. A vector of variables to include in the differential
+expression model if you want to skip the output of the stepwise regression.</p></td>
     </tr>
     </table>
 

@@ -121,11 +121,15 @@
 <li>
 <code>sex_plot</code> - the distribution of samples by x and y marker genes.</li>
 <li>
+<code>sex_plot_pca</code> - a PCA of sex-specific expression to visualize more dimensionality than <code>sex_plot</code>.</li>
+<li>
 <code>correlation_plot</code> - the correlation of covariates.</li>
 <li>
 <code>significant_covariates_plot</code> - the correlation of covariates to gene expression.</li>
 <li>
 <code>outliers</code> - the clustering of samples by PCA.</li>
+<li>
+<code>plot_de_volcano</code> - volcano plot of differentially expressed genes.</li>
 </ul>
 <p>Transformed or normalized data:</p>
 <ul>
@@ -138,7 +142,11 @@
 <li>
 <code>cqn_counts</code> - CQN normalized counts.</li>
 <li>
-<code>model</code> - Model selected by multivariate forward stepwise regression (evaluated by Bayesian Information Criteria (BIC)).</li>
+<code>model</code> - model selected by multivariate forward stepwise regression (evaluated by Bayesian Information Criteria (BIC)).</li>
+<li>
+<code>de</code> - differential expression results including adjusted p-values and gene list.</li>
+<li>
+<code>report</code> - output markdown report rendered as HTML.</li>
 </ul>
 </div>
 <div id="access-to-data" class="section level1">

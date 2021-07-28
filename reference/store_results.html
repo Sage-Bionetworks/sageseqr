@@ -136,8 +136,9 @@
   clean_md <span class='op'>=</span> <span class='va'>clean_md</span>,
   filtered_counts <span class='op'>=</span> <span class='va'>filtered_counts</span>,
   biomart_results <span class='op'>=</span> <span class='va'>biomart_results</span>,
-  cqn_counts <span class='op'>=</span> <span class='va'>cqn_counts</span><span class='op'>$</span><span class='va'>counts</span>,
-  <span class='va'>de_results</span>,
+  cqn_counts <span class='op'>=</span> <span class='va'>cqn_counts</span><span class='op'>$</span><span class='va'>E</span>,
+  de_results <span class='op'>=</span> <span class='va'>de</span>,
+  report <span class='op'>=</span> <span class='va'>report</span>,
   <span class='va'>syn_names</span>,
   <span class='va'>data_names</span>,
   <span class='va'>parent_id</span>,
@@ -181,6 +182,11 @@ lists. Defaults to target name constrained by
 <code>"sageseqr::rnaseq_plan()"</code>.</p></td>
     </tr>
     <tr>
+      <th>report</th>
+      <td><p>The drake target containing the rendered markdown as html.
+Defaults to target names constrained by <code>"sageseqr::rnaseq_plan()"</code>.</p></td>
+    </tr>
+    <tr>
       <th>syn_names</th>
       <td><p>A list of human-readable names for the Synapse entities
 ordered
@@ -189,7 +195,8 @@ by `metadata`, `filtered_counts`, `biomart_results`, `cqn_counts`.</p></td>
     <tr>
       <th>data_names</th>
       <td><p>A list of identifiers to embed in the file name ordered
-by `metadata`, `filtered_counts`, `biomart_results`, `cqn_counts`.</p></td>
+by `clean_md`, `filtered_counts`, `biomart_results`, `cqn_counts`,
+`de_results`.</p></td>
     </tr>
     <tr>
       <th>parent_id</th>

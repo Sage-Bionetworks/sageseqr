@@ -195,6 +195,16 @@ If not supplied, the model will include all variables in <code>md</code>.</p></t
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A named list with <code>"variancePartition::voomWithDreamWeights()"</code>
+ normalized counts, contrasts from <code>"variancePartition::getContrasts()"</code>,
+ linear mixed model fits from <code>"variancePartition::dream()"</code>, differential
+ expression results from <code>"limma::topTable()"</code> and gene feature-specific
+ metadata, the response variable, the model formula fit to compute differential
+ expression results.
+ The list names are: <code>"list(voom_object, contrasts_to_plot, fits, differential_expression,
+ primary_variable, formula)"</code></p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
