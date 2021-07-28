@@ -9,7 +9,7 @@ store_results(
   filtered_counts = filtered_counts,
   biomart_results = biomart_results,
   cqn_counts = cqn_counts$E,
-  de_results = de$differential_expression,
+  de_results = de,
   syn_names,
   data_names,
   parent_id,
