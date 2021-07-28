@@ -755,14 +755,25 @@ store_results <- function(clean_md = clean_md,
   ver <- utils::packageVersion("sageseqr")
   description <- glue::glue(
     "analyzed with sageseqr {ver}"
-    )
+  )
 
   # nest drake targets in a list. Every time a new target is to-be stored, it
   # must be added as an argument to this function and then added to this list.
-  targets <- list(clean_md, filtered_counts, biomart_results, cqn_counts)
+  targets <- list(
+    clean_md,
+    filtered_counts,
+    biomart_results,
+    as.data.frame(cqn_counts)
+  )
+
+  # parse differential expression gene list
+  de_results <- purrr::map(de_results, function(x) x$differential_expression)
 
   # append differential expression data frames already nested in list
-  targets <- append(targets, list(de_results))
+  targets <- append(targets, de_results)
+
+  # append null rownames for differential expression object
+  rownames <- append(rownames, rep(list(NULL), length(de_results)))
 
   mash <- list(
     target = targets,

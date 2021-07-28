@@ -155,7 +155,7 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
           ),
         as.list(
           glue::glue(
-            "Differential Expression({names(de)})")
+            "Differential Expression ({names(de)})")
           )
       ),
       data_names = append(
