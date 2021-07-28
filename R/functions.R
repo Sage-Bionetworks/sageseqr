@@ -725,6 +725,8 @@ prepare_results <- function(target, data_name, rowname = NULL) {
 #' @param de_results The drake target containing differential expression gene
 #' lists. Defaults to target name constrained by
 #' \code{"sageseqr::rnaseq_plan()"}.
+#' @param report The drake target containing the rendered markdown as html.
+#' Defaults to target names constrained by \code{"sageseqr::rnaseq_plan()"}.
 #' @param rownames A list of variables to store rownames ordered by `metadata`,
 #' `filtered_counts`, `biomart_results`, `cqn_counts`. If not applicable,
 #' set as NULL.
@@ -746,6 +748,7 @@ store_results <- function(clean_md = clean_md,
                           biomart_results = biomart_results,
                           cqn_counts = cqn_counts$E,
                           de_results = de,
+                          report = report,
                           syn_names, data_names,
                           parent_id, inputs, activity_provenance,
                           rownames = NULL, config_file = NULL,

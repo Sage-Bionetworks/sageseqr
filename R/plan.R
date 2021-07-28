@@ -144,6 +144,7 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
       clean_md = clean_md,
       filtered_counts = filtered_counts,
       de_results = de,
+      report = report,
       biomart_results = biomart_results,
       rownames = !!rownames,
       syn_names = append(

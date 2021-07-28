@@ -10,6 +10,7 @@ store_results(
   biomart_results = biomart_results,
   cqn_counts = cqn_counts$E,
   de_results = de,
+  report = report,
   syn_names,
   data_names,
   parent_id,
@@ -39,6 +40,9 @@ biomart. Defaults to target name constrained by
 \item{de_results}{The drake target containing differential expression gene
 lists. Defaults to target name constrained by
 \code{"sageseqr::rnaseq_plan()"}.}
+
+\item{report}{The drake target containing the rendered markdown as html.
+Defaults to target names constrained by \code{"sageseqr::rnaseq_plan()"}.}
 
 \item{syn_names}{A list of human-readable names for the Synapse entities
 ordered
