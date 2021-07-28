@@ -7,8 +7,8 @@ LABEL base_image="debian:stretch"
 LABEL about.summary="Docker image for sageseqr R package"
 LABEL about.license="SPDX:Apache-2.0"
 
-# required by synapser#293
-ENV CRYPTOGRAPHY_DONT_BUILD_RUST=true
+# required to suppress verbose S3 messages
+ENV _R_S3_METHOD_REGISTRATION_NOTE_OVERWRITES_=false
 
 # install required packages
 RUN apt-get update -y\
