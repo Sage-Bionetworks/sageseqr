@@ -27,18 +27,23 @@ Exploratory data visualizations:
 - `gene_coexpression` - the distribution of correlated gene counts.
 - `boxplots` - the distribution of continuous variables.
 - `sex_plot` - the distribution of samples by x and y marker genes.
+- `sex_plot_pca` - a PCA of sex-specific expression to visualize more 
+                   dimensionality than `sex_plot`.
 - `correlation_plot` - the correlation of covariates.
 - `significant_covariates_plot` - the correlation of covariates to gene 
                                   expression.
 - `outliers` - the clustering of samples by PCA.
+- `plot_de_volcano` - volcano plot of differentially expressed genes.
 
 Transformed or normalized data:
 - `clean_md` - metadata with factor and numeric types.
 - `filtered_counts` - counts matrix with low gene expression removed.
 - `biotypes` - gene proportions summarized by biotype.
 - `cqn_counts` - CQN normalized counts. 
-- `model` - Model selected by multivariate forward stepwise regression 
+- `model` - model selected by multivariate forward stepwise regression 
             (evaluated by Bayesian Information Criteria (BIC)).
+- `de` - differential expression results including adjusted p-values and gene list.
+- `report` - output markdown report rendered as HTML.
 
 # Access to Data 
 
