@@ -1366,25 +1366,25 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
 plot_volcano <- function(de, p_value_threshold, fold_change_threshold, gene_list) {
   tmp <- de %>%
     dplyr::filter(.data$adj.P.Val <= p_value_threshold) %>%
-    dplyr::select(.data$ensemble_gene_id, Comparison) %>%
+    dplyr::select(.data$ensemble_gene_id, .data$Comparison) %>%
     dplyr::group_by(.data$Comparison) %>%
     dplyr::summarise(
-      "FDR_{p_value_threshold}" := length(unique(ensembl_gene_id))
+      "FDR_{p_value_threshold}" := length(unique(.data$ensembl_gene_id))
     )
   tmp1 <- de %>%
     dplyr::filter(
       .data$adj.P.Val <= p_value_threshold,
-      abs(logFC) >= log2(fold_change_threshold)
+      abs(.data$logFC) >= log2(fold_change_threshold)
     ) %>%
     dplyr::select(.data$ensembl_gene_id, .data$Comparison) %>%
     dplyr::group_by(.data$Comparison) %>%
     dplyr::summarise(
-      "FDR_{p_value_threshold}_FC_{fold_change_threshold}" := length(unique(ensembl_gene_id))
+      "FDR_{p_value_threshold}_FC_{fold_change_threshold}" := length(unique(.data$ensembl_gene_id))
     )
   knitr::kable(dplyr::full_join(tmp,tmp1))
 
   plotdata <- de %>%
-    mutate(label = ifelse(
+    dplyr::mutate(label = ifelse(
       .data$hgnc_symbol %in% gene_list,
       .data$hgnc_symbol,
       NA)
