@@ -15,8 +15,8 @@ plot_volcano(de, p_value_threshold, fold_change_threshold, gene_list)
 Hochberg (BH) false discovery rate (FDR). Significant genes are those with an
 adjusted p-value greater than this threshold.}
 
-\item{fold_change_threshold}{Numeric. Significant genes are those with a log
-fold-change greater than this threshold}
+\item{fold_change_threshold}{Numeric. Significant genes are those with a
+fold-change greater than this threshold.}
 
 \item{gene_list}{A vector of genes to label in the volcano plot.}
 }

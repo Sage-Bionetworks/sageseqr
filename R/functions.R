@@ -495,8 +495,8 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
 #' @param p_value_threshold Numeric. P-values are adjusted by Benjamini and
 #' Hochberg (BH) false discovery rate (FDR). Significant genes are those with an
 #' adjusted p-value greater than this threshold.
-#' @param fold_change_threshold Numeric. Significant genes are those with a log
-#' fold-change greater than this threshold
+#' @param fold_change_threshold Numeric. Significant genes are those with a
+#' fold-change greater than this threshold.
 #' @inheritParams cqn
 #' @inheritParams coerce_factors
 #' @inheritParams build_formula

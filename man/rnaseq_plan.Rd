@@ -103,8 +103,8 @@ by size.}
 \item{de_contrasts}{Required. Variables in the metadata to define comparisons
 between groups.}
 
-\item{fold_change_threshold}{Numeric. Significant genes are those with a log
-fold-change greater than this threshold}
+\item{fold_change_threshold}{Numeric. Significant genes are those with a
+fold-change greater than this threshold.}
 
 \item{p_value_threshold}{Numeric. P-values are adjusted by Benjamini and
 Hochberg (BH) false discovery rate (FDR). Significant genes are those with an
