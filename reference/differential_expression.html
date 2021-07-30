@@ -143,7 +143,7 @@ effect. If you wish to test an interaction term, `primary_variable` can take mul
   <span class='va'>primary_variable</span>,
   <span class='va'>biomart_results</span>,
   <span class='va'>p_value_threshold</span>,
-  <span class='va'>log_fold_threshold</span>,
+  <span class='va'>fold_change_threshold</span>,
   model_variables <span class='op'>=</span> <span class='cn'>NULL</span>,
   exclude_variables <span class='op'>=</span> <span class='cn'>NULL</span>
 <span class='op'>)</span></pre>
@@ -180,9 +180,9 @@ Hochberg (BH) false discovery rate (FDR). Significant genes are those with an
 adjusted p-value greater than this threshold.</p></td>
     </tr>
     <tr>
-      <th>log_fold_threshold</th>
-      <td><p>Numeric. Significant genes are those with a log
-fold-change greater than this threshold</p></td>
+      <th>fold_change_threshold</th>
+      <td><p>Numeric. Significant genes are those with a
+fold-change greater than this threshold.</p></td>
     </tr>
     <tr>
       <th>model_variables</th>
