@@ -44,7 +44,7 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
                         organism, conditions, cpm_threshold = 1,
                         conditions_threshold = 0.5,
                         primary_variable, sex_var, color, shape, size,
-                        report_name, skip_model, de_contrasts, log_fold_threshold,
+                        report_name, skip_model, de_contrasts, fold_change_threshold,
                         p_value_threshold, parent_id,
                         rownames, config_file, gene_list, force_model = NULL) {
   # Copies markdown to user's working directory
@@ -114,15 +114,16 @@ rnaseq_plan <- function(metadata_id, metadata_version, counts_id,
       md = clean_md,
       biomart_results = biomart_results,
       p_value_threshold = !!p_value_threshold,
-      log_fold_threshold = !!log_fold_threshold,
+      fold_change_threshold = !!fold_change_threshold,
       model_variables = selected_model
       ),
+    get_gene_list = purrr::map(de, function(x) x$differential_expression),
     plot_de_volcano = purrr::map(
-      de$differential_expression,
+      get_gene_list,
       function(x) plot_volcano(
         x,
         p_value_threshold = !!p_value_threshold,
-        log_fold_threshold = !!log_fold_threshold,
+        fold_change_threshold = !!fold_change_threshold,
         gene_list = !!gene_list
         )
       ),

@@ -11,7 +11,7 @@ differential_expression(
   primary_variable,
   biomart_results,
   p_value_threshold,
-  log_fold_threshold,
+  fold_change_threshold,
   model_variables = NULL,
   exclude_variables = NULL
 )
@@ -33,7 +33,7 @@ stored as rownames.}
 Hochberg (BH) false discovery rate (FDR). Significant genes are those with an
 adjusted p-value greater than this threshold.}
 
-\item{log_fold_threshold}{Numeric. Significant genes are those with a log
+\item{fold_change_threshold}{Numeric. Significant genes are those with a log
 fold-change greater than this threshold}
 
 \item{model_variables}{Optional. Vector of variables to include in the linear (mixed) model.

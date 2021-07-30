@@ -29,7 +29,7 @@ rnaseq_plan(
   report_name,
   skip_model,
   de_contrasts,
-  log_fold_threshold,
+  fold_change_threshold,
   p_value_threshold,
   parent_id,
   rownames,
@@ -103,7 +103,7 @@ by size.}
 \item{de_contrasts}{Required. Variables in the metadata to define comparisons
 between groups.}
 
-\item{log_fold_threshold}{Numeric. Significant genes are those with a log
+\item{fold_change_threshold}{Numeric. Significant genes are those with a log
 fold-change greater than this threshold}
 
 \item{p_value_threshold}{Numeric. P-values are adjusted by Benjamini and
