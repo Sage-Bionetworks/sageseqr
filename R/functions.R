@@ -495,8 +495,8 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
 #' @param p_value_threshold Numeric. P-values are adjusted by Benjamini and
 #' Hochberg (BH) false discovery rate (FDR). Significant genes are those with an
 #' adjusted p-value greater than this threshold.
-#' @param log_fold_threshold Numeric. Significant genes are those with a log
-#' fold-change greater than this threshold
+#' @param fold_change_threshold Numeric. Significant genes are those with a
+#' fold-change greater than this threshold.
 #' @inheritParams cqn
 #' @inheritParams coerce_factors
 #' @inheritParams build_formula
@@ -512,7 +512,7 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
 #'  primary_variable, formula)"}
 differential_expression <- function(filtered_counts, cqn_counts, md,
                                     primary_variable, biomart_results,
-                                    p_value_threshold, log_fold_threshold,
+                                    p_value_threshold, fold_change_threshold,
                                     model_variables = NULL,
                                     exclude_variables = NULL) {
   # force order of samples in metadata to match order of samples in counts.
@@ -570,7 +570,7 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
                   Direction = .data$logFC/abs(.data$logFC),
                   Direction = ifelse(.data$Direction == -1,"down", .data$Direction),
                   Direction = ifelse(.data$Direction == 1, "up", .data$Direction),
-                  Direction = ifelse(.data$`adj.P.Val` > p_value_threshold | abs(.data$logFC) < log2(log_fold_threshold),
+                  Direction = ifelse(.data$`adj.P.Val` > p_value_threshold | abs(.data$logFC) < log2(fold_change_threshold),
                                      "none",
                                      .data$Direction)
     )
@@ -599,7 +599,7 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
 #' @inheritParams build_formula
 #' @export
 wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
-                    biomart_results, p_value_threshold, log_fold_threshold,
+                    biomart_results, p_value_threshold, fold_change_threshold,
                     model_variables = names(md)) {
   purrr::map(
     conditions,
@@ -610,7 +610,7 @@ wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
       primary_variable = x,
       biomart_results,
       p_value_threshold,
-      log_fold_threshold,
+      fold_change_threshold,
       model_variables
       )
     )

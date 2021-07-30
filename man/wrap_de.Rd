@@ -11,7 +11,7 @@ wrap_de(
   md,
   biomart_results,
   p_value_threshold,
-  log_fold_threshold,
+  fold_change_threshold,
   model_variables = names(md)
 )
 }
@@ -32,8 +32,8 @@ stored as rownames.}
 Hochberg (BH) false discovery rate (FDR). Significant genes are those with an
 adjusted p-value greater than this threshold.}
 
-\item{log_fold_threshold}{Numeric. Significant genes are those with a log
-fold-change greater than this threshold}
+\item{fold_change_threshold}{Numeric. Significant genes are those with a
+fold-change greater than this threshold.}
 
 \item{model_variables}{Optional. Vector of variables to include in the linear (mixed) model.
 If not supplied, the model will include all variables in \code{md}.}
