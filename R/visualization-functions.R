@@ -1366,7 +1366,7 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
 plot_volcano <- function(de, p_value_threshold, fold_change_threshold, gene_list) {
   tmp <- de %>%
     dplyr::filter(.data$adj.P.Val <= p_value_threshold) %>%
-    dplyr::select(.data$ensemble_gene_id, .data$Comparison) %>%
+    dplyr::select(.data$ensembl_gene_id, .data$Comparison) %>%
     dplyr::group_by(.data$Comparison) %>%
     dplyr::summarise(
       "FDR_{p_value_threshold}" := length(unique(.data$ensembl_gene_id))
