@@ -115,16 +115,17 @@ drake::readd(
   )$pc_results
 ```
 
-```{r model}
-if (!isTRUE(config::get("skip model"))) {
-  cat("# Model Identification
-Covariates are added as fixed and random effects iteratively if model improvement by  Bayesian Information Criteria (BIC) was observed.")
-
+# Model Identification
+Covariates are added as fixed and random effects iteratively if model improvement by  Bayesian Information Criteria (BIC) was observed.
+```{r model, results = "asis"}
 summary <- drake::readd(model)
-knitr::kable(summary$to_visualize)
-as.character(summary$formula)[2]
-}
+glue::glue('The best model is: {glue::glue_collapse(as.character(summary$formula), " ")}')
 ```
+\n
+```{r model_description}
+knitr::kable(summary$to_visualize)
+```
+# Differential Expression
 
 ```{r differential_expression}
 drake::readd(plot_de_volcano)
