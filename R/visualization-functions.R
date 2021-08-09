@@ -1353,7 +1353,7 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
 #' Volcano plot differential expression results'
 #'
 #' The plot colors genes where the adjusted p-value exceed the `p_value_threshold`
-#' and the `log_fold_threshold`. Optionally, provide a list of genes to label in
+#' and the `fold_change_threshold`. Optionally, provide a list of genes to label in
 #' the plot via `gene_list`.
 #'
 #' @param gene_list A vector of genes to label in the volcano plot.
@@ -1361,29 +1361,30 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
 #' \code{"sageseqr::differential_expression()"} output object named
 #' "differential_expression".
 #' @inheritParams differential_expression
+#' @export
 #'
-plot_volcano <- function(de, p_value_threshold, log_fold_threshold, gene_list) {
+plot_volcano <- function(de, p_value_threshold, fold_change_threshold, gene_list) {
   tmp <- de %>%
-    dplyr::filter(.datat$adj.P.Val <= p_value_threshold) %>%
-    dplyr::select(.data$ensemble_gene_id, Comparison) %>%
+    dplyr::filter(.data$adj.P.Val <= p_value_threshold) %>%
+    dplyr::select(.data$ensembl_gene_id, .data$Comparison) %>%
     dplyr::group_by(.data$Comparison) %>%
     dplyr::summarise(
-      "FDR_{p_value_threshold}" := length(unique(ensembl_gene_id))
+      "FDR_{p_value_threshold}" := length(unique(.data$ensembl_gene_id))
     )
   tmp1 <- de %>%
     dplyr::filter(
       .data$adj.P.Val <= p_value_threshold,
-      abs(logFC) >= log2(log_fold_threshold)
+      abs(.data$logFC) >= log2(fold_change_threshold)
     ) %>%
     dplyr::select(.data$ensembl_gene_id, .data$Comparison) %>%
     dplyr::group_by(.data$Comparison) %>%
     dplyr::summarise(
-      "FDR_{p_value_threshold}_FC_{log_fold_threshold}" := length(unique(ensembl_gene_id))
+      "FDR_{p_value_threshold}_FC_{fold_change_threshold}" := length(unique(.data$ensembl_gene_id))
     )
   knitr::kable(dplyr::full_join(tmp,tmp1))
 
   plotdata <- de %>%
-    mutate(label = ifelse(
+    dplyr::mutate(label = ifelse(
       .data$hgnc_symbol %in% gene_list,
       .data$hgnc_symbol,
       NA)

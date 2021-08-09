@@ -51,7 +51,7 @@ plan <- sageseqr::rnaseq_plan(
   conditions_threshold = config::get("percent threshold"),
   primary_variable = config::get("x_var"), 
   de_contrasts = config::get("de contrasts"),
-  log_fold_threshold = config::get("de FC"),
+  fold_change_threshold = config::get("de FC"),
   p_value_threshold = config::get("de p-value threshold"),
   sex_var = config::get("sex check"), 
   color = config::get("dimensions")$color, 
