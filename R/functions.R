@@ -247,8 +247,7 @@ get_biomart <- function(count_df, synid, version, host, filters, organism) {
 #'Check for SampleID Inconsistencies in Counts Matrix and Metadata
 #'
 #'Subsequent steps assume unique SampleIDs are present within both the counts matrix
-#'and the metadata. This function checks for duplicated SampleIDs in both the counts
-#'matrix and metadata before then ensuring each sample in the counts matrix has a 
+#'and the metadata. This function ensures each sample in the counts matrix has a 
 #'corresponding line in the metadata, and vice versa. 
 #'@inheritParams get_biomart
 #'@param md A data frame with sample identifiers as row names and relevant experimental covariates.
@@ -258,15 +257,9 @@ check_mismatch <- function(md, count_df) {
   md_sampleid <- rownames(md)
   cnt_sampleid <- colnames(count_df)
   
-  # First check if these are duplicates in either of these. Returns an error if duplicates are found.
-  if (length(unique(md_sampleid)) != length(md_sampleid) ){
-    stop("ERROR: Unique sample IDs are required for subsequent functions. Please check your metadata input.")}
-  else if (length(unique(cnt_sampleid)) != length(cnt_sampleid)){
-    stop("ERROR: Unique sample IDs are required for subsequent functions.Please check your counts input")}
-  
   # Ensures each sample in the metadata has a corresponding column in the counts matrix and vice versa
-  else if ((length(setdiff(md_sampleid, cnt_sampleid)) > 0) || (length(setdiff(cnt_sampleid, md_sampleid)) > 0)){
-    stop("ERROR: All SampleIDs provided must exist both in the counts and metadata inputs")
+  if ((length(setdiff(md_sampleid, cnt_sampleid)) > 0) || (length(setdiff(cnt_sampleid, md_sampleid)) > 0)){
+    stop("All sample identifiers in the counts matrix and metadata file must match")
   }
 }
 
