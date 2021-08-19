@@ -73,7 +73,7 @@ Imports:
 Additional_repositories:
     http://ran.synapse.org
 Remotes:
-    GabrielHoffman/mvIC@master,
+    GabrielHoffman/mvIC,
     Sage-Bionetworks/sagethemes@main,
     GabrielHoffman/variancePartition
 VignetteBuilder:
