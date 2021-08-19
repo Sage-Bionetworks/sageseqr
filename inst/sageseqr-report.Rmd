@@ -115,17 +115,31 @@ targets::tar_read(
   )$pc_results
 ```
 
-```{r model}
+# Model Identification
+Covariates are added as fixed and random effects iteratively if model improvement by  Bayesian Information Criteria (BIC) was observed.
+```{r model, results = "asis"}
 if (!isTRUE(config::get("skip model"))) {
-  cat("# Model Identification
-Covariates are added as fixed and random effects iteratively if model improvement by  Bayesian Information Criteria (BIC) was observed.")
-
-summary <- targets::tar_read(model)
-knitr::kable(summary$to_visualize)
-as.character(summary$formula)[2]
+  summary <- targets::tar_read(model)
+  glue::glue('The best model is: {glue::glue_collapse(as.character(summary$formula), " ")}')
+} else {
+  glue::glue(
+    
+    '\n\nStepwise regression model not quantified.\n\n'
+    
+    )
 }
 ```
+\n
+```{r model_description}
+if (!isTRUE(config::get("skip model"))) {
+  knitr::kable(summary$to_visualize)
+}
+```
+# Differential Expression
 
 ```{r differential_expression}
-drake::readd(plot_de_volcano)
+plots <- drake::readd(plot_de_volcano)
+for(p in plots) {
+  print(p)
+}
 ```

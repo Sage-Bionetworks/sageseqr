@@ -11,7 +11,7 @@ differential_expression(
   primary_variable,
   biomart_results,
   p_value_threshold,
-  log_fold_threshold,
+  fold_change_threshold,
   model_variables = NULL,
   exclude_variables = NULL
 )
@@ -33,13 +33,23 @@ stored as rownames.}
 Hochberg (BH) false discovery rate (FDR). Significant genes are those with an
 adjusted p-value greater than this threshold.}
 
-\item{log_fold_threshold}{Numeric. Significant genes are those with a log
-fold-change greater than this threshold}
+\item{fold_change_threshold}{Numeric. Significant genes are those with a
+fold-change greater than this threshold.}
 
 \item{model_variables}{Optional. Vector of variables to include in the linear (mixed) model.
 If not supplied, the model will include all variables in \code{md}.}
 
 \item{exclude_variables}{Vector of variables to exclude from testing.}
+}
+\value{
+A named list with \code{"variancePartition::voomWithDreamWeights()"}
+ normalized counts, contrasts from \code{"variancePartition::getContrasts()"},
+ linear mixed model fits from \code{"variancePartition::dream()"}, differential
+ expression results from \code{"limma::topTable()"} and gene feature-specific
+ metadata, the response variable, the model formula fit to compute differential
+ expression results.
+ The list names are: \code{"list(voom_object, contrasts_to_plot, fits, differential_expression,
+ primary_variable, formula)"}
 }
 \description{
 Differential expression testing is performed with \code{"variancePartition::dream()"} to increase power

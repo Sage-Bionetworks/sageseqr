@@ -4,20 +4,24 @@
 \alias{plot_volcano}
 \title{Volcano plot differential expression results'}
 \usage{
-plot_volcano(de, p_value_threshold, log_fold_threshold, gene_list)
+plot_volcano(de, p_value_threshold, fold_change_threshold, gene_list)
 }
 \arguments{
+\item{de}{Differential expression results from
+\code{"sageseqr::differential_expression()"} output object named
+"differential_expression".}
+
 \item{p_value_threshold}{Numeric. P-values are adjusted by Benjamini and
 Hochberg (BH) false discovery rate (FDR). Significant genes are those with an
 adjusted p-value greater than this threshold.}
 
-\item{log_fold_threshold}{Numeric. Significant genes are those with a log
-fold-change greater than this threshold}
+\item{fold_change_threshold}{Numeric. Significant genes are those with a
+fold-change greater than this threshold.}
 
 \item{gene_list}{A vector of genes to label in the volcano plot.}
 }
 \description{
 The plot colors genes where the adjusted p-value exceed the `p_value_threshold`
-and the `log_fold_threshold`. Optionally, provide a list of genes to label in
+and the `fold_change_threshold`. Optionally, provide a list of genes to label in
 the plot via `gene_list`.
 }

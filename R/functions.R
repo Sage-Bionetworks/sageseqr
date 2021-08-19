@@ -242,6 +242,25 @@ get_biomart <- function(count_df, synid, version, host, filters, organism) {
     return(biomart_results)
   }
 }
+#'Check for consistent identifiers
+#'
+#'Subsequent steps assume unique identifiers are present within both the counts
+#'matrix and the metadata. This function checks whether samples in the counts
+#'matrix match samples in the metadata, and vice versa.versa.
+#'@inheritParams get_biomart
+#'@param md A data frame with sample identifiers as row names and relevant experimental covariates.
+#'@export
+check_mismatch <- function(md, count_df) {
+  # Isolate the SampleID's from the metadata and counts matrix
+  md_sampleid <- rownames(md)
+  cnt_sampleid <- colnames(count_df)
+
+  # Ensures each sample in the metadata has a corresponding column in the counts matrix and vice versa
+  if ((length(setdiff(md_sampleid, cnt_sampleid)) > 0) || (length(setdiff(cnt_sampleid, md_sampleid)) > 0)){
+    stop("All sample identifiers in the counts matrix and metadata file must match")
+  }
+}
+
 #'Duplicate HGNC
 #'
 #'Count normalization requires Ensembl Ids to be unique. In rare cases, there are more
@@ -495,16 +514,24 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
 #' @param p_value_threshold Numeric. P-values are adjusted by Benjamini and
 #' Hochberg (BH) false discovery rate (FDR). Significant genes are those with an
 #' adjusted p-value greater than this threshold.
-#' @param log_fold_threshold Numeric. Significant genes are those with a log
-#' fold-change greater than this threshold
+#' @param fold_change_threshold Numeric. Significant genes are those with a
+#' fold-change greater than this threshold.
 #' @inheritParams cqn
 #' @inheritParams coerce_factors
 #' @inheritParams build_formula
 #' @inheritParams cqn
 #' @export
+#' @return A named list with \code{"variancePartition::voomWithDreamWeights()"}
+#'  normalized counts, contrasts from \code{"variancePartition::getContrasts()"},
+#'  linear mixed model fits from \code{"variancePartition::dream()"}, differential
+#'  expression results from \code{"limma::topTable()"} and gene feature-specific
+#'  metadata, the response variable, the model formula fit to compute differential
+#'  expression results.
+#'  The list names are: \code{"list(voom_object, contrasts_to_plot, fits, differential_expression,
+#'  primary_variable, formula)"}
 differential_expression <- function(filtered_counts, cqn_counts, md,
                                     primary_variable, biomart_results,
-                                    p_value_threshold, log_fold_threshold,
+                                    p_value_threshold, fold_change_threshold,
                                     model_variables = NULL,
                                     exclude_variables = NULL) {
   # force order of samples in metadata to match order of samples in counts.
@@ -562,7 +589,7 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
                   Direction = .data$logFC/abs(.data$logFC),
                   Direction = ifelse(.data$Direction == -1,"down", .data$Direction),
                   Direction = ifelse(.data$Direction == 1, "up", .data$Direction),
-                  Direction = ifelse(.data$`adj.P.Val` > p_value_threshold | abs(.data$logFC) < log2(log_fold_threshold),
+                  Direction = ifelse(.data$`adj.P.Val` > p_value_threshold | abs(.data$logFC) < log2(fold_change_threshold),
                                      "none",
                                      .data$Direction)
     )
@@ -591,7 +618,7 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
 #' @inheritParams build_formula
 #' @export
 wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
-                    biomart_results, p_value_threshold, log_fold_threshold,
+                    biomart_results, p_value_threshold, fold_change_threshold,
                     model_variables = names(md)) {
   purrr::map(
     conditions,
@@ -602,7 +629,7 @@ wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
       primary_variable = x,
       biomart_results,
       p_value_threshold,
-      log_fold_threshold,
+      fold_change_threshold,
       model_variables
       )
     )
@@ -715,7 +742,7 @@ prepare_results <- function(target, data_name, rowname = NULL) {
 #' biomart. Defaults to target name constrained by
 #' \code{"targets::tar_make"}.
 #' @param de_results The drake target containing differential expression gene
-#' lists. Defaults to target name constrained by
+#' lists. Defaults to target name constrained in the _targets.R file.
 #' @param rownames A list of variables to store rownames ordered by `metadata`,
 #' `filtered_counts`, `biomart_results`, `cqn_counts`. If not applicable,
 #' set as NULL.
@@ -727,15 +754,17 @@ prepare_results <- function(target, data_name, rowname = NULL) {
 #' @param activity_provenance A phrase to describe the data transformation for
 #' provenance.
 #' @param data_names A list of identifiers to embed in the file name ordered
-#' by `metadata`, `filtered_counts`, `biomart_results`, `cqn_counts`.
+#' by `clean_md`, `filtered_counts`, `biomart_results`, `cqn_counts`,
+#' `de_results`.
 #' @param config_file Optional. Path to configuration file.
 #' @param report_name Name of output markdown file.
 #' @export
 store_results <- function(clean_md = clean_md,
                           filtered_counts = filtered_counts,
                           biomart_results = biomart_results,
-                          cqn_counts = cqn_counts$counts,
-                          de_results,
+                          cqn_counts = cqn_counts$E,
+                          de_results = de,
+                          report = report,
                           syn_names, data_names,
                           parent_id, inputs, activity_provenance,
                           rownames = NULL, config_file = NULL,
@@ -745,14 +774,25 @@ store_results <- function(clean_md = clean_md,
   ver <- utils::packageVersion("sageseqr")
   description <- glue::glue(
     "analyzed with sageseqr {ver}"
-    )
+  )
 
   # nest targets targets in a list. Every time a new target is to-be stored, it
   # must be added as an argument to this function and then added to this list.
-  targets <- list(clean_md, filtered_counts, biomart_results, cqn_counts)
+  targets <- list(
+    clean_md,
+    filtered_counts,
+    biomart_results,
+    as.data.frame(cqn_counts)
+  )
+
+  # parse differential expression gene list
+  de_results <- purrr::map(de_results, function(x) x$differential_expression)
 
   # append differential expression data frames already nested in list
-  targets <- append(targets, list(de_results))
+  targets <- append(targets, de_results)
+
+  # append null rownames for differential expression object
+  rownames <- append(rownames, rep(list(NULL), length(de_results)))
 
   mash <- list(
     target = targets,

@@ -11,6 +11,9 @@ Authors@R:
            family = "Gockley",
            role = c("aut"),
            email = "jake.gockley@sagebase.org"),
+      person(given = "Daisy",
+           family = "Han",
+           role = c("aut")),
       person(given = "Sage Bionetworks",
              role = "cph")
            )
@@ -74,7 +77,7 @@ Imports:
 Additional_repositories:
     http://ran.synapse.org
 Remotes:
-    GabrielHoffman/mvIC@fb4f5e2,
+    GabrielHoffman/mvIC,
     Sage-Bionetworks/sagethemes@main,
     GabrielHoffman/variancePartition
 VignetteBuilder:
