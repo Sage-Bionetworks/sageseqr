@@ -32,8 +32,7 @@ Sys.setenv(R_CONFIG_ACTIVE = profile_set)
 
 ```{r run-plan}
 library(sageseqr)
-
-# gather the dependencies
+# gather the dependencies in your working directory by running this function:
 start_de()
 # inspect the steps of the workflow
 targets::tar_manifest()
