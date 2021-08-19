@@ -14,6 +14,7 @@
 #'
 #'}
 get_data <- function(synid, version = NULL) {
+  synapser::synLogin()
   df <- tibble::as_tibble(data.table::fread(synapser::synGet(synid,
                                                      version = as.numeric(version)
                                                      )$path))

@@ -14,22 +14,24 @@ knitr::opts_chunk$set(
   eval = FALSE
 )
 ```
+1. This workflow requires file inputs to be stored on [Synapse](https://www.synapse.org). It is free to make an account and store
+small files. Store your counts files and metadata on Synapse.
 
-1. [Write your own config file](https://sage-bionetworks.github.io/sageseqr/articles/customize-config.html).
+2. [Write your own config file](https://sage-bionetworks.github.io/sageseqr/articles/customize-config.html).
 
-2. Specify the active configuration by setting `R_CONFIG_ACTIVE`.
+3. Specify the active configuration by setting `R_CONFIG_ACTIVE`.
 
 ```{r config-setup}
 profile_set <- "default"
 Sys.setenv(R_CONFIG_ACTIVE = profile_set)
 ```
 
-3. Load the `sageseqr` library and login to [Synapse](https://www.synapse.org/). `start_de()` copies the `targets` plan to your working directory. Execute `targets::make()` to compute. Run this code from your project root.
+4. Store your Synapse credentials locally. You can achieve this by either creating a  `.synapseConfig` file or executing `synLogin()` with `rememberMe = True`. [This article](https://r-docs.synapse.org/articles/manageSynapseCredentials.html) provides more context to storing Synapse credentials.
+
+5. Load the `sageseqr` library. `start_de()` copies the `targets` plan to your working directory. Execute `targets::make()` to compute. Run this code from your project root.
 
 ```{r run-plan}
 library(sageseqr)
-# Login to Synapse. Make a Synapse account and use synapser to login: https://r-docs.synapse.org/articles/manageSynapseCredentials.html
-synapser::synLogin()
 
 # gather the dependencies
 start_de()
