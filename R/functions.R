@@ -242,6 +242,25 @@ get_biomart <- function(count_df, synid, version, host, filters, organism) {
     return(biomart_results)
   }
 }
+#'Check for consistent identifiers
+#'
+#'Subsequent steps assume unique identifiers are present within both the counts
+#'matrix and the metadata. This function checks whether samples in the counts
+#'matrix match samples in the metadata, and vice versa.versa.
+#'@inheritParams get_biomart
+#'@param md A data frame with sample identifiers as row names and relevant experimental covariates.
+#'@export
+check_mismatch <- function(md, count_df) {
+  # Isolate the SampleID's from the metadata and counts matrix
+  md_sampleid <- rownames(md)
+  cnt_sampleid <- colnames(count_df)
+
+  # Ensures each sample in the metadata has a corresponding column in the counts matrix and vice versa
+  if ((length(setdiff(md_sampleid, cnt_sampleid)) > 0) || (length(setdiff(cnt_sampleid, md_sampleid)) > 0)){
+    stop("All sample identifiers in the counts matrix and metadata file must match")
+  }
+}
+
 #'Duplicate HGNC
 #'
 #'Count normalization requires Ensembl Ids to be unique. In rare cases, there are more
