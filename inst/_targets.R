@@ -143,7 +143,7 @@ list(
       clean_md,
       biomart_results,
       p_value_threshold = get("de p-value threshold"),
-      log_fold_threshold = get("de FC")
+      fold_change_threshold = get("de FC")
       )
     ),
   tar_target(
