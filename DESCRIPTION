@@ -11,6 +11,9 @@ Authors@R:
            family = "Gockley",
            role = c("aut"),
            email = "jake.gockley@sagebase.org"),
+      person(given = "Daisy",
+           family = "Han",
+           role = c("aut")),
       person(given = "Sage Bionetworks",
              role = "cph")
            )
