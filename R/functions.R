@@ -874,6 +874,9 @@ store_results <- function(clean_md = clean_md,
       parent = parent_id
     )
 
+    # login to Synapse
+    synapser::synLogin()
+
     markdown_provenance <- synapser::synStore(
       obj = file,
       used = used_ids,
