@@ -1,4 +1,5 @@
 library(config)
+library(sageseqr)
 library(targets)
 # build plan
 list(
@@ -149,10 +150,10 @@ list(
   tar_target(
     report,
       tarchetypes::tar_render(
-        name = "sageseqr-report.Rmd",
-        path = glue::glue(
+        name = glue::glue(
           "{getwd()}/{get('report')}.Rmd"
-          )
+          ),
+        path = "sageseqr-report.Rmd"
         )
     ),
   tar_target(
