@@ -831,6 +831,9 @@ store_results <- function(clean_md = clean_md,
     activity_description = description
     )
 
+  # login to Synapse
+  synapser::synLogin()
+
   for_provenance <- purrr::pmap(
     mash,
     function(
@@ -873,9 +876,6 @@ store_results <- function(clean_md = clean_md,
       path = path,
       parent = parent_id
     )
-
-    # login to Synapse
-    synapser::synLogin()
 
     markdown_provenance <- synapser::synStore(
       obj = file,
