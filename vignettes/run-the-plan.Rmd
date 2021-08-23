@@ -32,18 +32,17 @@ Sys.setenv(R_CONFIG_ACTIVE = profile_set)
 
 ```{r run-plan}
 library(sageseqr)
+library(targets)
 # gather the dependencies in your working directory by running this function:
 start_de()
 # inspect the steps of the workflow
-targets::tar_manifest()
+tar_manifest()
 # run the analysis
-targets::tar_make()
+tar_make()
 ```
 
 4. Visualize the results of your work. 
 
 ```{r visualize}
-targets::tar_glimpse(
-  targets_only = TRUE
-)
+tar_visnetwork()
 ```
