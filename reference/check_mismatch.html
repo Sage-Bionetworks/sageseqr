@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Summarize Biotypes — summarize_biotypes • sageseqr</title>
+<title>Check for consistent identifiers — check_mismatch • sageseqr</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,10 @@
 
 
 
-<meta property="og:title" content="Summarize Biotypes — summarize_biotypes" />
-<meta property="og:description" content="Computes the fraction of genes of a particular biotype. The number of genes
-must be above 100 to be summarized." />
+<meta property="og:title" content="Check for consistent identifiers — check_mismatch" />
+<meta property="og:description" content="Subsequent steps assume unique identifiers are present within both the counts
+matrix and the metadata. This function checks whether samples in the counts
+matrix match samples in the metadata, and vice versa.versa." />
 
 
 
@@ -124,29 +125,30 @@ must be above 100 to be summarized." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Summarize Biotypes</h1>
+    <h1>Check for consistent identifiers</h1>
     <small class="dont-index">Source: <a href='https://github.com/Sage-Bionetworks/sageseqr/blob/master/R/functions.R'><code>R/functions.R</code></a></small>
-    <div class="hidden name"><code>summarize_biotypes.Rd</code></div>
+    <div class="hidden name"><code>check_mismatch.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Computes the fraction of genes of a particular biotype. The number of genes
-must be above 100 to be summarized.</p>
+    <p>Subsequent steps assume unique identifiers are present within both the counts
+matrix and the metadata. This function checks whether samples in the counts
+matrix match samples in the metadata, and vice versa.versa.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>summarize_biotypes</span><span class='op'>(</span><span class='va'>filtered_counts</span>, <span class='va'>biomart_results</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>check_mismatch</span><span class='op'>(</span><span class='va'>md</span>, <span class='va'>count_df</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>filtered_counts</th>
-      <td><p>A counts data frame with genes removed that have low expression.</p></td>
+      <th>md</th>
+      <td><p>A data frame with sample identifiers as row names and relevant experimental covariates.</p></td>
     </tr>
     <tr>
-      <th>biomart_results</th>
-      <td><p>Output of <code>"sageseqr::get_biomart()"</code>. Gene Ids are
-stored as rownames.</p></td>
+      <th>count_df</th>
+      <td><p>A counts data frame with sample identifiers as column names
+and gene Ids are rownames.</p></td>
     </tr>
     </table>
 
