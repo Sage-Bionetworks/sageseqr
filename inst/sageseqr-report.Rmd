@@ -138,7 +138,7 @@ if (!isTRUE(config::get("skip model"))) {
 # Differential Expression
 
 ```{r differential_expression}
-plots <- drake::readd(plot_de_volcano)
+plots <- targets::tar_read(plot_de_volcano)
 for(p in plots) {
   print(p)
 }
