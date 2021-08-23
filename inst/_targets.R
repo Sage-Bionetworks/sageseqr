@@ -69,12 +69,6 @@ list(
     )
   ),
   tar_target(
-    gene_coexpression,
-    plot_coexpression(
-      cqn_counts
-    )
-  ),
-  tar_target(
     boxplots,
     boxplot_vars(
       md = clean_md,
@@ -168,14 +162,10 @@ list(
       )
     )
   ),
-  tar_target(
+  tarchetypes::tar_render(
     report,
-    tarchetypes::tar_render(
-      name = glue::glue(
-        "{getwd()}/{get('report')}.Rmd"
-      ),
-      path = "sageseqr-report.Rmd"
-    )
+    "sageseqr-report.Rmd",
+    output_file = glue::glue("{getwd()}/{config::get('report')}.html")
   ),
   tar_target(
     document_inputs,
@@ -197,6 +187,7 @@ list(
       filtered_counts = filtered_counts,
       biomart_results = biomart_results,
       de_results = de,
+      report = report,
       rownames = list(
         config::get("metadata")$`sample id`,
         config::get("counts")$`gene id`,
