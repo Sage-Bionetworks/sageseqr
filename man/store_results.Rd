@@ -40,6 +40,9 @@ biomart. Defaults to target name constrained by
 \item{de_results}{The target containing differential expression gene
 lists. Defaults to target name constrained in the _targets.R file.}
 
+\item{report}{The target containing the rendered html document. Defaults
+to target name constrained in the _targets.R file.}
+
 \item{syn_names}{A list of human-readable names for the Synapse entities
 ordered
 by `metadata`, `filtered_counts`, `biomart_results`, `cqn_counts`.}

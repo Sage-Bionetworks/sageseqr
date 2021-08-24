@@ -744,6 +744,8 @@ prepare_results <- function(target, data_name, rowname = NULL) {
 #' \code{"targets::tar_make"}.
 #' @param de_results The target containing differential expression gene
 #' lists. Defaults to target name constrained in the _targets.R file.
+#' @param report The target containing the rendered html document. Defaults
+#' to target name constrained in the _targets.R file.
 #' @param rownames A list of variables to store rownames ordered by `metadata`,
 #' `filtered_counts`, `biomart_results`, `cqn_counts`. If not applicable,
 #' set as NULL.
