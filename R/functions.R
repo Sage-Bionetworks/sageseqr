@@ -731,18 +731,18 @@ prepare_results <- function(target, data_name, rowname = NULL) {
 #'
 #' @param parent_id A Synapse Id that corresponds to a project or
 #' folder to store output.
-#' @param cqn_counts The targets target containing Conditional Quantile Normalized
+#' @param cqn_counts The target containing Conditional Quantile Normalized
 #'  (CQN) counts. Defaults to target name constrained by
 #'  \code{"targets::tar_make"}.
-#' @param clean_md The targets target containing the metadata data frame.
+#' @param clean_md The target containing the metadata data frame.
 #' Defaults to target name constrained by \code{"targets::tar_make"}.
-#' @param filtered_counts The targets target containing counts after low gene
+#' @param filtered_counts The target containing counts after low gene
 #' expression has been removed. Defaults to target name constrained by
 #'  \code{"targets::tar_make()"}.
-#' @param biomart_results The targets target containing gene annotations from
+#' @param biomart_results The target containing gene annotations from
 #' biomart. Defaults to target name constrained by
 #' \code{"targets::tar_make"}.
-#' @param de_results The drake target containing differential expression gene
+#' @param de_results The target containing differential expression gene
 #' lists. Defaults to target name constrained in the _targets.R file.
 #' @param rownames A list of variables to store rownames ordered by `metadata`,
 #' `filtered_counts`, `biomart_results`, `cqn_counts`. If not applicable,

@@ -22,22 +22,22 @@ store_results(
 )
 }
 \arguments{
-\item{clean_md}{The targets target containing the metadata data frame.
+\item{clean_md}{The target containing the metadata data frame.
 Defaults to target name constrained by \code{"targets::tar_make"}.}
 
-\item{filtered_counts}{The targets target containing counts after low gene
+\item{filtered_counts}{The target containing counts after low gene
 expression has been removed. Defaults to target name constrained by
  \code{"targets::tar_make()"}.}
 
-\item{biomart_results}{The targets target containing gene annotations from
+\item{biomart_results}{The target containing gene annotations from
 biomart. Defaults to target name constrained by
 \code{"targets::tar_make"}.}
 
-\item{cqn_counts}{The targets target containing Conditional Quantile Normalized
+\item{cqn_counts}{The target containing Conditional Quantile Normalized
 (CQN) counts. Defaults to target name constrained by
 \code{"targets::tar_make"}.}
 
-\item{de_results}{The drake target containing differential expression gene
+\item{de_results}{The target containing differential expression gene
 lists. Defaults to target name constrained in the _targets.R file.}
 
 \item{syn_names}{A list of human-readable names for the Synapse entities
