@@ -134,6 +134,18 @@ list(
     }
   ),
   tar_target(
+    residualized_counts,
+    purrr::map(
+      get("de contrasts"),
+      function(x) compute_residuals(
+        clean_metadata,
+        filtered_counts,
+        cqn_counts = cqn_counts$E,
+        primary_variable = x,
+        model_variables = selected_model
+      )
+    ),
+  tar_target(
     de,
     wrap_de(
       conditions = get("de contrasts"),
@@ -187,6 +199,7 @@ list(
       filtered_counts = filtered_counts,
       biomart_results = biomart_results,
       de_results = de,
+      residualized_counts = residualized_counts,
       report = report,
       rownames = list(
         config::get("metadata")$`sample id`,
@@ -202,16 +215,25 @@ list(
           "Normalized counts (CQN)"
         ),
         as.list(
+          glue::glue("Residualized counts({names(residualized_counts)})")
+        ),
+        as.list(
           glue::glue(
-            "Differential Expression ({names(de)})")
-        )
-      ),
+            "Differential Expression ({names(de)})"
+            )
+          )
+        ),
       data_names = append(
         list(
           "clean_md",
           "filtered_counts",
           "biomart_results",
           "cqn_counts"
+        ),
+        as.list(
+          names(
+            residualized_counts
+          )
         ),
         as.list(
           names(
