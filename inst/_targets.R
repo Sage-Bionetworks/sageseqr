@@ -199,7 +199,7 @@ list(
       filtered_counts = filtered_counts,
       biomart_results = biomart_results,
       de_results = de,
-      residualized_counts = residualized_counts,
+      residualized_counts = residualized_counts$output,
       report = report,
       rownames = list(
         config::get("metadata")$`sample id`,

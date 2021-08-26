@@ -964,9 +964,10 @@ start_de <- function() {
 #' @inheritParams cqn
 #' @inheritParams differential_expression
 #' @inheritParams filter_genes
+#' @export
 compute_residuals <- function(clean_metadata, filtered_counts,
                               cqn_counts = cqn_counts$E, primary_variable,
-                              model_variables)  {
+                              model_variables = NULL)  {
   # force order of samples in metadata to match order of samples in counts.
   # Required by variancePartition
   clean_metadata <- clean_metadata[match(colnames(filtered_counts),rownames(clean_metadata)),]
@@ -985,7 +986,7 @@ compute_residuals <- function(clean_metadata, filtered_counts,
   voom$E <- cqn_counts
   adjusted_fit <- variancePartition::dream(
     exprObj = voom,
-    formula = formula,
+    formula = metadata_input$formula,
     data = metadata_input$metadata,
     computeResiduals = TRUE
   )
@@ -1008,9 +1009,14 @@ compute_residuals <- function(clean_metadata, filtered_counts,
         )
 
   # save gene features
-  output <- rownames_to_column(as.data.frame(output), var = "feature")
+  output <- tibble::rownames_to_column(as.data.frame(output), var = "feature")
 
-  return(output)
-
-
+  return(
+    list(
+      output = output,
+      signal = variables_to_add_back,
+      adjusted_fit = adjusted_fit,
+      formula = metadata_input$formula
+      )
+  )
 }

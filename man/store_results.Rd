@@ -10,6 +10,7 @@ store_results(
   biomart_results = biomart_results,
   cqn_counts = cqn_counts$E,
   de_results = de,
+  residualized_counts = residualized_counts,
   report = report,
   syn_names,
   data_names,
