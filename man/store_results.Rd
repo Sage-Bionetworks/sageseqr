@@ -41,6 +41,9 @@ biomart. Defaults to target name constrained by
 \item{de_results}{The target containing differential expression gene
 lists. Defaults to target name constrained in the _targets.R file.}
 
+\item{residualized_counts}{The target containing counts adjusted for batch
+effects. Defaults to target name constrained in the _targets.R file.}
+
 \item{report}{The target containing the rendered html document. Defaults
 to target name constrained in the _targets.R file.}
 
