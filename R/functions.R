@@ -227,6 +227,14 @@ get_biomart <- function(count_df, synid, version, host, filters, organism) {
     # Download biomart object from syndID specified in config.yml
     biomart_results <- get_data(synid, version)
 
+    # Check if Ensembl Ids are unique. If not, collapse into single entry
+    gene_ids_uploaded <- biomart_results %>% dplyr::select(var = filters)
+    if (nrow(gene_ids_uploaded) != (nrow(unique(gene_ids_uploaded)))){
+      warning("Duplicate Ensembl IDs were found in your uploaded biomaRt file.
+              Duplicates have been collapsed into a single entry.")
+      biomart_results <- biomart_results %>% dplyr::group_by(var = filters) %>% unique()
+    }
+
     # Biomart IDs as rownames
     biomart_results <- tibble::column_to_rownames(
       biomart_results, var = filters
