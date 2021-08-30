@@ -26,7 +26,7 @@ profile_set <- "default"
 Sys.setenv(R_CONFIG_ACTIVE = profile_set)
 ```
 
-4. Store your Synapse credentials locally. You can achieve this by either creating a  `.synapseConfig` file or executing `synLogin()` with `rememberMe = True`. [This article](https://r-docs.synapse.org/articles/manageSynapseCredentials.html) provides more context to storing Synapse credentials.
+4. Store your Synapse credentials locally. You can achieve this by either creating a  `.synapseConfig` file or executing `synLogin()` with `rememberMe = True`. If you are working inside a Docker, make a text file called `.synapseConfig` from the home directory inside your container. [This article](https://r-docs.synapse.org/articles/manageSynapseCredentials.html) describes the format of the `.synapseConfig` file.
 
 5. Load the `sageseqr` library. `start_de()` copies the `targets` plan to your working directory. Execute `targets::make()` to compute. Run this code from your project root.
 
