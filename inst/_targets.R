@@ -143,6 +143,7 @@ list(
         cqn_counts = cqn_counts$E,
         primary_variable = x,
         model_variables = selected_model
+        )
       )
     ),
   tar_target(
