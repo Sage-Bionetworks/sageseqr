@@ -32,6 +32,7 @@ Suggests:
 RoxygenNote: 7.1.1
 biocViews:
 Imports:
+    assertthat,
     biomaRt,
     config,
     cqn,
@@ -41,6 +42,7 @@ Imports:
     edgeR,
     foreach,
     fs,
+    furrr,
     graphics,
     GenomicRanges,
     glue,
@@ -54,6 +56,7 @@ Imports:
     knitr,
     limma,
     magrittr,
+    meta,
     mclust,
     mvIC,
     plyr,

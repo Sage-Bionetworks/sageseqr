@@ -34,3 +34,4 @@ default:
     diagnosis-sex: ["diagnosis-sex"]
   report: "openSci"
   store output: syn23572479
+  residuals: ["syn123", "syn456", "syn678"]
