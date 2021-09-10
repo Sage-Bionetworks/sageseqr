@@ -138,7 +138,7 @@ list(
     purrr::map(
       get("de contrasts"),
       function(x) compute_residuals(
-        clean_metadata,
+        clean_md,
         filtered_counts,
         cqn_counts = cqn_counts$E,
         primary_variable = x,
