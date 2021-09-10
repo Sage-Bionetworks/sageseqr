@@ -27,7 +27,6 @@ URL: https://sage-bionetworks.github.io/sageseqr,
 Encoding: UTF-8
 LazyData: true
 Suggests: 
-    pandoc,
     testthat (>= 2.1.0),
     markdown
 RoxygenNote: 7.1.1
