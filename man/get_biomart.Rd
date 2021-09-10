@@ -10,7 +10,7 @@ get_biomart(count_df, synid, version, host, filters, organism)
 \item{count_df}{A counts data frame with sample identifiers as column names
 and gene Ids are rownames.}
 
-\item{synid}{A character vector with a Synapse Id.}
+\item{synid}{Optional. A character vector with a Synapse Id.}
 
 \item{version}{Optional. A numeric vector with the Synapse file
 version number.}
@@ -22,8 +22,10 @@ This specification is highly recommended for a reproducible workflow.
 \item{filters}{A character vector listing biomaRt query filters.
 (For a list of filters see \code{"biomaRt::listFilters()"})}
 
-\item{organism}{A character vector of the organism name. This argument
-takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".}
+\item{organism}{A character vector of the organism name. The organisms
+scientific name is required to query biomaRt. This argument accepts partial
+strings. For example,"hsa" will match "hsapiens_gene_ensembl" or "mmus" will
+match ""mmusculus_gene_ensembl".}
 }
 \description{
 Get GC content, gene Ids, gene symbols, gene biotypes, gene lengths
