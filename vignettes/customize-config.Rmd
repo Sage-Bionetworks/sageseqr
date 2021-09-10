@@ -45,8 +45,9 @@ factors:          Required. List of factor variables in brackets. Variables must
                   present in the metadata as column names (e.g. [ "donorid", "source"]).
 continuous:       Required. List of continuous variables in brackets. Variables must 
                   be present in the metadata as column names (e.g. [ "rin", "rin2"]).
-x_var:            Required. A boxplot will visualize the distribution of continuous variables using
-                  the x_var as a dimension.
+x_var:            Required. This is your predictor or primary variable of interest. 
+                  Additionally, a boxplot will visualize the distribution of 
+                  continuous variables using the x_var as a dimension.
 conditions:       Optional. Filtering low-expression genes is a common practice to improve
                   sensitivity in detection of differentially expressed genes. Low
                   count genes that have less than a user-defined threshold of counts 
