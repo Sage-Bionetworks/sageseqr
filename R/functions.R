@@ -549,7 +549,9 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
   gene_expression <- edgeR::calcNormFactors(gene_expression)
   voom_gene_expression <- variancePartition::voomWithDreamWeights(counts = gene_expression,
                                                                   formula = metadata_input$formula,
-                                                                  data = metadata_input$metadata)
+                                                                  data = metadata_input$metadata,
+                                                                  BPPARAM = BiocParallel::SnowParam(parallel::detectCores()-1)
+                                                                 )
   voom_gene_expression$E <- cqn_counts
 
   de_conditions <- levels(metadata_input$metadata[[metadata_input$primary_variable]])
@@ -580,7 +582,8 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
   fit_contrasts = variancePartition::dream(exprObj = voom_gene_expression,
                                            formula = metadata_input$formula_non_intercept,
                                            data = metadata_input$metadata,
-                                           L = contrasts
+                                           L = contrasts,
+                                           BPPARAM = BiocParallel::SnowParam(parallel::detectCores()-1) 
                                            )
 
   de <- lapply(names(contrasts), function(i, fit){
@@ -986,7 +989,8 @@ compute_residuals <- function(clean_metadata, filtered_counts,
   voom <- variancePartition::voomWithDreamWeights(
     counts = gene_expression,
     formula = metadata_input$formula,
-    data = metadata_input$metadata
+    data = metadata_input$metadata,
+    BPPARAM = BiocParallel::SnowParam(parallel::detectCores()-1)
   )
 
   # fit linear model using weights and best model
@@ -995,7 +999,8 @@ compute_residuals <- function(clean_metadata, filtered_counts,
     exprObj = voom,
     formula = metadata_input$formula,
     data = metadata_input$metadata,
-    computeResiduals = TRUE
+    computeResiduals = TRUE,
+    BPPARAM = BiocParallel::SnowParam(parallel::detectCores()-1)
   )
 
   # compute residual matrix
