@@ -230,6 +230,20 @@ get_biomart <- function(count_df, synid, version, host, filters, organism) {
     # Duplicate Ensembl Ids are collapsed into a single entry
     biomart_results <- collapse_duplicate_hgnc_symbol(biomart_results)
 
+    # Biomart query can add NAs as charactesr and empty strings. Convert those
+    # to NA values
+    biomart_results <- dplyr::mutate_all(
+      biomart_results,
+      na_if,
+      ""
+    )
+
+    biomart_results <- dplyr::mutate_all(
+      biomart_results,
+      na_if,
+      "NA"
+    )
+
     # Biomart IDs as rownames
     biomart_results <- tibble::column_to_rownames(
       biomart_results, var = filters
