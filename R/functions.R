@@ -145,6 +145,7 @@ parse_counts <- function(count_df){
 #'
 #'@param count_df A counts data frame with sample identifiers as column names
 #'and gene Ids are rownames.
+#'@param synid Optional. A character vector with a Synapse Id.
 #'@inheritParams get_data
 #'@param filters A character vector listing biomaRt query filters.
 #'(For a list of filters see \code{"biomaRt::listFilters()"})
