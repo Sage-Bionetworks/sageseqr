@@ -744,6 +744,8 @@ prepare_results <- function(target, data_name, rowname = NULL) {
 #' \code{"targets::tar_make"}.
 #' @param de_results The target containing differential expression gene
 #' lists. Defaults to target name constrained in the _targets.R file.
+#' @param residualized_counts The target containing counts adjusted for batch
+#' effects. Defaults to target name constrained in the _targets.R file.
 #' @param report The target containing the rendered html document. Defaults
 #' to target name constrained in the _targets.R file.
 #' @param rownames A list of variables to store rownames ordered by `metadata`,
@@ -767,6 +769,7 @@ store_results <- function(clean_md = clean_md,
                           biomart_results = biomart_results,
                           cqn_counts = cqn_counts$E,
                           de_results = de,
+                          residualized_counts = residualized_counts,
                           report = report,
                           syn_names, data_names,
                           parent_id, inputs, activity_provenance,
@@ -792,10 +795,10 @@ store_results <- function(clean_md = clean_md,
   de_results <- purrr::map(de_results, function(x) x$differential_expression)
 
   # append differential expression data frames already nested in list
-  targets <- append(targets, de_results)
+  targets <- append(targets, de_results, residualized_counts)
 
   # append null rownames for differential expression object
-  rownames <- append(rownames, rep(list(NULL), length(de_results)))
+  rownames <- append(rownames, rep(list(NULL), length(de_results) + length(residualized_counts)))
 
   mash <- list(
     target = targets,
@@ -948,4 +951,74 @@ start_de <- function() {
     fs::file_copy(system.file("_targets.R", package = "sageseqr"),
                   new_path = getwd())
   }
+}
+#' Compute residualized counts matrix
+#'
+#' Residuals of the best fit linear regression model are computed for each
+#'  observation. Batch effects are adjusted for in the returned counts matrix
+#'  while preserving the effect of the predictor variable.
+#'
+#' Counts are normalized prior to linear modeling to compute residuals. A
+#' precision weight is assigned to each gene feature to estimate the
+#' mean-variance relationship. Counts normalized by conditional quantile
+#'  normalization (CQN) are used in place of log2 normalized counts.
+#'
+#' @inheritParams cqn
+#' @inheritParams differential_expression
+#' @inheritParams filter_genes
+#' @export
+compute_residuals <- function(clean_metadata, filtered_counts,
+                              cqn_counts = cqn_counts$E, primary_variable,
+                              model_variables = NULL)  {
+  # force order of samples in metadata to match order of samples in counts.
+  # Required by variancePartition
+  clean_metadata <- clean_metadata[match(colnames(filtered_counts),rownames(clean_metadata)),]
+
+  metadata_input <- build_formula(clean_metadata, primary_variable, model_variables)
+  # Estimate voom weights with DREAM
+  gene_expression <- edgeR::DGEList(filtered_counts)
+  gene_expression <- edgeR::calcNormFactors(gene_expression)
+  voom <- variancePartition::voomWithDreamWeights(
+    counts = gene_expression,
+    formula = metadata_input$formula,
+    data = metadata_input$metadata
+  )
+
+  # fit linear model using weights and best model
+  voom$E <- cqn_counts
+  adjusted_fit <- variancePartition::dream(
+    exprObj = voom,
+    formula = metadata_input$formula,
+    data = metadata_input$metadata,
+    computeResiduals = TRUE
+  )
+
+  # compute residual matrix
+  residual_gene_expression <- stats::residuals(adjusted_fit)
+
+  # calculate weighted residuals and add back signal from predictor
+  variables_to_add_back <- grep(
+    metadata_input$primary_variable,
+    colnames(adjusted_fit$design),
+    value = TRUE
+    )
+  output <- residual_gene_expression +
+    adjusted_fit$coefficients[
+      ,variables_to_add_back
+      ] %*% t(
+        adjusted_fit$design[
+          ,variables_to_add_back]
+        )
+
+  # save gene features
+  output <- tibble::rownames_to_column(as.data.frame(output), var = "feature")
+
+  return(
+    list(
+      output = output,
+      signal = variables_to_add_back,
+      adjusted_fit = adjusted_fit,
+      formula = metadata_input$formula
+      )
+  )
 }
