@@ -260,6 +260,20 @@ get_biomart <- function(count_df, synid, version, host, filters, organism) {
       biomart_results, var = filters
       )
 
+    # Biomart query can add NAs as charactesr and empty strings. Convert those
+    # to NA values
+    biomart_results <- dplyr::mutate_all(
+      biomart_results,
+      na_if,
+      ""
+    )
+
+    biomart_results <- dplyr::mutate_all(
+      biomart_results,
+      na_if,
+      "NA"
+    )
+
     # Gene metadata required for count CQN
     required_variables <- c("gene_length", "percentage_gene_gc_content")
 
