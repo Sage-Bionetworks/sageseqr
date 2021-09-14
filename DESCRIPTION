@@ -27,7 +27,9 @@ URL: https://sage-bionetworks.github.io/sageseqr,
 Encoding: UTF-8
 LazyData: true
 Suggests: 
-    testthat (>= 2.1.0),
+    markdown,
+    pandoc,
+    testthat (>= 2.1.0)
 RoxygenNote: 7.1.1
 biocViews:
 Imports:
@@ -50,7 +52,6 @@ Imports:
     knitr,
     limma,
     magrittr,
-    markdown,
     mclust,
     mvIC,
     plyr,
