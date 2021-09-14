@@ -103,7 +103,7 @@ clean_covariates <- function(md, factors, continuous, sample_identifier) {
 #'@param organism A character vector of the organism name. The organisms
 #'scientific name is required to query biomaRt. This argument accepts partial
 #'strings. For example,"hsa" will match "hsapiens_gene_ensembl" or "mmus" will
-#'match ""mmusculus_gene_ensembl".
+#'match "mmusculus_gene_ensembl".
 #'@param host An optional character vector specifying the release version. This specification is highly recommended for a reproducible workflow. (see \code{"biomaRt::listEnsemblArchives()"})
 #'@export
 biomart_obj <- function(organism, host) {
