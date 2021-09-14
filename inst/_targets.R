@@ -142,7 +142,8 @@ list(
         filtered_counts,
         cqn_counts = cqn_counts$E,
         primary_variable = x,
-        model_variables = selected_model
+        model_variables = selected_model,
+        cores = get("cores")
         )
       )
     ),
@@ -156,7 +157,8 @@ list(
       biomart_results,
       p_value_threshold = get("de p-value threshold"),
       fold_change_threshold = get("de FC"),
-      model_variables = selected_model
+      model_variables = selected_model,
+      cores = get("cores")
     )
   ),
   tar_target(
