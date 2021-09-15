@@ -633,7 +633,7 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
 #' @export
 wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
                     biomart_results, p_value_threshold, fold_change_threshold,
-                    model_variables = names(md)) {
+                    model_variables = names(md), cores = NULL) {
   purrr::map(
     conditions,
     function(x) differential_expression(
@@ -644,7 +644,8 @@ wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
       biomart_results,
       p_value_threshold,
       fold_change_threshold,
-      model_variables
+      model_variables,
+      cores = cores
       )
     )
 }
