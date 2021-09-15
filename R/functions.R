@@ -515,14 +515,14 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
 #' Differential expression testing is performed with \code{"variancePartition::dream()"} to increase power
 #' and decrease false positives for repeated measure designs. The `primary_variable` is modeled as a fixed
 #' effect. If you wish to test an interaction term, `primary_variable` can take multiple variable names.
-#' 
+#'
 #' @param cqn_counts A counts data frame normalized by CQN.
 #' @param p_value_threshold Numeric. P-values are adjusted by Benjamini and
 #' Hochberg (BH) false discovery rate (FDR). Significant genes are those with an
 #' adjusted p-value greater than this threshold.
 #' @param fold_change_threshold Numeric. Significant genes are those with a
 #' fold-change greater than this threshold.
-#' @param cores An integer of cores to specify in the parallel backend (eg. 4)
+#' @param cores An integer of cores to specify in the parallel backend (eg. 4).
 #' @inheritParams cqn
 #' @inheritParams coerce_factors
 #' @inheritParams build_formula
