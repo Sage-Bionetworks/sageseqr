@@ -72,7 +72,7 @@ cores:            Optional. Specify an integer of cores to use with a BiocParall
                   parallel backend.  Null value results in the number of available
                   cores minus one being used. Parallel backend ccurrently only supports
                   BiocParallel::SnowParam(). BatchtoolsParam, MulticoreParam, 
-                  BiocParallelDoparParam, and SerialParam not currently supported.
+                  BiocParallelDoparParam, and SerialParam are not currently supported.
 de FC:            The fold-change (FC) of significant differentially expressed 
                   (de) genes must exceed this value. This value will be transformed
                   into log2 FC.
