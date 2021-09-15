@@ -32,6 +32,7 @@ Suggests:
 RoxygenNote: 7.1.1
 biocViews:
 Imports:
+    BiocParallel,
     biomaRt,
     cqn,
     data.table,
@@ -53,6 +54,7 @@ Imports:
     magrittr,
     mclust,
     mvIC,
+    parallel,
     plyr,
     psych,
     purrr,

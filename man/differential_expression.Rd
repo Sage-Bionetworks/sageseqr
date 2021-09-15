@@ -13,7 +13,8 @@ differential_expression(
   p_value_threshold,
   fold_change_threshold,
   model_variables = NULL,
-  exclude_variables = NULL
+  exclude_variables = NULL,
+  cores = NULL
 )
 }
 \arguments{
@@ -40,6 +41,8 @@ fold-change greater than this threshold.}
 If not supplied, the model will include all variables in \code{md}.}
 
 \item{exclude_variables}{Vector of variables to exclude from testing.}
+
+\item{cores}{An integer of cores to specify in the parallel backend (eg. 4).}
 }
 \value{
 A named list with \code{"variancePartition::voomWithDreamWeights()"}

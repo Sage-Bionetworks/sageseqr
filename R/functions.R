@@ -525,6 +525,7 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
 #' adjusted p-value greater than this threshold.
 #' @param fold_change_threshold Numeric. Significant genes are those with a
 #' fold-change greater than this threshold.
+#' @param cores An integer of cores to specify in the parallel backend (eg. 4).
 #' @inheritParams cqn
 #' @inheritParams coerce_factors
 #' @inheritParams build_formula
@@ -542,9 +543,13 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
                                     primary_variable, biomart_results,
                                     p_value_threshold, fold_change_threshold,
                                     model_variables = NULL,
-                                    exclude_variables = NULL) {
+                                    exclude_variables = NULL,
+                                    cores = NULL) {
   # force order of samples in metadata to match order of samples in counts.
   # Required by variancePartition
+  if(is.null(cores)){
+    cores = parallel::detectCores()-1
+  }
   md <- md[match(colnames(filtered_counts),rownames(md)),]
 
   metadata_input <- build_formula(md, primary_variable, model_variables)
@@ -552,7 +557,9 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
   gene_expression <- edgeR::calcNormFactors(gene_expression)
   voom_gene_expression <- variancePartition::voomWithDreamWeights(counts = gene_expression,
                                                                   formula = metadata_input$formula,
-                                                                  data = metadata_input$metadata)
+                                                                  data = metadata_input$metadata,
+                                                                  BPPARAM = BiocParallel::SnowParam(cores)
+                                                                 )
   voom_gene_expression$E <- cqn_counts
 
   de_conditions <- levels(metadata_input$metadata[[metadata_input$primary_variable]])
@@ -583,7 +590,8 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
   fit_contrasts = variancePartition::dream(exprObj = voom_gene_expression,
                                            formula = metadata_input$formula_non_intercept,
                                            data = metadata_input$metadata,
-                                           L = contrasts
+                                           L = contrasts,
+                                           BPPARAM = BiocParallel::SnowParam(cores) 
                                            )
 
   de <- lapply(names(contrasts), function(i, fit){
@@ -628,7 +636,7 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
 #' @export
 wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
                     biomart_results, p_value_threshold, fold_change_threshold,
-                    model_variables = names(md)) {
+                    model_variables = names(md), cores = NULL) {
   purrr::map(
     conditions,
     function(x) differential_expression(
@@ -639,7 +647,8 @@ wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
       biomart_results,
       p_value_threshold,
       fold_change_threshold,
-      model_variables
+      model_variables,
+      cores = cores
       )
     )
 }
@@ -977,7 +986,11 @@ start_de <- function() {
 #' @export
 compute_residuals <- function(clean_metadata, filtered_counts,
                               cqn_counts = cqn_counts$E, primary_variable,
-                              model_variables = NULL)  {
+                              model_variables = NULL, cores = NULL)  {
+  # set the number of cores if not specified in the config
+  if(is.null(cores)){
+    cores = parallel::detectCores()-1
+  }
   # force order of samples in metadata to match order of samples in counts.
   # Required by variancePartition
   clean_metadata <- clean_metadata[match(colnames(filtered_counts),rownames(clean_metadata)),]
@@ -989,7 +1002,8 @@ compute_residuals <- function(clean_metadata, filtered_counts,
   voom <- variancePartition::voomWithDreamWeights(
     counts = gene_expression,
     formula = metadata_input$formula,
-    data = metadata_input$metadata
+    data = metadata_input$metadata,
+    BPPARAM = BiocParallel::SnowParam(cores)
   )
 
   # fit linear model using weights and best model
@@ -998,7 +1012,8 @@ compute_residuals <- function(clean_metadata, filtered_counts,
     exprObj = voom,
     formula = metadata_input$formula,
     data = metadata_input$metadata,
-    computeResiduals = TRUE
+    computeResiduals = TRUE,
+    BPPARAM = BiocParallel::SnowParam(cores)
   )
 
   # compute residual matrix
