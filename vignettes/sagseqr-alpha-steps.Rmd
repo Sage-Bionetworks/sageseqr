@@ -1,0 +1,156 @@
+---
+title: "Run the drake plan in version 0.0.0.9-alpha"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Run the drake plan in version 0.0.0.9-alpha}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+In `sageseqr` version 0.0.0.9-alpha, `sageseqr` was built with the workflow R package called [`drake`](https://books.ropensci.org/drake/). There are differences between the latest version of `sageseqr` and the alpha version when it comes to executing the workflow. As new features are always being released, the latest release of the package is recommended! However, if you are reproducing an analysis that depends on the alpha version of the package, follow these instructions.
+
+1. Install the package `remotes::install_github("Sage-Bionetworks/sageseqr@v0.0.0.9-alpha")`.
+
+2. Write your own config file. 
+
+```
+counts:
+  synID:          Required. Synapse ID to counts data frame with identifiers to 
+                  the metadata as column names and gene ids in a column.
+  version:        Optional. Include Synapse file version number (e.g. 3).
+  gene id:        Required. Column name that corresponds to the gene ids (e.g. feature).
+metadata:
+  synID:          Required. Synapse ID to cleaned metadata file with sample 
+                  identifiers in a column and variables of interest as column names. 
+  version:        Optional. Include Synapse file version number (e.g. 3).
+  sample id:      Required. Column name that corresponds to the sample ids (e.g. donorid).
+biomart:
+  synID:          Optional. If left blank, Ensembl will be queried with the gene 
+                  ids provided in the counts. Otherwise, you may provide the
+                  Synapse ID to gene metadata from Ensembl. This must include gene
+                  length and GC content in order to implement Conditional Quantile
+                  Normalization. 
+  version:        Optional. Include Synapse file version number (e.g. 3).
+  filters:        Required. Column name that corresponds to the gene ids (e.g. 
+                  ensembl_gene_id).
+  host:           Optional. A character vector specifying the BioMart database release
+                  version. This specification is highly recommended for a reproducible           
+                  workflow. Defaults to ensembl.org.
+  organism:       Required. A character vector of the organism name. This argument 
+                  takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".
+factors:          Required. List of factor variables in brackets. Variables must be 
+                  present in the metadata as column names (e.g. [ "donorid", "source"]).
+continuous:       Required. List of continuous variables in brackets. Variables must 
+                  be present in the metadata as column names (e.g. [ "rin", "rin2"]).
+x_var:            Required. A boxplot will visualize the distribution of continuous variables using
+                  the x_var as a dimension.
+conditions:       Optional. Filtering low-expression genes is a common practice to improve
+                  sensitivity in detection of differentially expressed genes. Low
+                  count genes that have less than a user-defined threshold of counts 
+                  per million (CPM) in a user-defined percentage of samples per the
+                  conditions provided here will be removed. (e.g. ["diagnosis", "sex"]). 
+cpm threshold:    Optional. The minium allowable CPM to keep a gene in the analysis.
+percent threshold:Optional. The percentage of samples that should contain the minimum number
+                  of CPM. If a condition is passed, the percentage will apply to 
+                  the samples in that sub-population. 
+sex check:        Optional. The exact variable name that corresponds to reported gender or sex
+                  to check the distribution of x and y marker expression across
+                  samples.
+dimensions:       Required. Specify the PCA dimensions by variable name. 
+  color:
+  shape:
+  size:
+skip model:       Optional. If TRUE, the exploratory data report is run. Model selection
+                  is not computed.
+force model with: Optional. Force differential expression with this user defined model
+                  instead of the output of stepwise regression.
+de FC:            The fold-change (FC) of significant differentially expressed 
+                  (de) genes must exceed this value. This value will be transformed
+                  into log2 FC.
+de p-value threshold: The adjusted p-value of significant differentially expressed 
+                  (de) genes must exceed this value.
+de contrasts:     Required. Variable in the metadata to define comparisons between 
+                  groups.
+  <any named list:> If there are multiple comparisons, set them up as nested lists.
+visualization gene list: Label this list of genes in the volcano plot.
+report:           Required. The name of your project. This will become the name of your 
+                  output html file.
+store output:     Required. Folder Synapse Id to store output on Synapse.
+```
+
+3. Specify the active configuration by setting `R_CONFIG_ACTIVE`.
+
+```{r config-setup}
+Sys.setenv(R_CONFIG_ACTIVE = "default")
+```
+
+4. Load the `sageseqr` library and login to [Synapse](https://www.synapse.org/). `rnaseq_plan()` calls the arguments from the config file and creates the `drake` plan. Execute `drake::make(plan)` to compute. Run this code from your project root.
+
+```{r run-plan}
+library(sageseqr)
+
+# Login to Synapse. Make a Synapse account and use synapser to login: https://r-docs.synapse.org/articles/manageSynapseCredentials.html
+synapser::synLogin()
+
+# Run the analysis
+plan <- sageseqr::rnaseq_plan(
+  metadata_id = config::get("metadata")$synID,
+  metadata_version = config::get("metadata")$version,
+  counts_id = config::get("counts")$synID,
+  counts_version = config::get("counts")$version,
+  gene_id_input = config::get("counts")$`gene id`,
+  sample_id_input = config::get("metadata")$`sample id`,
+  factor_input = config::get("factors"),
+  continuous_input = config::get("continuous"),
+  biomart_id = config::get("biomart")$synID,
+  biomart_version = config::get("biomart")$version,
+  filters = config::get("biomart")$filters,
+  host = config::get("biomart")$host,
+  organism = config::get("biomart")$organism, 
+  conditions = config::get("conditions"), 
+  cpm_threshold = config::get("cpm threshold"),
+  conditions_threshold = config::get("percent threshold"),
+  primary_variable = config::get("x_var"), 
+  de_contrasts = config::get("de contrasts"),
+  fold_change_threshold = config::get("de FC"),
+  p_value_threshold = config::get("de p-value threshold"),
+  sex_var = config::get("sex check"), 
+  color = config::get("dimensions")$color, 
+  shape = config::get("dimensions")$shape,
+  size = config::get("dimensions")$size,
+  report_name = config::get("report"),
+  skip_model = config::get("skip model"),
+  parent_id = config::get("store output"),
+  rownames = list(
+    config::get("metadata")$`sample id`,
+    config::get("counts")$`gene id`,
+    config::get("biomart")$filters,
+    config::get("counts")$`gene id`
+    ),
+  config_file = "config.yml",
+  force_model = config::get("force model with"), 
+  gene_list = config::get("visualization gene list")
+)
+
+drake::make(
+  plan,
+  envir = getNamespace("sageseqr")
+    )
+```
+
+4. Visualize the results of your work. 
+
+```{r visualize}
+drake::vis_drake_graph(
+  plan,
+  envir = getNamespace("sageseqr"),
+  targets_only = TRUE
+  )
+```
