@@ -12,7 +12,8 @@ wrap_de(
   biomart_results,
   p_value_threshold,
   fold_change_threshold,
-  model_variables = names(md)
+  model_variables = names(md),
+  cores = NULL
 )
 }
 \arguments{
@@ -37,6 +38,8 @@ fold-change greater than this threshold.}
 
 \item{model_variables}{Optional. Vector of variables to include in the linear (mixed) model.
 If not supplied, the model will include all variables in \code{md}.}
+
+\item{cores}{An integer of cores to specify in the parallel backend (eg. 4).}
 }
 \description{
 This function will pass multiple conditions to test to \code{"sagseqr::differential_expression()"}.

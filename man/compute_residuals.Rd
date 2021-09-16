@@ -9,7 +9,8 @@ compute_residuals(
   filtered_counts,
   cqn_counts = cqn_counts$E,
   primary_variable,
-  model_variables = NULL
+  model_variables = NULL,
+  cores = NULL
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ fixed effect interaction term.}
 
 \item{model_variables}{Optional. Vector of variables to include in the linear (mixed) model.
 If not supplied, the model will include all variables in \code{md}.}
+
+\item{cores}{An integer of cores to specify in the parallel backend (eg. 4).}
 }
 \description{
 Residuals of the best fit linear regression model are computed for each
