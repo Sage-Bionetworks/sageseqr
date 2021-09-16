@@ -34,6 +34,13 @@ list(
     )
   ),
   tar_target(
+    check,
+    check_mismatch(
+      md = clean_md,
+      count_df = counts
+    )
+  ),
+  tar_target(
     biomart_results,
     get_biomart(
       count_df = counts,
@@ -66,6 +73,12 @@ list(
     cqn(
       filtered_counts,
       biomart_results
+    )
+  ),
+  tar_target(
+    gene_coexpression,
+    plot_coexpression(
+      cqn_counts
     )
   ),
   tar_target(
