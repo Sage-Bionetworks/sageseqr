@@ -892,31 +892,79 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
 
   clean_metadata <- tibble::rownames_to_column(clean_metadata, var = "sampleId")
 
-  # warning 1 of 3: If XIST and UTY doesn't exist in counts, return(warning)
-  uty_ensg <- row.names(
-    biomart_results[biomart_results$hgnc_symbol %in% c('UTY'), ]
+  # identify column with sex-specific gene symbols XIST and UTY
+  index <- which(
+    apply(
+      biomart_results,
+      1,
+      function(x) any(
+        grepl(
+          "xist|uty",
+          x,
+          ignore.case = TRUE
+          )
+        )
+      )
     )
-  xist_ensg <- row.names(
-    biomart_results[biomart_results$hgnc_symbol %in% c('XIST'), ]
-    )
-  if (!('UTY' %in% biomart_results$hgnc_symbol &
-        uty_ensg %in% row.names(filtered_counts) &
-        'XIST' %in% biomart_results$hgnc_symbol &
-        xist_ensg %in% row.names(filtered_counts))) {
+
+  # warning 1 of 3: If XIST and UTY doesn't exist in biomart_results, return(warning)
+  if (length(index) == 0) {
     p <- list(
       plot = NULL,
       sex_check_results = NULL,
       warnings = warning(
-      'plot_sexcheck_pca: XIST and UTY not found in biomart_results or count_df'
-        )
+        'plot_sexcheck_pca: XIST and UTY not present in biomart_results. The
+        mapping between gene symbol and feature id is required.'
       )
+    )
     clean_metadata <- dplyr::mutate(
       clean_metadata,
       "{sex_var} predicted" := NA
-      )
+    )
     return(p)
     quit()
   }
+
+  tmp <- biomart_results[index,]
+
+  symbol_name <- names(
+    which(
+      apply(
+        tmp,
+        2,
+        function(x) all(
+          grepl(
+            "xist|uty",
+            x,
+            ignore.case = TRUE
+          )
+        )
+      )
+    )
+  )
+
+  # if there are multiple columns complete with gene symbols, pick one
+  if (length(symbol_name) > 1) {
+    symbol_name <- symbol_name[1]
+  }
+
+  xist_ensg <- rownames(
+    biomart_results[
+      grepl(
+        "xist",
+        biomart_results[[symbol_name]],
+        ignore.case = TRUE),
+      ]
+    )
+
+  uty_ensg <- rownames(
+    biomart_results[
+      grepl(
+        "uty",
+        biomart_results[[symbol_name]],
+        ignore.case = TRUE),
+    ]
+  )
 
   # extract sex-specific genes from counts and store in sex_counts object
   sex_genes <- row.names(
