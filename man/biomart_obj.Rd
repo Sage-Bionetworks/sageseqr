@@ -7,7 +7,10 @@
 biomart_obj(organism, host)
 }
 \arguments{
-\item{organism}{A character vector of the organism name. This argument takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".}
+\item{organism}{A character vector of the organism name. The organisms
+scientific name is required to query biomaRt. This argument accepts partial
+strings. For example,"hsa" will match "hsapiens_gene_ensembl" or "mmus" will
+match ""mmusculus_gene_ensembl".}
 
 \item{host}{An optional character vector specifying the release version. This specification is highly recommended for a reproducible workflow. (see \code{"biomaRt::listEnsemblArchives()"})}
 }

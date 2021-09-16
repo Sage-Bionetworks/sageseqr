@@ -72,8 +72,10 @@ This specification is highly recommended for a reproducible workflow.
 \item{filters}{A character vector listing biomaRt query filters.
 (For a list of filters see \code{"biomaRt::listFilters()"})}
 
-\item{organism}{A character vector of the organism name. This argument
-takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".}
+\item{organism}{A character vector of the organism name. The organisms
+scientific name is required to query biomaRt. This argument accepts partial
+strings. For example,"hsa" will match "hsapiens_gene_ensembl" or "mmus" will
+match ""mmusculus_gene_ensembl".}
 
 \item{conditions}{Optional. Conditions to bin gene counts that correspond to
 variables in `md`.}

@@ -100,7 +100,10 @@ clean_covariates <- function(md, factors, continuous, sample_identifier) {
 #'
 #'Helper function to search relative Ensembl datasets by partial organism names.
 #'
-#'@param organism A character vector of the organism name. This argument takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".
+#'@param organism A character vector of the organism name. The organisms
+#'scientific name is required to query biomaRt. This argument accepts partial
+#'strings. For example,"hsa" will match "hsapiens_gene_ensembl" or "mmus" will
+#'match "mmusculus_gene_ensembl".
 #'@param host An optional character vector specifying the release version. This specification is highly recommended for a reproducible workflow. (see \code{"biomaRt::listEnsemblArchives()"})
 #'@export
 biomart_obj <- function(organism, host) {
@@ -142,14 +145,14 @@ parse_counts <- function(count_df){
 #'
 #'@param count_df A counts data frame with sample identifiers as column names
 #'and gene Ids are rownames.
+#'@param synid Optional. A character vector with a Synapse Id.
 #'@inheritParams get_data
 #'@param filters A character vector listing biomaRt query filters.
 #'(For a list of filters see \code{"biomaRt::listFilters()"})
 #'@param host An optional character vector specifying the release version.
 #'This specification is highly recommended for a reproducible workflow.
 #'(see \code{"biomaRt::listEnsemblArchives()"})
-#'@param organism A character vector of the organism name. This argument
-#'takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".
+#'@inheritParams biomart_obj
 #'@importFrom rlang .data
 #'@export
 get_biomart <- function(count_df, synid, version, host, filters, organism) {
@@ -176,6 +179,7 @@ get_biomart <- function(count_df, synid, version, host, filters, organism) {
 
     attrs <- c(filters, "ensembl_exon_id", "chromosome_name",
                "exon_chrom_start", "exon_chrom_end")
+
     coords <- biomaRt::getBM(
       filters = filters,
       attributes = attrs,
@@ -183,6 +187,12 @@ get_biomart <- function(count_df, synid, version, host, filters, organism) {
       mart = ensembl,
       useCache = FALSE
       )
+
+    # check for whether organism and gene features correspond
+    if (nrow(coords) == 0) {
+      stop("Gene feature ids and organism does not match.")
+    }
+
     gene_ids <- unique(coords[, filters])
 
     coords <- sapply(gene_ids, function(i) {
@@ -203,9 +213,13 @@ get_biomart <- function(count_df, synid, version, host, filters, organism) {
       ) %>%
       dplyr::rename(gene_length = .data$V1)
 
+    # match symbols available for organism
+    available_filters <- biomaRt::listFilters(ensembl)
+    symbols <- available_filters$name[grep("symbol", available_filters$name)]
+
     gc_content <- biomaRt::getBM(
       filters = filters,
-      attributes = c(filters, "hgnc_symbol", "percentage_gene_gc_content",
+      attributes = c(filters, symbols, "percentage_gene_gc_content",
                      "gene_biotype", "chromosome_name"),
       values = gene_ids,
       mart = ensembl,
@@ -216,6 +230,20 @@ get_biomart <- function(count_df, synid, version, host, filters, organism) {
 
     # Duplicate Ensembl Ids are collapsed into a single entry
     biomart_results <- collapse_duplicate_hgnc_symbol(biomart_results)
+
+    # Biomart query can add NAs as charactesr and empty strings. Convert those
+    # to NA values
+    biomart_results <- dplyr::mutate_all(
+      biomart_results,
+      na_if,
+      ""
+    )
+
+    biomart_results <- dplyr::mutate_all(
+      biomart_results,
+      na_if,
+      "NA"
+    )
 
     # Biomart IDs as rownames
     biomart_results <- tibble::column_to_rownames(
@@ -231,6 +259,20 @@ get_biomart <- function(count_df, synid, version, host, filters, organism) {
     biomart_results <- tibble::column_to_rownames(
       biomart_results, var = filters
       )
+
+    # Biomart query can add NAs as charactesr and empty strings. Convert those
+    # to NA values
+    biomart_results <- dplyr::mutate_all(
+      biomart_results,
+      na_if,
+      ""
+    )
+
+    biomart_results <- dplyr::mutate_all(
+      biomart_results,
+      na_if,
+      "NA"
+    )
 
     # Gene metadata required for count CQN
     required_variables <- c("gene_length", "percentage_gene_gc_content")
@@ -278,10 +320,15 @@ check_mismatch <- function(md, count_df) {
 #'
 #'@export
 collapse_duplicate_hgnc_symbol <- function(biomart_results){
-  biomart_results %>%
-    dplyr::group_by(.data$ensembl_gene_id) %>%
-    dplyr::mutate(hgnc_symbol = paste(.data$hgnc_symbol, collapse = ", ")) %>%
-    unique()
+  # check that hgnc_symbols are populated
+  if ("hgnc_symbol" %in% colnames(biomart_results)){
+    biomart_results %>%
+      dplyr::group_by(.data$ensembl_gene_id) %>%
+      dplyr::mutate(hgnc_symbol = paste(.data$hgnc_symbol, collapse = ", ")) %>%
+      unique()
+  } else {
+    biomart_results
+  }
 }
 #' Filter genes
 #'
