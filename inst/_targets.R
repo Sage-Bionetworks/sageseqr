@@ -236,9 +236,9 @@ list(
         as.list(
           glue::glue(
             "Differential Expression ({names(de)})"
-            )
           )
-        ),
+        )
+      ),
       data_names = append(
         list(
           "clean_md",
@@ -247,13 +247,9 @@ list(
           "cqn_counts"
         ),
         as.list(
-          names(
-            residualized_counts
-          )
-        ),
-        as.list(
-          names(
-            de
+          c(
+            names(residualized_counts),
+            names(de)
           )
         )
       ),

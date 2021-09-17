@@ -591,7 +591,7 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
                                            formula = metadata_input$formula_non_intercept,
                                            data = metadata_input$metadata,
                                            L = contrasts,
-                                           BPPARAM = BiocParallel::SnowParam(cores) 
+                                           BPPARAM = BiocParallel::SnowParam(cores)
                                            )
 
   de <- lapply(names(contrasts), function(i, fit){
@@ -811,8 +811,12 @@ store_results <- function(clean_md = clean_md,
   # parse differential expression gene list
   de_results <- purrr::map(de_results, function(x) x$differential_expression)
 
+  # parse residualized counts
+  parse_residual_matrix <- purrr::map(residualized_counts, function(x) x$output)
+
   # append differential expression data frames already nested in list
-  targets <- append(targets, de_results, residualized_counts)
+  targets <- append(targets, de_results)
+  targets <- append(targets, parse_residual_matrix)
 
   # append null rownames for differential expression object
   rownames <- append(rownames, rep(list(NULL), length(de_results) + length(residualized_counts)))
