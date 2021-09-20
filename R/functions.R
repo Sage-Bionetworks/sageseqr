@@ -815,11 +815,11 @@ store_results <- function(clean_md = clean_md,
   parse_residual_matrix <- purrr::map(residualized_counts, function(x) x$output)
 
   # append differential expression data frames already nested in list
-  targets <- append(targets, de_results)
   targets <- append(targets, parse_residual_matrix)
+  targets <- append(targets, de_results)
 
   # append null rownames for differential expression object
-  rownames <- append(rownames, rep(list(NULL), length(de_results) + length(residualized_counts)))
+  rownames <- append(rownames, rep(list(NULL), length(residualized_counts) + length(de_results)))
 
   mash <- list(
     target = targets,
