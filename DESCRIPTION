@@ -1,6 +1,6 @@
 Package: sageseqr
 Title: Identify differentially expressed genes counts data
-Version: 0.0.0.9000
+Version: 0.1.0.0
 Authors@R: 
     c(person(given = "Kelsey",
            family = "Montgomery",
@@ -27,19 +27,17 @@ URL: https://sage-bionetworks.github.io/sageseqr,
 Encoding: UTF-8
 LazyData: true
 Suggests: 
-    testthat (>= 2.1.0),
-    markdown
+    rmarkdown,
+    testthat (>= 2.1.0)
 RoxygenNote: 7.1.1
 biocViews:
 Imports:
+    BiocParallel,
     biomaRt,
-    config,
     cqn,
     data.table,
-    drake,
     dplyr,
     edgeR,
-    foreach,
     fs,
     graphics,
     GenomicRanges,
@@ -56,17 +54,19 @@ Imports:
     magrittr,
     mclust,
     mvIC,
+    parallel,
     plyr,
     psych,
     purrr,
     RColorBrewer,
     reshape2,
     rlang,
-    rmarkdown,
     sagethemes,
     stats,
     stringr,
     synapser,
+    tarchetypes,
+    targets,
     tidyr,
     tibble,
     utils,

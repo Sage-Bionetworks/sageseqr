@@ -37,7 +37,7 @@ library(sageseqr)
 # Explore Metadata
 
 ```{r sample_summary, message = FALSE}
-drake::loadd(clean_md)
+targets::tar_load(clean_md)
 var <- config::get("x_var")
 summary <- dplyr::group_by_at(clean_md, var)
 summary <- dplyr::summarise(summary, count = dplyr::n())
@@ -46,27 +46,27 @@ knitr::kable(summary)
 
 Visualize the distribution of data.
 ```{r boxplot}
-drake::readd(boxplots)
+targets::tar_read(boxplots)
 ```
 
 ```{r boxplot_sex_chromosomes, results = "asis", fig.dim = c(5,5)}
 if (!is.null(config::get("sex check"))) {
   cat("Visualize gene expression of sex chromosomes using XIST 
       as a X-chromosome marker and UTY as a Y-chromosome marker.")
-  drake::readd(sex_plot)$plot
+  targets::tar_read(sex_plot)$plot
 }
 ```
 
 ```{r sex_chromosome_pca, results = "asis",  fig.dim = c(10,5)}
 if (!is.null(config::get("sex check"))) {
    cat("Visualize gene expression across X and Y chromosomes by principal component analysis (PCA).")
-   drake::readd(sex_plot_pca)$plot
+   targets::tar_read(sex_plot)$plot
 }
 ```
 
 ```{r outlier_list, results = "asis"}
-if (!is.null(drake::readd(sex_plot_pca)$outliers)) {
-  list <- glue::glue_collapse(drake::readd(sex_plot_pca)$outliers, ", ", last = " and ")
+if (!is.null(targets::tar_read(sex_plot_pca)$outliers)) {
+  list <- glue::glue_collapse(targets::tar_read(sex_plot_pca)$outliers, ", ", last = " and ")
   glue::glue("Possible outliers, identified as 2 standard deviations from the mean of samples n split by {config::get('sex check')} are {list}.")
 } else {
   cat("No outliers identified.")
@@ -75,7 +75,7 @@ if (!is.null(drake::readd(sex_plot_pca)$outliers)) {
 
 Visualize the relationships between covariates.
 ```{r heatmap_covariates}
-correlation_input <- drake::readd(
+correlation_input <- targets::tar_read(
   correlation_plot
   )$plot
 col2 <- grDevices::colorRampPalette(rev(c("#67001F", "#B2182B", "#D6604D", "#F4A582",
@@ -88,29 +88,29 @@ corrplot::corrplot(correlation_input, col = col2(200), tl.col = "#000000")
 
 Remove genes that have less than `r config::get("cpm threshold")` counts per million (CPM) in at least `r config::get("percent threshold")` of samples per specified condition.
 
-`r dim(drake::readd(filtered_counts))[1]` genes are used in this analysis.
+`r dim(targets::tar_read(filtered_counts))[1]` genes are used in this analysis.
 ```{r filter_genes}
-knitr::kable(drake::readd(biotypes))
+knitr::kable(targets::tar_read(biotypes))
 ```
 
 Check distribution of correlation between genes.
 ```{r histogram}
-drake::readd(gene_coexpression)
+targets::tar_read(gene_coexpression)
 ```
 
 # Identify Outliers
 
 ```{r plot_outliers}
-drake::readd(outliers)$plot
+targets::tar_read(outliers)$plot
 ```
-Outliers, based on logCPM expression, are `r glue::glue_collapse(drake::readd(outliers)$outliers, ", ", last = " and ")`.
+Outliers, based on logCPM expression, are `r glue::glue_collapse(targets::tar_read(outliers)$outliers, ", ", last = " and ")`.
 
 # Significant Covariates
 
-Significant covariates are identified by the pearson correlation (p-value of 1%) between principal component analysis (PCA) of normalized transcripts and variables that meet a 0.1 false discovery rate (FDR) threshold. Significant covariates to adjust for are `r glue::glue_collapse(drake::readd(significant_covariates_plot)$significant_covariates, ", ", last = " and ")`.
+Significant covariates are identified by the pearson correlation (p-value of 1%) between principal component analysis (PCA) of normalized transcripts and variables that meet a 0.1 false discovery rate (FDR) threshold. Significant covariates to adjust for are `r glue::glue_collapse(targets::tar_read(significant_covariates_plot)$significant_covariates, ", ", last = " and ")`.
 
 ```{r pca_and_significant_covariates}
-drake::readd(
+targets::tar_read(
   significant_covariates_plot
   )$pc_results
 ```
@@ -119,7 +119,7 @@ drake::readd(
 Covariates are added as fixed and random effects iteratively if model improvement by  Bayesian Information Criteria (BIC) was observed.
 ```{r model, results = "asis"}
 if (!isTRUE(config::get("skip model"))) {
-  summary <- drake::readd(model)
+  summary <- targets::tar_read(model)
   glue::glue('The best model is: {glue::glue_collapse(as.character(summary$formula), " ")}')
 } else {
   glue::glue(
@@ -128,7 +128,6 @@ if (!isTRUE(config::get("skip model"))) {
     
     )
 }
-
 ```
 \n
 ```{r model_description}
@@ -139,7 +138,7 @@ if (!isTRUE(config::get("skip model"))) {
 # Differential Expression
 
 ```{r differential_expression}
-plots <- drake::readd(plot_de_volcano)
+plots <- targets::tar_read(plot_de_volcano)
 for(p in plots) {
   print(p)
 }

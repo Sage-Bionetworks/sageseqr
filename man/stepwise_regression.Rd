@@ -24,7 +24,7 @@ fixed effect interaction term.}
 If not supplied, the model will include all variables in \code{md}.}
 
 \item{skip}{Defaults to NULL. If TRUE, this step will be skipped in the
-Drake plan.}
+targets plan.}
 }
 \value{
 Table with BIC criteria for exclusion or inclusion of variables in

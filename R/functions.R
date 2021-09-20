@@ -14,6 +14,9 @@
 #'
 #'}
 get_data <- function(synid, version = NULL) {
+  # login to Synapse
+  synapser::synLogin()
+
   df <- tibble::as_tibble(
     data.table::fread(
       synapser::synGet(
@@ -522,6 +525,7 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
 #' adjusted p-value greater than this threshold.
 #' @param fold_change_threshold Numeric. Significant genes are those with a
 #' fold-change greater than this threshold.
+#' @param cores An integer of cores to specify in the parallel backend (eg. 4).
 #' @inheritParams cqn
 #' @inheritParams coerce_factors
 #' @inheritParams build_formula
@@ -539,9 +543,13 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
                                     primary_variable, biomart_results,
                                     p_value_threshold, fold_change_threshold,
                                     model_variables = NULL,
-                                    exclude_variables = NULL) {
+                                    exclude_variables = NULL,
+                                    cores = NULL) {
   # force order of samples in metadata to match order of samples in counts.
   # Required by variancePartition
+  if(is.null(cores)){
+    cores = parallel::detectCores()-1
+  }
   md <- md[match(colnames(filtered_counts),rownames(md)),]
 
   metadata_input <- build_formula(md, primary_variable, model_variables)
@@ -549,7 +557,9 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
   gene_expression <- edgeR::calcNormFactors(gene_expression)
   voom_gene_expression <- variancePartition::voomWithDreamWeights(counts = gene_expression,
                                                                   formula = metadata_input$formula,
-                                                                  data = metadata_input$metadata)
+                                                                  data = metadata_input$metadata,
+                                                                  BPPARAM = BiocParallel::SnowParam(cores)
+                                                                 )
   voom_gene_expression$E <- cqn_counts
 
   de_conditions <- levels(metadata_input$metadata[[metadata_input$primary_variable]])
@@ -580,7 +590,8 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
   fit_contrasts = variancePartition::dream(exprObj = voom_gene_expression,
                                            formula = metadata_input$formula_non_intercept,
                                            data = metadata_input$metadata,
-                                           L = contrasts
+                                           L = contrasts,
+                                           BPPARAM = BiocParallel::SnowParam(cores)
                                            )
 
   de <- lapply(names(contrasts), function(i, fit){
@@ -625,7 +636,7 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
 #' @export
 wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
                     biomart_results, p_value_threshold, fold_change_threshold,
-                    model_variables = names(md)) {
+                    model_variables = names(md), cores = NULL) {
   purrr::map(
     conditions,
     function(x) differential_expression(
@@ -636,7 +647,8 @@ wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
       biomart_results,
       p_value_threshold,
       fold_change_threshold,
-      model_variables
+      model_variables,
+      cores = cores
       )
     )
 }
@@ -648,7 +660,7 @@ wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
 #' @inheritParams differential_expression
 #' @inheritParams build_formula
 #' @param skip Defaults to NULL. If TRUE, this step will be skipped in the
-#' Drake plan.
+#' targets plan.
 #' @return Table with BIC criteria for exclusion or inclusion of variables in
 #' the model, linear (mixed) model formula and vector of variables to include.
 #' @export
@@ -736,22 +748,23 @@ prepare_results <- function(target, data_name, rowname = NULL) {
 #'
 #' @param parent_id A Synapse Id that corresponds to a project or
 #' folder to store output.
-#' @param cqn_counts The drake target containing Conditional Quantile Normalized
+#' @param cqn_counts The target containing Conditional Quantile Normalized
 #'  (CQN) counts. Defaults to target name constrained by
-#'  \code{"sageseqr::rnaseq_plan()"}.
-#' @param clean_md The drake target containing the metadata data frame.
-#' Defaults to target name constrained by \code{"sageseqr::rnaseq_plan()"}.
-#' @param filtered_counts The drake target containing counts after low gene
+#'  \code{"targets::tar_make"}.
+#' @param clean_md The target containing the metadata data frame.
+#' Defaults to target name constrained by \code{"targets::tar_make"}.
+#' @param filtered_counts The target containing counts after low gene
 #' expression has been removed. Defaults to target name constrained by
-#'  \code{"sageseqr::rnaseq_plan()"}.
-#' @param biomart_results The drake target containing gene annotations from
+#'  \code{"targets::tar_make()"}.
+#' @param biomart_results The target containing gene annotations from
 #' biomart. Defaults to target name constrained by
-#' \code{"sageseqr::rnaseq_plan()"}.
-#' @param de_results The drake target containing differential expression gene
-#' lists. Defaults to target name constrained by
-#' \code{"sageseqr::rnaseq_plan()"}.
-#' @param report The drake target containing the rendered markdown as html.
-#' Defaults to target names constrained by \code{"sageseqr::rnaseq_plan()"}.
+#' \code{"targets::tar_make"}.
+#' @param de_results The target containing differential expression gene
+#' lists. Defaults to target name constrained in the _targets.R file.
+#' @param residualized_counts The target containing counts adjusted for batch
+#' effects. Defaults to target name constrained in the _targets.R file.
+#' @param report The target containing the rendered html document. Defaults
+#' to target name constrained in the _targets.R file.
 #' @param rownames A list of variables to store rownames ordered by `metadata`,
 #' `filtered_counts`, `biomart_results`, `cqn_counts`. If not applicable,
 #' set as NULL.
@@ -766,13 +779,14 @@ prepare_results <- function(target, data_name, rowname = NULL) {
 #' by `clean_md`, `filtered_counts`, `biomart_results`, `cqn_counts`,
 #' `de_results`.
 #' @param config_file Optional. Path to configuration file.
-#' @inheritParams rnaseq_plan
+#' @param report_name Name of output markdown file.
 #' @export
 store_results <- function(clean_md = clean_md,
                           filtered_counts = filtered_counts,
                           biomart_results = biomart_results,
                           cqn_counts = cqn_counts$E,
                           de_results = de,
+                          residualized_counts = residualized_counts,
                           report = report,
                           syn_names, data_names,
                           parent_id, inputs, activity_provenance,
@@ -785,7 +799,7 @@ store_results <- function(clean_md = clean_md,
     "analyzed with sageseqr {ver}"
   )
 
-  # nest drake targets in a list. Every time a new target is to-be stored, it
+  # nest targets targets in a list. Every time a new target is to-be stored, it
   # must be added as an argument to this function and then added to this list.
   targets <- list(
     clean_md,
@@ -797,11 +811,15 @@ store_results <- function(clean_md = clean_md,
   # parse differential expression gene list
   de_results <- purrr::map(de_results, function(x) x$differential_expression)
 
+  # parse residualized counts
+  parse_residual_matrix <- purrr::map(residualized_counts, function(x) x$output)
+
   # append differential expression data frames already nested in list
+  targets <- append(targets, parse_residual_matrix)
   targets <- append(targets, de_results)
 
   # append null rownames for differential expression object
-  rownames <- append(rownames, rep(list(NULL), length(de_results)))
+  rownames <- append(rownames, rep(list(NULL), length(residualized_counts) + length(de_results)))
 
   mash <- list(
     target = targets,
@@ -838,6 +856,9 @@ store_results <- function(clean_md = clean_md,
     activity_provenance = activity_provenance,
     activity_description = description
     )
+
+  # login to Synapse
+  synapser::synLogin()
 
   for_provenance <- purrr::pmap(
     mash,
@@ -894,8 +915,16 @@ store_results <- function(clean_md = clean_md,
 #' Provenance helper
 #'
 #' Collapse Synapse Ids and version.
-#'
-#' @inheritParams rnaseq_plan
+#' @param metadata_id Synapse ID to clean metadata file with sample identifiers
+#' in a column and variables of interest as column names. There cannot be any
+#' missing values.
+#' @param counts_id Synapse ID to counts data frame with identifiers to the
+#' metadata as column names and gene ids in a column.
+#' @param metadata_version Optionally, include Synapse file version number. If
+#' omitted, current version will be downloaded.
+#' @param counts_version Optionally, include Synapse file version number.
+#' @param biomart_id Synapse ID to biomart object.
+#' @param biomart_version Optionally, include Synapse file version number.
 #' @export
 provenance_helper <- function(metadata_id,  counts_id, metadata_version = NULL,
                               counts_version = NULL, biomart_id = NULL,
@@ -921,4 +950,102 @@ provenance_helper <- function(metadata_id,  counts_id, metadata_version = NULL,
     ids <- c(ids, glue::glue("{biomart_id}.{biomart_version}"))
   }
   ids
+}
+#' Initialize differential expression analysis workflow
+#'
+#' The `sageseqr` package provides a `targets` workflow to string together the
+#' data processing and computational steps of RNA-seq differential expression
+#' analysis. This funciton copies a markdown document and _targets.R file to your
+#' working directory. The _targets.R file in your working directory is required
+#' for the workflow to run.
+#'
+#' @export
+start_de <- function() {
+  # copy sageseqr-report.Rmd markdown to working directory
+  if (!file.exists("sageseqr-report.Rmd")) {
+    fs::file_copy(system.file("sageseqr-report.Rmd", package = "sageseqr"),
+                  new_path = getwd())
+  }
+
+  # copy _targets.R file to working directory
+  if (!file.exists("_targets.R")) {
+    fs::file_copy(system.file("_targets.R", package = "sageseqr"),
+                  new_path = getwd())
+  }
+}
+#' Compute residualized counts matrix
+#'
+#' Residuals of the best fit linear regression model are computed for each
+#'  observation. Batch effects are adjusted for in the returned counts matrix
+#'  while preserving the effect of the predictor variable.
+#'
+#' Counts are normalized prior to linear modeling to compute residuals. A
+#' precision weight is assigned to each gene feature to estimate the
+#' mean-variance relationship. Counts normalized by conditional quantile
+#'  normalization (CQN) are used in place of log2 normalized counts.
+#'
+#' @inheritParams cqn
+#' @inheritParams differential_expression
+#' @inheritParams filter_genes
+#' @export
+compute_residuals <- function(clean_metadata, filtered_counts,
+                              cqn_counts = cqn_counts$E, primary_variable,
+                              model_variables = NULL, cores = NULL)  {
+  # set the number of cores if not specified in the config
+  if(is.null(cores)){
+    cores = parallel::detectCores()-1
+  }
+  # force order of samples in metadata to match order of samples in counts.
+  # Required by variancePartition
+  clean_metadata <- clean_metadata[match(colnames(filtered_counts),rownames(clean_metadata)),]
+
+  metadata_input <- build_formula(clean_metadata, primary_variable, model_variables)
+  # Estimate voom weights with DREAM
+  gene_expression <- edgeR::DGEList(filtered_counts)
+  gene_expression <- edgeR::calcNormFactors(gene_expression)
+  voom <- variancePartition::voomWithDreamWeights(
+    counts = gene_expression,
+    formula = metadata_input$formula,
+    data = metadata_input$metadata,
+    BPPARAM = BiocParallel::SnowParam(cores)
+  )
+
+  # fit linear model using weights and best model
+  voom$E <- cqn_counts
+  adjusted_fit <- variancePartition::dream(
+    exprObj = voom,
+    formula = metadata_input$formula,
+    data = metadata_input$metadata,
+    computeResiduals = TRUE,
+    BPPARAM = BiocParallel::SnowParam(cores)
+  )
+
+  # compute residual matrix
+  residual_gene_expression <- stats::residuals(adjusted_fit)
+
+  # calculate weighted residuals and add back signal from predictor
+  variables_to_add_back <- grep(
+    metadata_input$primary_variable,
+    colnames(adjusted_fit$design),
+    value = TRUE
+    )
+  output <- residual_gene_expression +
+    adjusted_fit$coefficients[
+      ,variables_to_add_back
+      ] %*% t(
+        adjusted_fit$design[
+          ,variables_to_add_back]
+        )
+
+  # save gene features
+  output <- tibble::rownames_to_column(as.data.frame(output), var = "feature")
+
+  return(
+    list(
+      output = output,
+      signal = variables_to_add_back,
+      adjusted_fit = adjusted_fit,
+      formula = metadata_input$formula
+      )
+  )
 }
