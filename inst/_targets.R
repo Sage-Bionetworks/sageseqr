@@ -223,36 +223,26 @@ list(
         config::get("biomart")$filters,
         config::get("counts")$`gene id`
       ),
-      syn_names = append(
-        list(
+      syn_names = as.list(
+        c(
           "Covariates",
           "Filtered counts (greater than 1cpm)",
           "BioMart query results",
-          "Normalized counts (CQN)"
-        ),
-        as.list(
-          glue::glue("Residualized counts({names(residualized_counts)})")
-        ),
-        as.list(
-          glue::glue(
-            "Differential Expression ({names(de)})"
+          "Normalized counts (CQN)",
+          glue::glue("Residualized counts ({names(residualized_counts)})"),
+          glue::glue("Differential Expression ({names(de)})")
           )
-        )
-      ),
-      data_names = append(
-        list(
+        ),
+      data_names = as.list(
+        c(
           "clean_md",
           "filtered_counts",
           "biomart_results",
-          "cqn_counts"
-        ),
-        as.list(
-          c(
-            names(residualized_counts),
-            names(de)
+          "cqn_counts",
+          names(residualized_counts),
+          names(de)
           )
-        )
-      ),
+        ),
       inputs = document_inputs,
       activity_provenance = "Analyze RNA-seq data with sageseqr pkg",
       config_file = "config.yml",
