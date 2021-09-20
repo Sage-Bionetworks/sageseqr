@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Conditionally wrap plot_sexcheck for drake — conditional_plot_sexcheck • sageseqr</title>
+<title>Conditionally wrap plot_sexcheck for targets — conditional_plot_sexcheck • sageseqr</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,9 @@
 
 
 
-<meta property="og:title" content="Conditionally wrap plot_sexcheck for drake — conditional_plot_sexcheck" />
+<meta property="og:title" content="Conditionally wrap plot_sexcheck for targets — conditional_plot_sexcheck" />
 <meta property="og:description" content="Work around to expose plot_sexcheck to testing and export but also leverage
-drakes function for skipping targets conditionally (see &quot;drake::cancel_if()&quot;)." />
+targets function for skipping targets conditionally (see &quot;targets::tar_cancel()&quot;)." />
 
 
 
@@ -73,7 +73,7 @@ drakes function for skipping targets conditionally (see &quot;drake::cancel_if()
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sageseqr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0.0</span>
       </span>
     </div>
 
@@ -99,7 +99,10 @@ drakes function for skipping targets conditionally (see &quot;drake::cancel_if()
       <a href="../articles/customize-config.html">Write your own config file</a>
     </li>
     <li>
-      <a href="../articles/run-the-plan.html">Run the drake plan</a>
+      <a href="../articles/run-the-plan.html">Run the targets plan</a>
+    </li>
+    <li>
+      <a href="../articles/sagseqr-alpha-steps.html">Run the drake plan in version 0.0.0.9-alpha</a>
     </li>
   </ul>
 </li>
@@ -124,14 +127,14 @@ drakes function for skipping targets conditionally (see &quot;drake::cancel_if()
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Conditionally wrap plot_sexcheck for drake</h1>
+    <h1>Conditionally wrap plot_sexcheck for targets</h1>
     <small class="dont-index">Source: <a href='https://github.com/Sage-Bionetworks/sageseqr/blob/master/R/visualization-functions.R'><code>R/visualization-functions.R</code></a></small>
     <div class="hidden name"><code>conditional_plot_sexcheck.Rd</code></div>
     </div>
 
     <div class="ref-description">
     <p>Work around to expose plot_sexcheck to testing and export but also leverage
-drakes function for skipping targets conditionally (see <code>"drake::cancel_if()"</code>).</p>
+targets function for skipping targets conditionally (see <code>"targets::tar_cancel()"</code>).</p>
     </div>
 
     <pre class="usage"><span class='fu'>conditional_plot_sexcheck</span><span class='op'>(</span><span class='va'>clean_metadata</span>, <span class='va'>count_df</span>, <span class='va'>biomart_results</span>, <span class='va'>sex_var</span><span class='op'>)</span></pre>

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Filter genes — filter_genes • sageseqr</title>
+<title>Compute residualized counts matrix — compute_residuals • sageseqr</title>
 
 
 <!-- jquery -->
@@ -39,10 +39,10 @@
 
 
 
-<meta property="og:title" content="Filter genes — filter_genes" />
-<meta property="og:description" content="Filter genes with low expression. This function is more permissive by setting conditions
-that corresponds to metadata variables. The gene matrix is split by condition and the
-counts per million (CPM) for a given condition is computed by &quot;sageseqr::simple_filter()&quot;." />
+<meta property="og:title" content="Compute residualized counts matrix — compute_residuals" />
+<meta property="og:description" content="Residuals of the best fit linear regression model are computed for each
+ observation. Batch effects are adjusted for in the returned counts matrix
+ while preserving the effect of the predictor variable." />
 
 
 
@@ -128,23 +128,24 @@ counts per million (CPM) for a given condition is computed by &quot;sageseqr::si
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Filter genes</h1>
+    <h1>Compute residualized counts matrix</h1>
     <small class="dont-index">Source: <a href='https://github.com/Sage-Bionetworks/sageseqr/blob/master/R/functions.R'><code>R/functions.R</code></a></small>
-    <div class="hidden name"><code>filter_genes.Rd</code></div>
+    <div class="hidden name"><code>compute_residuals.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Filter genes with low expression. This function is more permissive by setting conditions
-that corresponds to metadata variables. The gene matrix is split by condition and the
-counts per million (CPM) for a given condition is computed by <code>"sageseqr::simple_filter()"</code>.</p>
+    <p>Residuals of the best fit linear regression model are computed for each
+ observation. Batch effects are adjusted for in the returned counts matrix
+ while preserving the effect of the predictor variable.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>filter_genes</span><span class='op'>(</span>
+    <pre class="usage"><span class='fu'>compute_residuals</span><span class='op'>(</span>
   <span class='va'>clean_metadata</span>,
-  <span class='va'>count_df</span>,
-  <span class='va'>cpm_threshold</span>,
-  <span class='va'>conditions_threshold</span>,
-  conditions <span class='op'>=</span> <span class='cn'>NULL</span>
+  <span class='va'>filtered_counts</span>,
+  cqn_counts <span class='op'>=</span> <span class='va'>cqn_counts</span><span class='op'>$</span><span class='va'>E</span>,
+  <span class='va'>primary_variable</span>,
+  model_variables <span class='op'>=</span> <span class='cn'>NULL</span>,
+  cores <span class='op'>=</span> <span class='cn'>NULL</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -156,25 +157,35 @@ counts per million (CPM) for a given condition is computed by <code>"sageseqr::s
 factors or numeric as determined by <code>"sageseqr::clean_covariates()"</code>.</p></td>
     </tr>
     <tr>
-      <th>count_df</th>
-      <td><p>A counts data frame with sample identifiers as column names
-and gene Ids are rownames.</p></td>
+      <th>filtered_counts</th>
+      <td><p>A counts data frame with genes removed that have low expression.</p></td>
     </tr>
     <tr>
-      <th>cpm_threshold</th>
-      <td><p>The minimum number of CPM allowed.</p></td>
+      <th>cqn_counts</th>
+      <td><p>A counts data frame normalized by CQN.</p></td>
     </tr>
     <tr>
-      <th>conditions_threshold</th>
-      <td><p>Percentage of samples that should contain the minimum CPM.</p></td>
+      <th>primary_variable</th>
+      <td><p>Vector of variables that will be collapsed into a single
+fixed effect interaction term.</p></td>
     </tr>
     <tr>
-      <th>conditions</th>
-      <td><p>Optional. Conditions to bin gene counts that correspond to
-variables in `md`.</p></td>
+      <th>model_variables</th>
+      <td><p>Optional. Vector of variables to include in the linear (mixed) model.
+If not supplied, the model will include all variables in <code>md</code>.</p></td>
+    </tr>
+    <tr>
+      <th>cores</th>
+      <td><p>An integer of cores to specify in the parallel backend (eg. 4).</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>Counts are normalized prior to linear modeling to compute residuals. A
+precision weight is assigned to each gene feature to estimate the
+mean-variance relationship. Counts normalized by conditional quantile
+ normalization (CQN) are used in place of log2 normalized counts.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

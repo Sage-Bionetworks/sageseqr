@@ -74,7 +74,7 @@ effect. If you wish to test an interaction term, `primary_variable` can take mul
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sageseqr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0.0</span>
       </span>
     </div>
 
@@ -100,7 +100,10 @@ effect. If you wish to test an interaction term, `primary_variable` can take mul
       <a href="../articles/customize-config.html">Write your own config file</a>
     </li>
     <li>
-      <a href="../articles/run-the-plan.html">Run the drake plan</a>
+      <a href="../articles/run-the-plan.html">Run the targets plan</a>
+    </li>
+    <li>
+      <a href="../articles/sagseqr-alpha-steps.html">Run the drake plan in version 0.0.0.9-alpha</a>
     </li>
   </ul>
 </li>
@@ -145,7 +148,8 @@ effect. If you wish to test an interaction term, `primary_variable` can take mul
   <span class='va'>p_value_threshold</span>,
   <span class='va'>fold_change_threshold</span>,
   model_variables <span class='op'>=</span> <span class='cn'>NULL</span>,
-  exclude_variables <span class='op'>=</span> <span class='cn'>NULL</span>
+  exclude_variables <span class='op'>=</span> <span class='cn'>NULL</span>,
+  cores <span class='op'>=</span> <span class='cn'>NULL</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -192,6 +196,10 @@ If not supplied, the model will include all variables in <code>md</code>.</p></t
     <tr>
       <th>exclude_variables</th>
       <td><p>Vector of variables to exclude from testing.</p></td>
+    </tr>
+    <tr>
+      <th>cores</th>
+      <td><p>An integer of cores to specify in the parallel backend (eg. 4).</p></td>
     </tr>
     </table>
 

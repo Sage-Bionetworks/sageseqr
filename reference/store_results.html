@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sageseqr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0.0</span>
       </span>
     </div>
 
@@ -98,7 +98,10 @@
       <a href="../articles/customize-config.html">Write your own config file</a>
     </li>
     <li>
-      <a href="../articles/run-the-plan.html">Run the drake plan</a>
+      <a href="../articles/run-the-plan.html">Run the targets plan</a>
+    </li>
+    <li>
+      <a href="../articles/sagseqr-alpha-steps.html">Run the drake plan in version 0.0.0.9-alpha</a>
     </li>
   </ul>
 </li>
@@ -138,6 +141,7 @@
   biomart_results <span class='op'>=</span> <span class='va'>biomart_results</span>,
   cqn_counts <span class='op'>=</span> <span class='va'>cqn_counts</span><span class='op'>$</span><span class='va'>E</span>,
   de_results <span class='op'>=</span> <span class='va'>de</span>,
+  residualized_counts <span class='op'>=</span> <span class='va'>residualized_counts</span>,
   report <span class='op'>=</span> <span class='va'>report</span>,
   <span class='va'>syn_names</span>,
   <span class='va'>data_names</span>,
@@ -154,37 +158,41 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>clean_md</th>
-      <td><p>The drake target containing the metadata data frame.
-Defaults to target name constrained by <code>"sageseqr::rnaseq_plan()"</code>.</p></td>
+      <td><p>The target containing the metadata data frame.
+Defaults to target name constrained by <code>"targets::tar_make"</code>.</p></td>
     </tr>
     <tr>
       <th>filtered_counts</th>
-      <td><p>The drake target containing counts after low gene
+      <td><p>The target containing counts after low gene
 expression has been removed. Defaults to target name constrained by
- <code>"sageseqr::rnaseq_plan()"</code>.</p></td>
+ <code>"targets::tar_make()"</code>.</p></td>
     </tr>
     <tr>
       <th>biomart_results</th>
-      <td><p>The drake target containing gene annotations from
+      <td><p>The target containing gene annotations from
 biomart. Defaults to target name constrained by
-<code>"sageseqr::rnaseq_plan()"</code>.</p></td>
+<code>"targets::tar_make"</code>.</p></td>
     </tr>
     <tr>
       <th>cqn_counts</th>
-      <td><p>The drake target containing Conditional Quantile Normalized
+      <td><p>The target containing Conditional Quantile Normalized
 (CQN) counts. Defaults to target name constrained by
-<code>"sageseqr::rnaseq_plan()"</code>.</p></td>
+<code>"targets::tar_make"</code>.</p></td>
     </tr>
     <tr>
       <th>de_results</th>
-      <td><p>The drake target containing differential expression gene
-lists. Defaults to target name constrained by
-<code>"sageseqr::rnaseq_plan()"</code>.</p></td>
+      <td><p>The target containing differential expression gene
+lists. Defaults to target name constrained in the _targets.R file.</p></td>
+    </tr>
+    <tr>
+      <th>residualized_counts</th>
+      <td><p>The target containing counts adjusted for batch
+effects. Defaults to target name constrained in the _targets.R file.</p></td>
     </tr>
     <tr>
       <th>report</th>
-      <td><p>The drake target containing the rendered markdown as html.
-Defaults to target names constrained by <code>"sageseqr::rnaseq_plan()"</code>.</p></td>
+      <td><p>The target containing the rendered html document. Defaults
+to target name constrained in the _targets.R file.</p></td>
     </tr>
     <tr>
       <th>syn_names</th>

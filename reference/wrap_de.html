@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sageseqr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0.0</span>
       </span>
     </div>
 
@@ -98,7 +98,10 @@
       <a href="../articles/customize-config.html">Write your own config file</a>
     </li>
     <li>
-      <a href="../articles/run-the-plan.html">Run the drake plan</a>
+      <a href="../articles/run-the-plan.html">Run the targets plan</a>
+    </li>
+    <li>
+      <a href="../articles/sagseqr-alpha-steps.html">Run the drake plan in version 0.0.0.9-alpha</a>
     </li>
   </ul>
 </li>
@@ -140,7 +143,8 @@
   <span class='va'>biomart_results</span>,
   <span class='va'>p_value_threshold</span>,
   <span class='va'>fold_change_threshold</span>,
-  model_variables <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span><span class='op'>(</span><span class='va'>md</span><span class='op'>)</span>
+  model_variables <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span><span class='op'>(</span><span class='va'>md</span><span class='op'>)</span>,
+  cores <span class='op'>=</span> <span class='cn'>NULL</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -183,6 +187,10 @@ fold-change greater than this threshold.</p></td>
       <th>model_variables</th>
       <td><p>Optional. Vector of variables to include in the linear (mixed) model.
 If not supplied, the model will include all variables in <code>md</code>.</p></td>
+    </tr>
+    <tr>
+      <th>cores</th>
+      <td><p>An integer of cores to specify in the parallel backend (eg. 4).</p></td>
     </tr>
     </table>
 
