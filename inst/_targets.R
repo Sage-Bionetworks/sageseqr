@@ -49,7 +49,7 @@ list(
       filters = get("biomart")$filters,
       host = get("biomart")$host,
       organism = get("biomart")$organism,
-      exon = get("biomart")$`exon only`,
+      isexon = get("biomart")$`exon only`,
       custom = get("biomart")$`custom build`,
       gtfID = get("biomart")$gtfID,
       gtfVersion = get("biomart")$gtfVersion,
