@@ -51,6 +51,7 @@ list(
       organism = get("biomart")$organism,
       isexon = get("biomart")$`exon only`,
       custom = get("biomart")$`custom build`,
+      cores = get("cores"),
       gtfID = get("biomart")$gtfID,
       gtfVersion = get("biomart")$gtfVersion,
       fastaID = get("biomart")$fastaID,
