@@ -8,7 +8,10 @@ store_results(
   clean_md = clean_md,
   filtered_counts = filtered_counts,
   biomart_results = biomart_results,
-  cqn_counts = cqn_counts$counts,
+  cqn_counts = cqn_counts$E,
+  de_results = de,
+  residualized_counts = residualized_counts,
+  report = report,
   syn_names,
   data_names,
   parent_id,
@@ -20,27 +23,37 @@ store_results(
 )
 }
 \arguments{
-\item{clean_md}{The drake target containing the metadata data frame.
-Defaults to target name constrained by \code{"sageseqr::rnaseq_plan()"}.}
+\item{clean_md}{The target containing the metadata data frame.
+Defaults to target name constrained by \code{"targets::tar_make"}.}
 
-\item{filtered_counts}{The drake target containing counts after low gene
+\item{filtered_counts}{The target containing counts after low gene
 expression has been removed. Defaults to target name constrained by
- \code{"sageseqr::rnaseq_plan()"}.}
+ \code{"targets::tar_make()"}.}
 
-\item{biomart_results}{The drake target containing gene annotations from
+\item{biomart_results}{The target containing gene annotations from
 biomart. Defaults to target name constrained by
-\code{"sageseqr::rnaseq_plan()"}.}
+\code{"targets::tar_make"}.}
 
-\item{cqn_counts}{The drake target containing Conditional Quantile Normalized
+\item{cqn_counts}{The target containing Conditional Quantile Normalized
 (CQN) counts. Defaults to target name constrained by
-\code{"sageseqr::rnaseq_plan()"}.}
+\code{"targets::tar_make"}.}
+
+\item{de_results}{The target containing differential expression gene
+lists. Defaults to target name constrained in the _targets.R file.}
+
+\item{residualized_counts}{The target containing counts adjusted for batch
+effects. Defaults to target name constrained in the _targets.R file.}
+
+\item{report}{The target containing the rendered html document. Defaults
+to target name constrained in the _targets.R file.}
 
 \item{syn_names}{A list of human-readable names for the Synapse entities
 ordered
 by `metadata`, `filtered_counts`, `biomart_results`, `cqn_counts`.}
 
 \item{data_names}{A list of identifiers to embed in the file name ordered
-by `metadata`, `filtered_counts`, `biomart_results`, `cqn_counts`.}
+by `clean_md`, `filtered_counts`, `biomart_results`, `cqn_counts`,
+`de_results`.}
 
 \item{parent_id}{A Synapse Id that corresponds to a project or
 folder to store output.}

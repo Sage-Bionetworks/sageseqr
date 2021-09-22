@@ -1,0 +1,43 @@
+default:
+  counts:
+    synID: syn25808335
+    version:
+    gene id: feature
+  metadata:
+    synID: syn26136277
+    version: 3
+    sample id: specimenID
+  biomart:
+    synID: syn23625835
+    version:
+    filters: ensembl_gene_id
+    host: ensembl.org
+    organism: hsa
+    exon only:
+    custom build:
+    gtfID:
+    gtfVersion:
+    fastaID:
+    fataVersion:
+  factors: ['diagnosis',	'tissue',	'race',	'spanish','apoe4_allele',	'sex',	'final_batch' ]
+  continuous: ['pmi',	'RIN', 'RIN2',	'age_death',	'AlignmentSummaryMetrics_PCT_PF_READS_ALIGNED',	'RnaSeqMetrics_PCT_INTRONIC_BASES',	'RnaSeqMetrics_PCT_INTERGENIC_BASES',	'RnaSeqMetrics_PCT_CODING_BASES'  ]
+  x_var: diagnosis
+  conditions:
+    sex-diagnosis-tissue interaction: ["diagnosis", "sex", "tissue"]
+  cpm threshold: 1
+  percent threshold: 0.5
+  sex check: sex
+  dimensions:
+    color: "diagnosis"
+    shape: "final_batch"
+    size: "age_death"
+  skip model: FALSE
+  force model with:
+  de FC: 1.2
+  de p-value threshold: 0.05
+  visualization gene list: ["LCN2", "TRIM69"]
+  de contrasts:
+    diagnosis: ["diagnosis", "tissue"]
+    diagnosis-sex: ["diagnosis","tissue", "sex"]
+  report: "rosmap"
+  store output: syn25869418

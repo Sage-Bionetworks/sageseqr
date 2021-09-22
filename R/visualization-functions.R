@@ -767,15 +767,15 @@ plot_sexcheck <- function(clean_metadata, count_df, biomart_results, sex_var) {
             sex_specific_counts = results)
   p
 }
-#' Conditionally wrap plot_sexcheck for drake
+#' Conditionally wrap plot_sexcheck for targets
 #'
 #' Work around to expose plot_sexcheck to testing and export but also leverage
-#' drakes function for skipping targets conditionally (see \code{"drake::cancel_if()"}).
+#' targets function for skipping targets conditionally (see \code{"targets::tar_cancel()"}).
 #' @inheritParams plot_sexcheck
 #' @inheritParams get_biomart
 #' @export
 conditional_plot_sexcheck <- function(clean_metadata, count_df, biomart_results, sex_var) {
-  drake::cancel_if(is.null(sex_var))
+  targets::tar_cancel(is.null(sex_var))
   plot_sexcheck(clean_metadata, count_df, biomart_results, sex_var)
 }
 #' Explore samples that are outliers
@@ -1349,4 +1349,65 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
     warnings = warning
   )
   return(p)
+}
+#' Volcano plot differential expression results'
+#'
+#' The plot colors genes where the adjusted p-value exceed the `p_value_threshold`
+#' and the `fold_change_threshold`. Optionally, provide a list of genes to label in
+#' the plot via `gene_list`.
+#'
+#' @param gene_list A vector of genes to label in the volcano plot.
+#' @param de Differential expression results from
+#' \code{"sageseqr::differential_expression()"} output object named
+#' "differential_expression".
+#' @inheritParams differential_expression
+#' @export
+#'
+plot_volcano <- function(de, p_value_threshold, fold_change_threshold, gene_list) {
+  tmp <- de %>%
+    dplyr::filter(.data$adj.P.Val <= p_value_threshold) %>%
+    dplyr::select(.data$ensembl_gene_id, .data$Comparison) %>%
+    dplyr::group_by(.data$Comparison) %>%
+    dplyr::summarise(
+      "FDR_{p_value_threshold}" := length(unique(.data$ensembl_gene_id))
+    )
+  tmp1 <- de %>%
+    dplyr::filter(
+      .data$adj.P.Val <= p_value_threshold,
+      abs(.data$logFC) >= log2(fold_change_threshold)
+    ) %>%
+    dplyr::select(.data$ensembl_gene_id, .data$Comparison) %>%
+    dplyr::group_by(.data$Comparison) %>%
+    dplyr::summarise(
+      "FDR_{p_value_threshold}_FC_{fold_change_threshold}" := length(unique(.data$ensembl_gene_id))
+    )
+  knitr::kable(dplyr::full_join(tmp,tmp1))
+
+  plotdata <- de %>%
+    dplyr::mutate(label = ifelse(
+      .data$hgnc_symbol %in% gene_list,
+      .data$hgnc_symbol,
+      NA)
+    )
+
+  p = ggplot2::ggplot(
+    plotdata, ggplot2::aes(
+      y = -log10(.data$adj.P.Val),
+      x = .data$logFC,
+      color = .data$Direction)
+  ) + ggplot2::geom_point()
+  p = p + ggplot2::scale_color_manual(values = c('red','grey','green'))
+  p = p + ggrepel::geom_text_repel(
+    ggplot2::aes(label = .data$label),
+    family = "Lato",
+    size = 4,
+    color = "black",
+    hjust = "inward",
+    vjust = "inward",
+    na.rm = TRUE,
+    max.overlaps = 20
+  ) + sagethemes::theme_sage()
+  p = p + ggplot2::labs(x = expression(log[2]~FC))
+  p = p + ggplot2::facet_grid(.~Comparison, scales = 'fixed')
+  p
 }

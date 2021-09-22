@@ -16,17 +16,22 @@ default:
   factors: ["sampleID", "batch", "sex", "diagnosis"]
   continuous: ["RIN", "pmi", "ageofdeath"]
   x_var: diagnosis
-  conditions:
-    sex-diagnosis interaction: ["diagnosis", "sex"]
-    diagnosis: ["diagnosis"]
-    sex: ["sex"]
+  conditions: ["diagnosis", "sex"]
   cpm threshold: 1
   percent threshold: 0.5
   sex check: sex
+  cores: 
   dimensions:
     color: "diagnosis"
     shape: "batch"
     size: "ageofdeath"
   skip model: TRUE
+  force model with: ["sex", "diagnosis", "batch"]
+  de FC: 1.5
+  de p-value threshold: 0.05
+  visualization gene list: ["LCN2", "TRIM69"]
+  de contrasts:
+    diagnosis: ["diagnosis"]
+    diagnosis-sex: ["diagnosis-sex"]
   report: "openSci"
   store output: syn23572479

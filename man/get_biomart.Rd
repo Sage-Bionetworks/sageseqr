@@ -4,7 +4,21 @@
 \alias{get_biomart}
 \title{Get Ensembl biomaRt object}
 \usage{
-get_biomart(count_df, synid, version, host, filters, organism)
+get_biomart(
+  count_df,
+  synid,
+  version,
+  host,
+  filters,
+  organism,
+  custom,
+  gtfID,
+  gtfVersion = NULL,
+  fastaID,
+  fastaVersion = NULL,
+  cores = NULL,
+  isexon = FALSE
+)
 }
 \arguments{
 \item{count_df}{A counts data frame with sample identifiers as column names
@@ -24,6 +38,26 @@ This specification is highly recommended for a reproducible workflow.
 
 \item{organism}{A character vector of the organism name. This argument
 takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".}
+
+\item{custom}{Defaults to NULL. If TRUE, the GC and Gene Length parameters will
+only consider exotic regions.}
+
+\item{gtfID}{Defaults to NULL. A character vector with a Synapse ID
+corresponding to a gtf formatted gene annotation file.}
+
+\item{gtfVersion}{Optional. A numeric vector with the gene GTF Synapse file
+version number.}
+
+\item{fastaID}{Defaults to NULL. A character vector with a Synapse ID
+corresponding to a FASTA formatted genome annotation file.}
+
+\item{fastaVersion}{Optional. A numeric vector with the genome FASTA Synapse
+file version number.}
+
+\item{cores}{An integer of cores to specify in the parallel backend (eg. 4).}
+
+\item{isexon}{Defaults to FALSE. If TRUE, the GC and Gene Length parameters will
+only consider exotic regions.}
 }
 \description{
 Get GC content, gene Ids, gene symbols, gene biotypes, gene lengths

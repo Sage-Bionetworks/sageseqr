@@ -10,7 +10,11 @@ differential_expression(
   md,
   primary_variable,
   biomart_results,
-  model_variables = NULL
+  p_value_threshold,
+  fold_change_threshold,
+  model_variables = NULL,
+  exclude_variables = NULL,
+  cores = NULL
 )
 }
 \arguments{
@@ -26,8 +30,29 @@ fixed effect interaction term.}
 \item{biomart_results}{Output of \code{"sageseqr::get_biomart()"}. Gene Ids are
 stored as rownames.}
 
+\item{p_value_threshold}{Numeric. P-values are adjusted by Benjamini and
+Hochberg (BH) false discovery rate (FDR). Significant genes are those with an
+adjusted p-value greater than this threshold.}
+
+\item{fold_change_threshold}{Numeric. Significant genes are those with a
+fold-change greater than this threshold.}
+
 \item{model_variables}{Optional. Vector of variables to include in the linear (mixed) model.
 If not supplied, the model will include all variables in \code{md}.}
+
+\item{exclude_variables}{Vector of variables to exclude from testing.}
+
+\item{cores}{An integer of cores to specify in the parallel backend (eg. 4).}
+}
+\value{
+A named list with \code{"variancePartition::voomWithDreamWeights()"}
+ normalized counts, contrasts from \code{"variancePartition::getContrasts()"},
+ linear mixed model fits from \code{"variancePartition::dream()"}, differential
+ expression results from \code{"limma::topTable()"} and gene feature-specific
+ metadata, the response variable, the model formula fit to compute differential
+ expression results.
+ The list names are: \code{"list(voom_object, contrasts_to_plot, fits, differential_expression,
+ primary_variable, formula)"}
 }
 \description{
 Differential expression testing is performed with \code{"variancePartition::dream()"} to increase power

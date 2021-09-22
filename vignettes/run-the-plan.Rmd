@@ -1,8 +1,8 @@
 ---
-title: "Run the drake plan"
+title: "Run the targets plan"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Run the drake plan}
+  %\VignetteIndexEntry{Run the targets plan}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -14,70 +14,35 @@ knitr::opts_chunk$set(
   eval = FALSE
 )
 ```
+1. This workflow requires file inputs to be stored on [Synapse](https://www.synapse.org). It is free to make an account and store
+small files. Store your counts files and metadata on Synapse.
 
-1. [Write your own config file](https://sage-bionetworks.github.io/sageseqr/articles/customize-config.html).
+2. [Write your own config file](https://sage-bionetworks.github.io/sageseqr/articles/customize-config.html).
 
-2. Specify the active configuration by setting `R_CONFIG_ACTIVE`.
+3. Specify the active configuration by setting `R_CONFIG_ACTIVE`.
 
 ```{r config-setup}
-Sys.setenv(R_CONFIG_ACTIVE = "default")
+profile_set <- "default"
+Sys.setenv(R_CONFIG_ACTIVE = profile_set)
 ```
 
-3. Load the `sageseqr` library and login to [Synapse](https://www.synapse.org/). `rnaseq_plan()` calls the arguments from the config file and creates the `drake` plan. Execute `drake::make(plan)` to compute. Run this code from your project root.
+4. Store your Synapse credentials locally. You can achieve this by either creating a  `.synapseConfig` file or executing `synLogin()` with `rememberMe = True`. If you are working inside a Docker, make a text file called `.synapseConfig` from the home directory inside your container. [This article](https://r-docs.synapse.org/articles/manageSynapseCredentials.html) describes the format of the `.synapseConfig` file.
+
+5. Load the `sageseqr` library. `start_de()` copies the `targets` plan to your working directory. Execute `targets::make()` to compute. Run this code from your project root.
 
 ```{r run-plan}
 library(sageseqr)
-
-# Login to Synapse. Make a Synapse account and use synapser to login: https://r-docs.synapse.org/articles/manageSynapseCredentials.html
-synapser::synLogin()
-
-# Run the analysis
-plan <- sageseqr::rnaseq_plan(
-  metadata_id = config::get("metadata")$synID,
-  metadata_version = config::get("metadata")$version,
-  counts_id = config::get("counts")$synID,
-  counts_version = config::get("counts")$version,
-  gene_id_input = config::get("counts")$`gene id`,
-  sample_id_input = config::get("metadata")$`sample id`,
-  factor_input = config::get("factors"),
-  continuous_input = config::get("continuous"),
-  biomart_id = config::get("biomart")$synID,
-  biomart_version = config::get("biomart")$version,
-  filters = config::get("biomart")$filters,
-  host = config::get("biomart")$host,
-  organism = config::get("biomart")$organism, 
-  conditions = config::get("conditions"), 
-  cpm_threshold = config::get("cpm threshold"),
-  conditions_threshold = config::get("percent threshold"),
-  x_var_for_plot = config::get("x_var"), 
-  sex_var = config::get("sex check"), 
-  color = config::get("dimensions")$color, 
-  shape = config::get("dimensions")$shape,
-  size = config::get("dimensions")$size,
-  report_name = config::get("report"),
-  skip_model = config::get("skip model"),
-  parent_id = config::get("store output"),
-  rownames = list(
-    config::get("metadata")$`sample id`,
-    config::get("counts")$`gene id`,
-    config::get("biomart")$filters,
-    config::get("counts")$`gene id`
-    ),
-  config_file = "config.yml"
-)
-
-drake::make(
-  plan,
-  envir = getNamespace("sageseqr")
-    )
+library(targets)
+# gather the dependencies in your working directory by running this function:
+start_de()
+# inspect the steps of the workflow
+tar_manifest()
+# run the analysis
+tar_make()
 ```
 
 4. Visualize the results of your work. 
 
 ```{r visualize}
-drake::vis_drake_graph(
-  plan,
-  envir = getNamespace("sageseqr"),
-  targets_only = TRUE
-  )
+tar_visnetwork()
 ```

@@ -14,9 +14,18 @@
 #'
 #'}
 get_data <- function(synid, version = NULL) {
-  df <- tibble::as_tibble(data.table::fread(synapser::synGet(synid,
-                                                     version = as.numeric(version)
-                                                     )$path))
+  # login to Synapse
+  synapser::synLogin()
+
+  df <- tibble::as_tibble(
+    data.table::fread(
+      synapser::synGet(
+        synid,
+        version = as.numeric(version)
+        )$path,
+      header = TRUE
+      )
+    )
   df
 }
 #' Create complete URL to Synapse entity
@@ -128,6 +137,92 @@ parse_counts <- function(count_df){
     count_df
   }
 }
+#'Get Gene Length and GC: biomart
+#'
+#'Get gene length and GC content of `gene` from data frame (`df`) containing
+#'gene IDs in a column labeled the value of `column_id`. `df` must have a column
+#'labeled sequence where the sequence info for exons/or transcripts are and
+#'feature start and stop coordinates in columns labled the value of `start` and
+#'`stop`. This will return a vector of `gene`, length, and GC content as a
+#'percentage.
+#'
+#'@param gene a gene name corresponding to a value in `df[,column_id]`
+#'@param column_id the column name containg gene feature IDs
+#'@param df the dataframe of exon/transcript annotations
+#'@param start column name of feature start coordinate
+#'@param end column name of feature end coordinate
+#'@export
+biomart_stats <- function(gene, column_id, df, start, end){
+  df <- df[ df[,column_id] == gene,]
+  # Split the sequence into a list object
+  seq <- strsplit(df$sequence, '')
+
+  # Name the vector of bases
+  for (i in 1:length(seq)) {
+    names(seq[[i]]) <- df[i,start]:df[i,end]
+  }
+
+  # Unlist and remove overlapping bases
+  bases <- unlist(seq)
+  bases <- bases[!duplicated(names(bases))]
+
+  # gene length:
+  length <- length(bases)
+
+  # Calculate base stats and GC content
+  base_freq <- BSgenome::alphabetFrequency(Biostrings::DNAString(
+    paste0(bases,collapse = '')
+  ))
+
+  gc <- sum(base_freq[c('G','C')])/sum(base_freq[c('A','G','C','T')])*100
+
+  return(c('ID'= gene,
+           'gene_length'= length,
+           'percentage_gene_gc_content'=gc)
+  )
+}
+#'Get Gene Length and GC: GTF/Fasta
+#'
+#'Get gene GC content of `gene` from data frame (`df`) containing
+#'gene IDs in a column labeled the value of `column_id`. `df` must have a column
+#'labeled sequence where the sequence info for exons/or transcripts are and
+#'feature start and stop coordinates in columns labled the value of `start` and
+#'`stop`. This will return a vector of `gene`, length, and GC content as a
+#'percentage.
+#'
+#'@param i A character of a gene id.
+#'@param data a dataframe of exons transcrtipts or genes, imported from a GTF file.
+#'one line per-feature, data$V1 corresponds to the featur chormosome, data$V4 to
+#' start coordinate, data$V5 to stop coordinate, and data$V7 to the sequence strand.
+#'@param genome a list of DNAStringSet objects named by their contig (chromosome)
+#'name.
+#'@export
+gtf_stats <- function( i, data, genome){
+  gene_model <- data[data$gene_id == i,]
+
+  gr <- GenomicRanges::reduce(
+    GenomicRanges::GRanges(
+      paste0(
+        names(genome),':',
+        gene_model$V4, '-',gene_model$V5, ':',
+        gene_model$V7
+      )))
+
+  # calculate the length
+  len <- sum(GenomicRanges::width(gr))
+
+  ## Get Exon Sequence
+  seq <- BSgenome::getSeq(genome, gr)
+
+  ## Get Base Frequency
+  alphafreq <- BSgenome::alphabetFrequency(seq)
+  totalfreq <- colSums(alphafreq)
+
+  ## get G/C content as a fraction
+  gc <- (sum(totalfreq[c('G','C')]) /
+           sum(totalfreq[c('A','G','C','T')])) * 100
+  return(c(i, gc, len))
+}
 #'Get Ensembl biomaRt object
 #'
 #'Get GC content, gene Ids, gene symbols, gene biotypes, gene lengths
@@ -144,12 +239,28 @@ parse_counts <- function(count_df){
 #'(see \code{"biomaRt::listEnsemblArchives()"})
 #'@param organism A character vector of the organism name. This argument
 #'takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".
+#'@param custom Defaults to NULL. If TRUE, the GC and Gene Length parameters will
+#'only consider exotic regions.
+#'@param gtfID Defaults to NULL. A character vector with a Synapse ID
+#'corresponding to a gtf formatted gene annotation file.
+#'@param gtfVersion Optional. A numeric vector with the gene GTF Synapse file
+#' version number.
+#'@param fastaID Defaults to NULL. A character vector with a Synapse ID
+#'corresponding to a FASTA formatted genome annotation file.
+#'@param fastaVersion Optional. A numeric vector with the genome FASTA Synapse
+#'file version number.
+#'@param cores An integer of cores to specify in the parallel backend (eg. 4).
+#'@param isexon Defaults to FALSE. If TRUE, the GC and Gene Length parameters will
+#'only consider exotic regions.
 #'@importFrom rlang .data
 #'@export
-get_biomart <- function(count_df, synid, version, host, filters, organism) {
+get_biomart <- function(count_df, synid, version, host, filters, organism,
+                        custom, gtfID, gtfVersion = NULL, fastaID,
+                        fastaVersion = NULL, cores = NULL, isexon = FALSE) {
   if (is.null(synid)) {
-    # Get available datset from Ensembl
-    ensembl <- biomart_obj(organism, host)
+    if(is.null(cores)){
+      cores = parallel::detectCores()-1
+    }
 
     # Check for extraneous rows
     count_df <- parse_counts(count_df)
@@ -157,74 +268,208 @@ get_biomart <- function(count_df, synid, version, host, filters, organism) {
     # Parse gene IDs to use in query
     gene_ids <- convert_geneids(count_df)
 
-    message(
-      paste0(
-        "Downloading sequence",
-        ifelse(length(gene_ids) > 1, "s", ""),
-        " ..."
+    # Create Biomart Object
+    if (is.null(custom) | isFALSE(custom)) {
+      # use biomaRt to construct the biomart_object
+
+      # Get available datset from Ensembl
+      ensembl <- biomart_obj(organism, host)
+
+      message(
+        paste0(
+          "Downloading sequence",
+          ifelse(length(gene_ids) > 1, "s", ""),
+          " ..."
         )
       )
 
-    if (length(gene_ids) > 100)
-      message("This may take a few minutes ...")
-
-    attrs <- c(filters, "ensembl_exon_id", "chromosome_name",
-               "exon_chrom_start", "exon_chrom_end")
-    coords <- biomaRt::getBM(
-      filters = filters,
-      attributes = attrs,
-      values = gene_ids,
-      mart = ensembl,
-      useCache = FALSE
-      )
-    gene_ids <- unique(coords[, filters])
-
-    coords <- sapply(gene_ids, function(i) {
-      i.coords <- coords[
-        coords[, 1] == i,
-        c("chromosome_name", "exon_chrom_start", "exon_chrom_end")
-        ]
-      g <- GenomicRanges::GRanges(
-        i.coords[, 1], IRanges::IRanges(i.coords[, 2], i.coords[, 3])
-        )
-      g
+      if (length(gene_ids) > 100) {
+        message("This may take a few minutes ...")
       }
-    )
+      if (isTRUE(isexon)) {
+        # calculate length and GC only for exonic regions
+        # set feature, start, and stop equal to exon values
+        feature <- 'ensembl_exon_id'
+        start <- "exon_chrom_start"
+        end <- "exon_chrom_end"
+        typ <- "gene_exon"
+      }else{
+        # calculate length and GC only for entire transcript
+        # set feature, start, and stop equal to transcript values
+        feature <- "ensembl_transcript_id"
+        start <- "transcript_start"
+        end <- "transcript_end"
+        typ <- "transcript_exon_intron"
+      }
 
-    length <- plyr::ldply(
-      coords[gene_ids],
-      function(x) sum(IRanges::width(x)), .id = "ensembl_gene_id"
-      ) %>%
-      dplyr::rename(gene_length = .data$V1)
-
-    gc_content <- biomaRt::getBM(
-      filters = filters,
-      attributes = c(filters, "hgnc_symbol", "percentage_gene_gc_content",
-                     "gene_biotype", "chromosome_name"),
-      values = gene_ids,
-      mart = ensembl,
-      useCache = FALSE
+      # pull feature level coordinates by either exon or transcript coordinates
+      #"hgnc_symbol", "gene_biotype",
+      attrs <- c(filters, feature, "chromosome_name", start, end)
+      coords <- biomaRt::getBM(
+        filters = filters,
+        attributes = attrs,
+        values = gene_ids,
+        mart = ensembl,
+        useCache = FALSE
       )
 
-    biomart_results <- dplyr::full_join(gc_content, length)
+      #Pull the feature Sequences from Biomart
+      seqs <- biomaRt::getSequence(
+        id = coords[,feature],
+        type = feature,
+        seqType = typ,
+        mart = ensembl,
+        useCache = FALSE
+      )
 
+      # Insert the sequences into coords
+      row.names(seqs) <- seqs[,feature]
+      coords$sequence <- NA
+      coords$sequence <- seqs[ coords[,feature], ][,typ]
+
+      # Biomart gene column name
+      gene_value <- names(coords)[1]
+
+      # Calculate GC content and Gene Length
+      cl <- snow::makeCluster(cores)
+      len_gc <- as.data.frame(do.call(rbind, parallel::parLapply(
+        cl = cl,
+        gene_ids[gene_ids %in% coords$ensembl_gene_id],
+        biomart_stats,
+        column_id = gene_value, df = coords, start = start, end = end
+      )))
+      colnames(len_gc)[1] <- gene_value
+
+      # Pull gene info
+      attrs <- c(filters, "hgnc_symbol", "gene_biotype", "chromosome_name")
+      gene_info <- biomaRt::getBM(
+        filters = filters,
+        attributes = attrs,
+        values = gene_ids,
+        mart = ensembl,
+        useCache = FALSE
+      )
+
+      # Join Data:
+      biomart_results <- gene_info %>%
+        dplyr::full_join(len_gc, by = gene_value)
+      biomart_results <- biomart_results[, c(gene_value, 'hgnc_symbol',
+                                             'percentage_gene_gc_content', 'gene_biotype',
+                                             'chromosome_name', 'gene_length'
+      )
+      ]
+    }else{
+      # use custom specified GTF and FASTA from synapse
+
+      # Load GTF and FASTA from synapse
+      synapser::synLogin()
+      gtf <- synapser::synGet(gtfID, version = gtfVersion)
+      genome <- synapser::synGet(fastaID, version = fastaVersion)
+
+      biom <- GenomicTools.fileHandler::importGTF(file=gtf$path,
+                                                  level="gene",
+                                                  features=c("gene_id",
+                                                             "gene_name",
+                                                             "gene_type"))
+      biom <- biom[ ,c('V1', 'gene_id', 'gene_name', 'gene_type') ]
+
+      # set feature level
+      if (isTRUE(isexon)) {
+        # calculate length and GC only for exonic regions
+        lvl <- "exon"
+      }else{
+        # calculate length and GC only for entire transcript
+        lvl <- "transcript"
+      }
+      # pull features from gtf file
+      feature_gtf <- GenomicTools.fileHandler::importGTF(
+        file=gtf$path,
+        level=lvl
+      )
+
+      #Calc GC content
+      dna <- Biostrings::readDNAStringSet(genome$path)
+
+      # assemble chromosomes chromosome
+      chroms <- list()
+      for(contig in names(table(biom$V1))){
+        chroms[[contig]] <- dna[grep(contig,names(dna),value=T)][1]
+      }
+
+      # Translation for fasta chrom name alterations
+      region_names <- rep(NA, length(names(chroms)))
+      names(region_names) <- names(chroms)
+      for(nam in names(region_names)){
+        region_names[nam] <- names(chroms[[nam]])
+      }
+
+      # Gene named vector with of chromosome designations
+      #gene_chr <- biom$V1
+      #names(gene_chr) <- biom$gene_id
+      gene_chr <- biom$gene_id
+      #genome <- chroms[gene_chr[i]]
+
+      cl <- snow::makeCluster(cores, outfile="log.log")
+      stats <- matrix(NA,0,3)
+      for (element in names(table(biom$V1))) {
+        calcs <- do.call(rbind, parallel::parLapply(
+          cl = cl,
+          as.list(biom[biom$V1 == element, ]$gene_id),
+          gtf_stats,
+          data = as.data.frame(feature_gtf)[feature_gtf$V1 == element,],
+          genome = chroms[[element]]
+        ))
+        stats <- rbind(stats,calcs)
+      }
+      stats <- as.data.frame(stats)
+      colnames(stats) <- c(filters, 'percentage_gene_gc_content',
+                           'gene_length')
+      colnames(biom) <- c( 'chromosome_name', filters, 'hgnc_symbol',
+                           'gene_biotype')
+      biomart_results <- biom %>%
+        dplyr::full_join(stats, by = 'ensembl_gene_id')
+
+      #Remove PAR_Y
+      biomart_results <- biomart_results[
+        !(grepl('_PAR_Y', biomart_results$ensembl_gene_id)),
+      ]
+
+      # Clean chr from chromosomes
+      biomart_results$chromosome_name <- gsub(
+        'chr', '',biomart_results$chromosome_name
+      )
+
+      # Clean ENSGs
+      biomart_results[,filters] <- gsub(
+        'chr', '',biomart_results$chromosome_name
+      )
+
+      biomart_results <- as.data.frame(biomart_results)
+      biomart_results[,filters] <- do.call(
+        rbind,
+        strsplit(biomart_results[,filters], '[.]'))[,1]
+      biomart_results <- biomart_results[ ,c(filters, 'hgnc_symbol',
+                                             'percentage_gene_gc_content',
+                                             'gene_biotype',
+                                             'chromosome_name', 'gene_length')]
+    }
+    # Finish cleaning bioMart Object
     # Duplicate Ensembl Ids are collapsed into a single entry
     biomart_results <- collapse_duplicate_hgnc_symbol(biomart_results)
 
     # Biomart IDs as rownames
     biomart_results <- tibble::column_to_rownames(
       biomart_results, var = filters
-      )
+    )
+  }else{
 
-    biomart_results
-  } else {
     # Download biomart object from syndID specified in config.yml
     biomart_results <- get_data(synid, version)
 
     # Biomart IDs as rownames
     biomart_results <- tibble::column_to_rownames(
       biomart_results, var = filters
-      )
+    )
 
     # Gene metadata required for count CQN
     required_variables <- c("gene_length", "percentage_gene_gc_content")
@@ -233,14 +478,33 @@ get_biomart <- function(count_df, synid, version, host, filters, organism) {
         setdiff(required_variables, colnames(biomart_results)),
         sep = ", ",
         last = " and "
-        )
+      )
       message(glue::glue("Warning: {vars} missing from biomart object.
                          This information is required for Conditional
                          Quantile Normalization"))
     }
-    return(biomart_results)
+  }
+  return(biomart_results)
+}
+#'Check for consistent identifiers
+#'
+#'Subsequent steps assume unique identifiers are present within both the counts
+#'matrix and the metadata. This function checks whether samples in the counts
+#'matrix match samples in the metadata, and vice versa.versa.
+#'@inheritParams get_biomart
+#'@param md A data frame with sample identifiers as row names and relevant experimental covariates.
+#'@export
+check_mismatch <- function(md, count_df) {
+  # Isolate the SampleID's from the metadata and counts matrix
+  md_sampleid <- rownames(md)
+  cnt_sampleid <- colnames(count_df)
+
+  # Ensures each sample in the metadata has a corresponding column in the counts matrix and vice versa
+  if ((length(setdiff(md_sampleid, cnt_sampleid)) > 0) || (length(setdiff(cnt_sampleid, md_sampleid)) > 0)){
+    stop("All sample identifiers in the counts matrix and metadata file must match")
   }
 }
+
 #'Duplicate HGNC
 #'
 #'Count normalization requires Ensembl Ids to be unique. In rare cases, there are more
@@ -436,7 +700,7 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
   # Update metadata to reflect variable subset
 
   # Variables of factor or numeric class are required
-  col_type <- dplyr::select(md, -primary_variable) %>%
+  col_type <- dplyr::select(md, -dplyr::all_of(primary_variable)) %>%
     dplyr::summarise_all(class) %>%
     tidyr::pivot_longer(tidyr::everything(), names_to = "variable", values_to = "class")
 
@@ -490,19 +754,46 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
 #' effect. If you wish to test an interaction term, `primary_variable` can take multiple variable names.
 #'
 #' @param cqn_counts A counts data frame normalized by CQN.
+#' @param p_value_threshold Numeric. P-values are adjusted by Benjamini and
+#' Hochberg (BH) false discovery rate (FDR). Significant genes are those with an
+#' adjusted p-value greater than this threshold.
+#' @param fold_change_threshold Numeric. Significant genes are those with a
+#' fold-change greater than this threshold.
+#' @param cores An integer of cores to specify in the parallel backend (eg. 4).
 #' @inheritParams cqn
 #' @inheritParams coerce_factors
 #' @inheritParams build_formula
 #' @inheritParams cqn
 #' @export
-differential_expression <- function(filtered_counts, cqn_counts, md, primary_variable,
-                                    biomart_results, model_variables = NULL) {
+#' @return A named list with \code{"variancePartition::voomWithDreamWeights()"}
+#'  normalized counts, contrasts from \code{"variancePartition::getContrasts()"},
+#'  linear mixed model fits from \code{"variancePartition::dream()"}, differential
+#'  expression results from \code{"limma::topTable()"} and gene feature-specific
+#'  metadata, the response variable, the model formula fit to compute differential
+#'  expression results.
+#'  The list names are: \code{"list(voom_object, contrasts_to_plot, fits, differential_expression,
+#'  primary_variable, formula)"}
+differential_expression <- function(filtered_counts, cqn_counts, md,
+                                    primary_variable, biomart_results,
+                                    p_value_threshold, fold_change_threshold,
+                                    model_variables = NULL,
+                                    exclude_variables = NULL,
+                                    cores = NULL) {
+  # force order of samples in metadata to match order of samples in counts.
+  # Required by variancePartition
+  if(is.null(cores)){
+    cores = parallel::detectCores()-1
+  }
+  md <- md[match(colnames(filtered_counts),rownames(md)),]
+
   metadata_input <- build_formula(md, primary_variable, model_variables)
   gene_expression <- edgeR::DGEList(filtered_counts)
   gene_expression <- edgeR::calcNormFactors(gene_expression)
   voom_gene_expression <- variancePartition::voomWithDreamWeights(counts = gene_expression,
                                                                   formula = metadata_input$formula,
-                                                                  data = metadata_input$metadata)
+                                                                  data = metadata_input$metadata,
+                                                                  BPPARAM = BiocParallel::SnowParam(cores)
+                                                                 )
   voom_gene_expression$E <- cqn_counts
 
   de_conditions <- levels(metadata_input$metadata[[metadata_input$primary_variable]])
@@ -533,7 +824,8 @@ differential_expression <- function(filtered_counts, cqn_counts, md, primary_var
   fit_contrasts = variancePartition::dream(exprObj = voom_gene_expression,
                                            formula = metadata_input$formula_non_intercept,
                                            data = metadata_input$metadata,
-                                           L = contrasts
+                                           L = contrasts,
+                                           BPPARAM = BiocParallel::SnowParam(cores)
                                            )
 
   de <- lapply(names(contrasts), function(i, fit){
@@ -546,11 +838,11 @@ differential_expression <- function(filtered_counts, cqn_counts, md, primary_var
   de <- data.table::rbindlist(de, idcol = "Comparison") %>%
     dplyr::mutate(Comparison = gsub(metadata_input$primary_variable, "", .data$Comparison),
                   Direction = .data$logFC/abs(.data$logFC),
-                  Direction = factor(.data$Direction, c(-1,1), c("-1" = "down", "1" = "up")),
-                  Direction = ifelse(.data$`adj.P.Val` > 0.5 | abs(.data$logFC) < log2(1.2),
+                  Direction = ifelse(.data$Direction == -1,"down", .data$Direction),
+                  Direction = ifelse(.data$Direction == 1, "up", .data$Direction),
+                  Direction = ifelse(.data$`adj.P.Val` > p_value_threshold | abs(.data$logFC) < log2(fold_change_threshold),
                                      "none",
-                                     .data$Direction),
-                  Direction = as.character(.data$Direction)
+                                     .data$Direction)
     )
 
   # Join metadata from biomart to differential expression results
@@ -571,17 +863,28 @@ differential_expression <- function(filtered_counts, cqn_counts, md, primary_var
 #'
 #' This function will pass multiple conditions to test to \code{"sagseqr::differential_expression()"}.
 #'
-#' @param conditions A list of conditions to test as `primary_variable`
+#' @param conditions A named list of conditions to test as `primary_variable`
 #' in \code{"sagseqr::differential_expression()"}.
 #' @inheritParams differential_expression
 #' @inheritParams build_formula
 #' @export
 wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
-                    biomart_results, model_variables = names(md)) {
-  purrr::map(conditions,
-             function(x) differential_expression(filtered_counts, cqn_counts, md, primary_variable = x,
-                                                 biomart_results, model_variables))
-
+                    biomart_results, p_value_threshold, fold_change_threshold,
+                    model_variables = names(md), cores = NULL) {
+  purrr::map(
+    conditions,
+    function(x) differential_expression(
+      filtered_counts,
+      cqn_counts,
+      md,
+      primary_variable = x,
+      biomart_results,
+      p_value_threshold,
+      fold_change_threshold,
+      model_variables,
+      cores = cores
+      )
+    )
 }
 #' Stepwise Regression
 #'
@@ -591,7 +894,9 @@ wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
 #' @inheritParams differential_expression
 #' @inheritParams build_formula
 #' @param skip Defaults to NULL. If TRUE, this step will be skipped in the
-#' Drake plan.
+#' targets plan.
+#' @return Table with BIC criteria for exclusion or inclusion of variables in
+#' the model, linear (mixed) model formula and vector of variables to include.
 #' @export
 stepwise_regression <- function(md, primary_variable, cqn_counts,
                                 model_variables = names(md),
@@ -615,7 +920,12 @@ stepwise_regression <- function(md, primary_variable, cqn_counts,
                   `added to model` = .data$isAdded,
                   `(effective) number of parameters estimated` = .data$m
                   )
-  to_include <- model$trace$variable[model$trace$isAdded == "yes"]
+
+  # return vector of variables that map to the metadata columns. This requires
+  # some cleaning of extraneous characters. Do not include primary variable(s)
+
+  to_include <- model$trace$variable[model$trace$isAdded == "yes" & model$trace$iter != 0]
+  to_include <- gsub("\\)|\\(1\\||scale\\(", "", to_include)
 
   output <- list(
     to_visualize = to_visualize,
@@ -672,17 +982,23 @@ prepare_results <- function(target, data_name, rowname = NULL) {
 #'
 #' @param parent_id A Synapse Id that corresponds to a project or
 #' folder to store output.
-#' @param cqn_counts The drake target containing Conditional Quantile Normalized
+#' @param cqn_counts The target containing Conditional Quantile Normalized
 #'  (CQN) counts. Defaults to target name constrained by
-#'  \code{"sageseqr::rnaseq_plan()"}.
-#' @param clean_md The drake target containing the metadata data frame.
-#' Defaults to target name constrained by \code{"sageseqr::rnaseq_plan()"}.
-#' @param filtered_counts The drake target containing counts after low gene
+#'  \code{"targets::tar_make"}.
+#' @param clean_md The target containing the metadata data frame.
+#' Defaults to target name constrained by \code{"targets::tar_make"}.
+#' @param filtered_counts The target containing counts after low gene
 #' expression has been removed. Defaults to target name constrained by
-#'  \code{"sageseqr::rnaseq_plan()"}.
-#' @param biomart_results The drake target containing gene annotations from
+#'  \code{"targets::tar_make()"}.
+#' @param biomart_results The target containing gene annotations from
 #' biomart. Defaults to target name constrained by
-#' \code{"sageseqr::rnaseq_plan()"}.
+#' \code{"targets::tar_make"}.
+#' @param de_results The target containing differential expression gene
+#' lists. Defaults to target name constrained in the _targets.R file.
+#' @param residualized_counts The target containing counts adjusted for batch
+#' effects. Defaults to target name constrained in the _targets.R file.
+#' @param report The target containing the rendered html document. Defaults
+#' to target name constrained in the _targets.R file.
 #' @param rownames A list of variables to store rownames ordered by `metadata`,
 #' `filtered_counts`, `biomart_results`, `cqn_counts`. If not applicable,
 #' set as NULL.
@@ -694,14 +1010,18 @@ prepare_results <- function(target, data_name, rowname = NULL) {
 #' @param activity_provenance A phrase to describe the data transformation for
 #' provenance.
 #' @param data_names A list of identifiers to embed in the file name ordered
-#' by `metadata`, `filtered_counts`, `biomart_results`, `cqn_counts`.
+#' by `clean_md`, `filtered_counts`, `biomart_results`, `cqn_counts`,
+#' `de_results`.
 #' @param config_file Optional. Path to configuration file.
-#' @inheritParams rnaseq_plan
+#' @param report_name Name of output markdown file.
 #' @export
 store_results <- function(clean_md = clean_md,
                           filtered_counts = filtered_counts,
                           biomart_results = biomart_results,
-                          cqn_counts = cqn_counts$counts,
+                          cqn_counts = cqn_counts$E,
+                          de_results = de,
+                          residualized_counts = residualized_counts,
+                          report = report,
                           syn_names, data_names,
                           parent_id, inputs, activity_provenance,
                           rownames = NULL, config_file = NULL,
@@ -711,11 +1031,29 @@ store_results <- function(clean_md = clean_md,
   ver <- utils::packageVersion("sageseqr")
   description <- glue::glue(
     "analyzed with sageseqr {ver}"
-    )
+  )
 
-  # nest drake targets in a list. Every time a new target is to-be stored, it
+  # nest targets targets in a list. Every time a new target is to-be stored, it
   # must be added as an argument to this function and then added to this list.
-  targets <- list(clean_md, filtered_counts, biomart_results, cqn_counts)
+  targets <- list(
+    clean_md,
+    filtered_counts,
+    biomart_results,
+    as.data.frame(cqn_counts)
+  )
+
+  # parse differential expression gene list
+  de_results <- purrr::map(de_results, function(x) x$differential_expression)
+
+  # parse residualized counts
+  parse_residual_matrix <- purrr::map(residualized_counts, function(x) x$output)
+
+  # append differential expression data frames already nested in list
+  targets <- append(targets, parse_residual_matrix)
+  targets <- append(targets, de_results)
+
+  # append null rownames for differential expression object
+  rownames <- append(rownames, rep(list(NULL), length(residualized_counts) + length(de_results)))
 
   mash <- list(
     target = targets,
@@ -752,6 +1090,9 @@ store_results <- function(clean_md = clean_md,
     activity_provenance = activity_provenance,
     activity_description = description
     )
+
+  # login to Synapse
+  synapser::synLogin()
 
   for_provenance <- purrr::pmap(
     mash,
@@ -808,8 +1149,16 @@ store_results <- function(clean_md = clean_md,
 #' Provenance helper
 #'
 #' Collapse Synapse Ids and version.
-#'
-#' @inheritParams rnaseq_plan
+#' @param metadata_id Synapse ID to clean metadata file with sample identifiers
+#' in a column and variables of interest as column names. There cannot be any
+#' missing values.
+#' @param counts_id Synapse ID to counts data frame with identifiers to the
+#' metadata as column names and gene ids in a column.
+#' @param metadata_version Optionally, include Synapse file version number. If
+#' omitted, current version will be downloaded.
+#' @param counts_version Optionally, include Synapse file version number.
+#' @param biomart_id Synapse ID to biomart object.
+#' @param biomart_version Optionally, include Synapse file version number.
 #' @export
 provenance_helper <- function(metadata_id,  counts_id, metadata_version = NULL,
                               counts_version = NULL, biomart_id = NULL,
@@ -835,4 +1184,102 @@ provenance_helper <- function(metadata_id,  counts_id, metadata_version = NULL,
     ids <- c(ids, glue::glue("{biomart_id}.{biomart_version}"))
   }
   ids
+}
+#' Initialize differential expression analysis workflow
+#'
+#' The `sageseqr` package provides a `targets` workflow to string together the
+#' data processing and computational steps of RNA-seq differential expression
+#' analysis. This funciton copies a markdown document and _targets.R file to your
+#' working directory. The _targets.R file in your working directory is required
+#' for the workflow to run.
+#'
+#' @export
+start_de <- function() {
+  # copy sageseqr-report.Rmd markdown to working directory
+  if (!file.exists("sageseqr-report.Rmd")) {
+    fs::file_copy(system.file("sageseqr-report.Rmd", package = "sageseqr"),
+                  new_path = getwd())
+  }
+
+  # copy _targets.R file to working directory
+  if (!file.exists("_targets.R")) {
+    fs::file_copy(system.file("_targets.R", package = "sageseqr"),
+                  new_path = getwd())
+  }
+}
+#' Compute residualized counts matrix
+#'
+#' Residuals of the best fit linear regression model are computed for each
+#'  observation. Batch effects are adjusted for in the returned counts matrix
+#'  while preserving the effect of the predictor variable.
+#'
+#' Counts are normalized prior to linear modeling to compute residuals. A
+#' precision weight is assigned to each gene feature to estimate the
+#' mean-variance relationship. Counts normalized by conditional quantile
+#'  normalization (CQN) are used in place of log2 normalized counts.
+#'
+#' @inheritParams cqn
+#' @inheritParams differential_expression
+#' @inheritParams filter_genes
+#' @export
+compute_residuals <- function(clean_metadata, filtered_counts,
+                              cqn_counts = cqn_counts$E, primary_variable,
+                              model_variables = NULL, cores = NULL)  {
+  # set the number of cores if not specified in the config
+  if(is.null(cores)){
+    cores = parallel::detectCores()-1
+  }
+  # force order of samples in metadata to match order of samples in counts.
+  # Required by variancePartition
+  clean_metadata <- clean_metadata[match(colnames(filtered_counts),rownames(clean_metadata)),]
+
+  metadata_input <- build_formula(clean_metadata, primary_variable, model_variables)
+  # Estimate voom weights with DREAM
+  gene_expression <- edgeR::DGEList(filtered_counts)
+  gene_expression <- edgeR::calcNormFactors(gene_expression)
+  voom <- variancePartition::voomWithDreamWeights(
+    counts = gene_expression,
+    formula = metadata_input$formula,
+    data = metadata_input$metadata,
+    BPPARAM = BiocParallel::SnowParam(cores)
+  )
+
+  # fit linear model using weights and best model
+  voom$E <- cqn_counts
+  adjusted_fit <- variancePartition::dream(
+    exprObj = voom,
+    formula = metadata_input$formula,
+    data = metadata_input$metadata,
+    computeResiduals = TRUE,
+    BPPARAM = BiocParallel::SnowParam(cores)
+  )
+
+  # compute residual matrix
+  residual_gene_expression <- stats::residuals(adjusted_fit)
+
+  # calculate weighted residuals and add back signal from predictor
+  variables_to_add_back <- grep(
+    metadata_input$primary_variable,
+    colnames(adjusted_fit$design),
+    value = TRUE
+    )
+  output <- residual_gene_expression +
+    adjusted_fit$coefficients[
+      ,variables_to_add_back
+      ] %*% t(
+        adjusted_fit$design[
+          ,variables_to_add_back]
+        )
+
+  # save gene features
+  output <- tibble::rownames_to_column(as.data.frame(output), var = "feature")
+
+  return(
+    list(
+      output = output,
+      signal = variables_to_add_back,
+      adjusted_fit = adjusted_fit,
+      formula = metadata_input$formula
+      )
+  )
 }

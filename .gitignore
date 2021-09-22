@@ -1,6 +1,8 @@
+_targets/
+sageseqr-report.Rmd
+.Rhistory
 .Rproj.user
 *.txt
 *.tsv
 *.csv
-/.drake
 docs
