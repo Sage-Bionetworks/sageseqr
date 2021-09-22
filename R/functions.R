@@ -436,14 +436,10 @@ get_biomart <- function(count_df, synid, version, host, filters, organism,
 
       # Clean chr from chromosomes
       biomart_results$chromosome_name <- gsub(
-        'chr', '',biomart_results$chromosome_name
+        'chr', '', biomart_results$chromosome_name
       )
 
       # Clean ENSGs
-      biomart_results[,filters] <- gsub(
-        'chr', '',biomart_results$chromosome_name
-      )
-
       biomart_results <- as.data.frame(biomart_results)
       biomart_results[,filters] <- do.call(
         rbind,
