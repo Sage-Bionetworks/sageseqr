@@ -450,8 +450,7 @@ get_biomart <- function(count_df, synid, version, host, filters, organism,
                                              'chromosome_name', 'gene_length')]
       biomart_results <- as.data.frame(biomart_results)
       biomart_results$percentage_gene_gc_content <- as.numeric(biomart_results$percentage_gene_gc_content)
-      biomart_results$chromosome_name <- as.numeric(biomart_results$chromosome_name)
-      biomart_results$gene_length <- as.numeric(biomart_results$gene_length)
+      biomart_results$gene_length <- as.integer(biomart_results$gene_length)
     }
     # Finish cleaning bioMart Object
     # Duplicate Ensembl Ids are collapsed into a single entry
