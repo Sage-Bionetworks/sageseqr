@@ -339,7 +339,8 @@ get_biomart <- function(count_df, synid, version, host, filters, organism,
         column_id = gene_value, df = coords, start = start, end = end
       )))
       colnames(len_gc)[1] <- gene_value
-
+      snow::stopCluster(cl)
+      rm(cl)
       # Pull gene info
       attrs <- c(filters, "hgnc_symbol", "gene_biotype", "chromosome_name")
       gene_info <- biomaRt::getBM(
@@ -421,6 +422,9 @@ get_biomart <- function(count_df, synid, version, host, filters, organism,
         ))
         stats <- rbind(stats,calcs)
       }
+      snow::stopCluster(cl)
+      rm(cl)
+      
       stats <- as.data.frame(stats)
       colnames(stats) <- c(filters, 'percentage_gene_gc_content',
                            'gene_length')
