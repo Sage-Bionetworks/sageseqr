@@ -327,19 +327,40 @@ get_biomart <- function(count_df, synid, version, host, filters, organism,
       coords$sequence <- NA
       coords$sequence <- seqs[ coords[,feature], ][,typ]
 
+      coords[,start] <- as.numeric(coords[,start])
+      coords[,end] <- as.numeric(coords[,end])
+      
       # Biomart gene column name
       gene_value <- names(coords)[1]
 
       # Calculate GC content and Gene Length
-      cl <- snow::makeCluster(cores)
-      len_gc <- as.data.frame(do.call(rbind, parallel::parLapply(
-        cl = cl,
-        gene_ids[gene_ids %in% coords$ensembl_gene_id],
-        biomart_stats,
-        column_id = gene_value, df = coords, start = start, end = end
-      )))
+      cl <- snow::makeCluster(cores, outfile="log.log")
+      len_gc <- data.frame()
+      
+      for (chr in names(table(coords$chromosome_name))) {
+        
+        df <- coords[coords$chromosome_name == chr,]
+        genes <- as.list(gene_ids[gene_ids %in% 
+                            coords[coords$chromosome_name == chr,]$ensembl_gene_id
+        ])
+        
+        message(paste0("Starting Chromosome: ", chr))
+        foo <- as.data.frame(do.call(rbind, parallel::parLapply(
+          cl = cl,
+          genes,
+          biomart_stats,
+          column_id = gene_value, 
+          df = df, 
+          start = start, 
+          end = end
+        )))
+        len_gc <- as.data.frame(rbind(len_gc,foo))
+      }
+        
       colnames(len_gc)[1] <- gene_value
-
+      snow::stopCluster(cl)
+      rm(cl)
+      
       # Pull gene info
       attrs <- c(filters, "hgnc_symbol", "gene_biotype", "chromosome_name")
       gene_info <- biomaRt::getBM(
@@ -358,6 +379,8 @@ get_biomart <- function(count_df, synid, version, host, filters, organism,
                                              'chromosome_name', 'gene_length'
       )
       ]
+      biomart_results$percentage_gene_gc_content <- as.numeric(biomart_results$percentage_gene_gc_content)
+      biomart_results$gene_length <- as.numeric(biomart_results$gene_length)
     }else{
       # use custom specified GTF and FASTA from synapse
 
@@ -421,6 +444,9 @@ get_biomart <- function(count_df, synid, version, host, filters, organism,
         ))
         stats <- rbind(stats,calcs)
       }
+      snow::stopCluster(cl)
+      rm(cl)
+      
       stats <- as.data.frame(stats)
       colnames(stats) <- c(filters, 'percentage_gene_gc_content',
                            'gene_length')
@@ -448,6 +474,9 @@ get_biomart <- function(count_df, synid, version, host, filters, organism,
                                              'percentage_gene_gc_content',
                                              'gene_biotype',
                                              'chromosome_name', 'gene_length')]
+      biomart_results <- as.data.frame(biomart_results)
+      biomart_results$percentage_gene_gc_content <- as.numeric(biomart_results$percentage_gene_gc_content)
+      biomart_results$gene_length <- as.integer(biomart_results$gene_length)
     }
     # Finish cleaning bioMart Object
     # Duplicate Ensembl Ids are collapsed into a single entry
