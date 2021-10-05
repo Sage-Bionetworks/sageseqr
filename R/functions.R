@@ -696,7 +696,7 @@ dropped_genes <- function (filtered_counts, cqn_counts) {
   missing <- row.names(filtered_counts)[
     !(row.names(filtered_counts) %in% row.names(cqn_counts))
   ]
-  if (length(dropped) == 0) {
+  if (length(missing) == 0) {
     dropped <- NULL
   }else{
     dropped <- missing
