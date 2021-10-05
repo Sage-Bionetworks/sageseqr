@@ -105,6 +105,10 @@ targets::tar_read(outliers)$plot
 ```
 Outliers, based on logCPM expression, are `r glue::glue_collapse(targets::tar_read(outliers)$outliers, ", ", last = " and ")`.
 
+# Identify Dropped Gene Features
+
+Gene features dropped because they are not annotated in Biomart Version are `r glue::glue_collapse(targets::tar_read(dropped), ", ", last = " and ")`.
+
 # Significant Covariates
 
 Significant covariates are identified by the pearson correlation (p-value of 1%) between principal component analysis (PCA) of normalized transcripts and variables that meet a 0.1 false discovery rate (FDR) threshold. Significant covariates to adjust for are `r glue::glue_collapse(targets::tar_read(significant_covariates_plot)$significant_covariates, ", ", last = " and ")`.

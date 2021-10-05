@@ -329,38 +329,38 @@ get_biomart <- function(count_df, synid, version, host, filters, organism,
 
       coords[,start] <- as.numeric(coords[,start])
       coords[,end] <- as.numeric(coords[,end])
-      
+
       # Biomart gene column name
       gene_value <- names(coords)[1]
 
       # Calculate GC content and Gene Length
       cl <- snow::makeCluster(cores, outfile="log.log")
       len_gc <- data.frame()
-      
+
       for (chr in names(table(coords$chromosome_name))) {
-        
+
         df <- coords[coords$chromosome_name == chr,]
-        genes <- as.list(gene_ids[gene_ids %in% 
+        genes <- as.list(gene_ids[gene_ids %in%
                             coords[coords$chromosome_name == chr,]$ensembl_gene_id
         ])
-        
+
         message(paste0("Starting Chromosome: ", chr))
         foo <- as.data.frame(do.call(rbind, parallel::parLapply(
           cl = cl,
           genes,
           biomart_stats,
-          column_id = gene_value, 
-          df = df, 
-          start = start, 
+          column_id = gene_value,
+          df = df,
+          start = start,
           end = end
         )))
         len_gc <- as.data.frame(rbind(len_gc,foo))
       }
-        
+
       colnames(len_gc)[1] <- gene_value
       snow::stopCluster(cl)
       rm(cl)
-      
+
       # Pull gene info
       attrs <- c(filters, "hgnc_symbol", "gene_biotype", "chromosome_name")
       gene_info <- biomaRt::getBM(
@@ -446,7 +446,7 @@ get_biomart <- function(count_df, synid, version, host, filters, organism,
       }
       snow::stopCluster(cl)
       rm(cl)
-      
+
       stats <- as.data.frame(stats)
       colnames(stats) <- c(filters, 'percentage_gene_gc_content',
                            'gene_length')
@@ -681,6 +681,28 @@ cqn <- function(filtered_counts, biomart_results) {
     return(normalized_counts)
   }
 }
+#' Dropped Genes Finder
+#'
+#' Finds gene IDs in the filtered counts which were removed in cqn normalization
+#' most likely as a function if no GC or length estimates being present in the
+#' user specified biomart object.
+#' @param filtered_counts The target containing counts after low gene
+#' expression has been removed. Defaults to target name constrained by
+#'  \code{"targets::tar_make()"}.
+#' @param cqn_counts A counts data frame normalized by CQN.
+#'
+#' @export
+dropped_genes <- function (filtered_counts, cqn_counts) {
+  missing <- row.names(filtered_counts)[
+    !(row.names(filtered_counts) %in% row.names(cqn_counts))
+  ]
+  if (length(dropped) == 0) {
+    dropped <- NULL
+  }else{
+    dropped <- missing
+  }
+  return(dropped)
+}
 #'@importFrom quantreg rq
 #'@export
 quantreg::rq
@@ -887,15 +909,22 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
 #' Wrapper for Differential Expression Analysis
 #'
 #' This function will pass multiple conditions to test to \code{"sagseqr::differential_expression()"}.
-#'
 #' @param conditions A named list of conditions to test as `primary_variable`
 #' in \code{"sagseqr::differential_expression()"}.
+#' @param dropped a vector of gene names to drop from filtered counts, as they
+#' were not cqn normalized
 #' @inheritParams differential_expression
 #' @inheritParams build_formula
 #' @export
-wrap_de <- function(conditions, filtered_counts, cqn_counts, md,
+wrap_de <- function(conditions, filtered_counts, cqn_counts, md, dropped,
                     biomart_results, p_value_threshold, fold_change_threshold,
                     model_variables = names(md), cores = NULL) {
+
+  if (!is.null(dropped)) {
+    filtered_counts <- filtered_counts[
+      !(row.names(filtered_counts) %in% dropped),
+    ]
+  }
   purrr::map(
     conditions,
     function(x) differential_expression(
@@ -1246,10 +1275,20 @@ start_de <- function() {
 #' @inheritParams cqn
 #' @inheritParams differential_expression
 #' @inheritParams filter_genes
+#' @param dropped a vector of gene names to drop from filtered counts, as they
+#' were not cqn normalized
 #' @export
-compute_residuals <- function(clean_metadata, filtered_counts,
+compute_residuals <- function(clean_metadata, filtered_counts, dropped,
                               cqn_counts = cqn_counts$E, primary_variable,
-                              model_variables = NULL, cores = NULL)  {
+                              model_variables = NULL, cores = NULL, synid = NULL,
+                              custom = NULL)  {
+
+  if (!is.null(dropped)) {
+    filtered_counts <- filtered_counts[
+      !(row.names(filtered_counts) %in% dropped),
+    ]
+  }
+
   # set the number of cores if not specified in the config
   if(is.null(cores)){
     cores = parallel::detectCores()-1

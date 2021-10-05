@@ -137,6 +137,13 @@ list(
     )
   ),
   tar_target(
+    dropped,
+    dropped_genes(
+      filtered_counts = filtered_counts,
+      cqn_counts = cqn_counts$E
+    )
+  ),
+  tar_target(
     model,
     stepwise_regression(
       clean_md,
@@ -160,10 +167,13 @@ list(
       function(x) compute_residuals(
         clean_md,
         filtered_counts,
+        dropped,
         cqn_counts = cqn_counts$E,
         primary_variable = x,
         model_variables = selected_model,
-        cores = get("cores")
+        cores = get("cores"),
+        custom = get("biomart")$`custom build`,
+        synid = get("biomart")$synID
         )
       )
     ),
@@ -174,11 +184,14 @@ list(
       filtered_counts,
       cqn_counts$E,
       clean_md,
+      dropped,
       biomart_results,
       p_value_threshold = get("de p-value threshold"),
       fold_change_threshold = get("de FC"),
       model_variables = selected_model,
-      cores = get("cores")
+      cores = get("cores"),
+      custom = get("biomart")$`custom build`,
+      synid = get("biomart")$synID
     )
   ),
   tar_target(

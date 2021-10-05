@@ -7,10 +7,13 @@
 compute_residuals(
   clean_metadata,
   filtered_counts,
+  dropped,
   cqn_counts = cqn_counts$E,
   primary_variable,
   model_variables = NULL,
-  cores = NULL
+  cores = NULL,
+  synid = NULL,
+  custom = NULL
 )
 }
 \arguments{
@@ -18,6 +21,9 @@ compute_residuals(
 factors or numeric as determined by \code{"sageseqr::clean_covariates()"}.}
 
 \item{filtered_counts}{A counts data frame with genes removed that have low expression.}
+
+\item{dropped}{a vector of gene names to drop from filtered counts, as they
+were not cqn normalized}
 
 \item{cqn_counts}{A counts data frame normalized by CQN.}
 
