@@ -11,9 +11,7 @@ compute_residuals(
   cqn_counts = cqn_counts$E,
   primary_variable,
   model_variables = NULL,
-  cores = NULL,
-  synid = NULL,
-  custom = NULL
+  cores = NULL
 )
 }
 \arguments{

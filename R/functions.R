@@ -1280,8 +1280,7 @@ start_de <- function() {
 #' @export
 compute_residuals <- function(clean_metadata, filtered_counts, dropped,
                               cqn_counts = cqn_counts$E, primary_variable,
-                              model_variables = NULL, cores = NULL, synid = NULL,
-                              custom = NULL)  {
+                              model_variables = NULL, cores = NULL)  {
 
   if (!is.null(dropped)) {
     filtered_counts <- filtered_counts[
