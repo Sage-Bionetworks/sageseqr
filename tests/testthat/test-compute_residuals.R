@@ -18,8 +18,9 @@ counts <- data.frame(matrix(
 
 matrix <- compute_residuals(
   metadata,
-  counts,
-  counts,
+  filtered_counts = counts,
+  dropped = NULL,
+  cqn_counts = counts,
   primary_variable = c("diagnosis", "sex"),
 )
 
