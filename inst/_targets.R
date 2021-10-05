@@ -171,9 +171,7 @@ list(
         cqn_counts = cqn_counts$E,
         primary_variable = x,
         model_variables = selected_model,
-        cores = get("cores"),
-        custom = get("biomart")$`custom build`,
-        synid = get("biomart")$synID
+        cores = get("cores")
         )
       )
     ),
@@ -189,9 +187,7 @@ list(
       p_value_threshold = get("de p-value threshold"),
       fold_change_threshold = get("de FC"),
       model_variables = selected_model,
-      cores = get("cores"),
-      custom = get("biomart")$`custom build`,
-      synid = get("biomart")$synID
+      cores = get("cores")
     )
   ),
   tar_target(
