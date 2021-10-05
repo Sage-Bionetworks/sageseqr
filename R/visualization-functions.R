@@ -1346,7 +1346,8 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
   p <- list(
     plot = discordance_plots,
     sex_check_results = tibble::as_tibble(scan_vars),
-    warnings = warning
+    warnings = warning,
+    discordant = names(table(scan_vars$label))
   )
   return(p)
 }

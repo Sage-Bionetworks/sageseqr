@@ -64,6 +64,8 @@ if (!is.null(config::get("sex check"))) {
 }
 ```
 
+Sample swaps identified by discordant sex label, are `r glue::glue_collapse(targets::tar_read(sex_plot_pca)$discordant, ", ", last = " and ")`.
+
 ```{r outlier_list, results = "asis"}
 if (!is.null(targets::tar_read(sex_plot_pca)$outliers)) {
   list <- glue::glue_collapse(targets::tar_read(sex_plot_pca)$outliers, ", ", last = " and ")
