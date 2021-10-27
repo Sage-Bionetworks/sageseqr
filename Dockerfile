@@ -13,7 +13,7 @@ ENV _R_S3_METHOD_REGISTRATION_NOTE_OVERWRITES_=false
 # install required packages
 RUN apt-get update -y\
 && apt-get install -y dpkg-dev zlib1g-dev libssl-dev libgsl-dev libffi-dev\
-&& apt-get install -y curl libcurl4-openssl-dev libglpk-dev libxt6\
+&& apt-get install -y curl libcurl4-openssl-dev libglpk-dev libxt6 liblzma-dev libbz2-dev\
 && apt-get install -y git\
 && R -e "install.packages('RcppZiggurat')"\
 && R -e "remotes::install_github('Sage-Bionetworks/sageseqr')"\
