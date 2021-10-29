@@ -381,7 +381,7 @@ get_biomart <- function(count_df, synid, version, host, filters, organism,
       ]
       biomart_results$percentage_gene_gc_content <- as.numeric(biomart_results$percentage_gene_gc_content)
       biomart_results$gene_length <- as.numeric(biomart_results$gene_length)
-    }else{
+    } else {
       # use custom specified GTF and FASTA from synapse
 
       # Load GTF and FASTA from synapse
