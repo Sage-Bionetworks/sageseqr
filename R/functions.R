@@ -453,7 +453,7 @@ get_biomart <- function(count_df, synid, version, host, filters, organism,
       colnames(biom) <- c( 'chromosome_name', filters, 'hgnc_symbol',
                            'gene_biotype')
       biomart_results <- biom %>%
-        dplyr::full_join(stats, by = 'ensembl_gene_id')
+        dplyr::full_join(stats, by = "ensembl_gene_id")
 
       #Remove PAR_Y
       biomart_results <- biomart_results[
