@@ -289,7 +289,7 @@ get_biomart <- function(count_df, synid, version, host, filters, organism,
       if (isTRUE(isexon)) {
         # calculate length and GC only for exonic regions
         # set feature, start, and stop equal to exon values
-        feature <- 'ensembl_exon_id'
+        feature <- "ensembl_exon_id"
         start <- "exon_chrom_start"
         end <- "exon_chrom_end"
         typ <- "gene_exon"
