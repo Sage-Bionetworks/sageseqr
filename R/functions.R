@@ -394,7 +394,7 @@ get_biomart <- function(count_df, synid, version, host, filters, organism,
                                                   features=c("gene_id",
                                                              "gene_name",
                                                              "gene_type"))
-      biom <- biom[ ,c('V1', 'gene_id', 'gene_name', 'gene_type') ]
+      biom <- biom[ , c("V1", "gene_id", "gene_name", "gene_type")]
 
       # set feature level
       if (isTRUE(isexon)) {
