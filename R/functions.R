@@ -152,7 +152,7 @@ parse_counts <- function(count_df){
 #'@param start column name of feature start coordinate
 #'@param end column name of feature end coordinate
 #'@export
-biomart_stats <- function(gene, column_id, df, start, end){
+biomart_stats <- function(gene, column_id, df, start, end) {
   df <- df[ df[,column_id] == gene,]
   # Split the sequence into a list object
   seq <- strsplit(df$sequence, '')
