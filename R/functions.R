@@ -448,10 +448,10 @@ get_biomart <- function(count_df, synid, version, host, filters, organism,
       rm(cl)
 
       stats <- as.data.frame(stats)
-      colnames(stats) <- c(filters, 'percentage_gene_gc_content',
-                           'gene_length')
-      colnames(biom) <- c( 'chromosome_name', filters, 'hgnc_symbol',
-                           'gene_biotype')
+      colnames(stats) <- c(filters, "percentage_gene_gc_content",
+                           "gene_length")
+      colnames(biom) <- c("chromosome_name", filters, "hgnc_symbol",
+                           "gene_biotype")
       biomart_results <- biom %>%
         dplyr::full_join(stats, by = "ensembl_gene_id")
 
