@@ -109,7 +109,7 @@ Outliers, based on logCPM expression, are `r glue::glue_collapse(targets::tar_re
 
 # Identify Dropped Gene Features
 
-Gene features dropped because they are not annotated in Biomart Version are `r glue::glue_collapse(targets::tar_read(dropped), ", ", last = " and ")`.
+Gene features dropped, because they are not annotated in BioMart, are `r glue::glue_collapse(targets::tar_read(dropped), ", ", last = " and ")`.
 
 # Significant Covariates
 
