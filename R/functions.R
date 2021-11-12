@@ -432,7 +432,7 @@ get_biomart <- function(count_df, synid, version, host, filters, organism,
       gene_chr <- biom$gene_id
       #genome <- chroms[gene_chr[i]]
 
-      cl <- snow::makeCluster(cores, outfile="log.log")
+      cl <- snow::makeCluster(cores, outfile = "log.log")
       stats <- matrix(NA,0,3)
       for (element in names(table(biom$V1))) {
         calcs <- do.call(rbind, parallel::parLapply(
