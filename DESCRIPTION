@@ -36,6 +36,7 @@ Imports:
     biomaRt,
     Biostrings,
     BSgenome,
+    config,
     cqn,
     data.table,
     dplyr,
