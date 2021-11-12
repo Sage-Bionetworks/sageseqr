@@ -293,7 +293,7 @@ get_biomart <- function(count_df, synid, version, host, filters, organism,
         start <- "exon_chrom_start"
         end <- "exon_chrom_end"
         typ <- "gene_exon"
-      }else{
+      } else {
         # calculate length and GC only for entire transcript
         # set feature, start, and stop equal to transcript values
         feature <- "ensembl_transcript_id"
