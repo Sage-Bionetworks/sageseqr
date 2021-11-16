@@ -14,11 +14,11 @@ default:
     host: ensembl.org
     organism: hsa
     exon only: FALSE
-    custom build: TRUE
-    gtfID: syn20692159
-    gtfVersion: 9
-    fastaID: syn20696945
-    fataVersion: 1
+    custom build: FALSE
+    gtfID: 
+    gtfVersion: 
+    fastaID: 
+    fataVersion: 
   factors: ["sampleID", "batch", "sex", "diagnosis"]
   continuous: ["RIN", "pmi", "ageofdeath"]
   x_var: diagnosis
