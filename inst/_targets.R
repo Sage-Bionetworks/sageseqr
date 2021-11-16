@@ -48,7 +48,14 @@ list(
       version = get("biomart")$version,
       filters = get("biomart")$filters,
       host = get("biomart")$host,
-      organism = get("biomart")$organism
+      organism = get("biomart")$organism,
+      isexon = get("biomart")$`exon only`,
+      custom = get("biomart")$`custom build`,
+      cores = get("cores"),
+      gtfID = get("biomart")$gtfID,
+      gtfVersion = get("biomart")$gtfVersion,
+      fastaID = get("biomart")$fastaID,
+      fastaVersion = get("biomart")$fastaVersion
     )
   ),
   tar_target(
@@ -130,6 +137,13 @@ list(
     )
   ),
   tar_target(
+    dropped,
+    dropped_genes(
+      filtered_counts = filtered_counts,
+      cqn_counts = cqn_counts$E
+    )
+  ),
+  tar_target(
     model,
     stepwise_regression(
       clean_md,
@@ -153,6 +167,7 @@ list(
       function(x) compute_residuals(
         clean_md,
         filtered_counts,
+        dropped,
         cqn_counts = cqn_counts$E,
         primary_variable = x,
         model_variables = selected_model,
@@ -167,6 +182,7 @@ list(
       filtered_counts,
       cqn_counts$E,
       clean_md,
+      dropped,
       biomart_results,
       p_value_threshold = get("de p-value threshold"),
       fold_change_threshold = get("de FC"),

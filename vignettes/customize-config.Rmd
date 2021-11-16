@@ -41,6 +41,22 @@ biomart:
                   workflow. Defaults to ensembl.org.
   organism:       Required. A character vector of the organism name. This argument 
                   takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".
+  exon only:      Optional. Set to TRUE if you want gene lengths and GC-content
+                  to be calculated only for exons of gene features. Recomended 
+                  depending on you experimental design paradigm. Default is FALSE,
+                  which considers the entire transcript start to stop (ie. includes
+                  intronic regions).
+  custom build:   Optional. If you want to bulid the biomart object from a user specified
+                  or custom GTF and genome FASTA file specify this value as TRUE.
+                  Default is FALSE. This would be reccomended for users analyzing
+                  data from a model system with a trans-gene inserted into the 
+                  genome.
+  gtfID:          Required IF custom build is set to TRUE. Synapse ID to the user
+                  specified GTF file to build the biomart object from.
+  gtfVersion:     Optional.Include Synapse file version number (e.g. 3).
+  fastaID:        Required IF custom build is set to TRUE. Synapse ID to the user
+                  specified genome FASTA file to build the biomart object from.
+  fastaVersion:   Optional. Include Synapse file version number (e.g. 3).
 factors:          Required. List of factor variables in brackets. Variables must be 
                   present in the metadata as column names (e.g. [ "donorid", "source"]).
 continuous:       Required. List of continuous variables in brackets. Variables must 

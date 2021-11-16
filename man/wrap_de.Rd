@@ -9,6 +9,7 @@ wrap_de(
   filtered_counts,
   cqn_counts,
   md,
+  dropped,
   biomart_results,
   p_value_threshold,
   fold_change_threshold,
@@ -25,6 +26,9 @@ in \code{"sagseqr::differential_expression()"}.}
 \item{cqn_counts}{A counts data frame normalized by CQN.}
 
 \item{md}{A data frame with sample identifiers in a column and relevant experimental covariates.}
+
+\item{dropped}{a vector of gene names to drop from filtered counts, as they
+were not cqn normalized}
 
 \item{biomart_results}{Output of \code{"sageseqr::get_biomart()"}. Gene Ids are
 stored as rownames.}

@@ -29,11 +29,14 @@ LazyData: true
 Suggests: 
     rmarkdown,
     testthat (>= 2.1.0)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 biocViews:
 Imports:
     BiocParallel,
     biomaRt,
+    Biostrings,
+    BSgenome,
+    config,
     cqn,
     data.table,
     dplyr,
@@ -41,6 +44,8 @@ Imports:
     fs,
     graphics,
     GenomicRanges,
+    GenomicTools,
+    GenomicTools.fileHandler,
     glue,
     ggforce,
     ggplot2,
@@ -52,6 +57,7 @@ Imports:
     knitr,
     limma,
     magrittr,
+    markdown,
     mclust,
     mvIC,
     parallel,
@@ -62,6 +68,7 @@ Imports:
     reshape2,
     rlang,
     sagethemes,
+    snow,
     stats,
     stringr,
     synapser,

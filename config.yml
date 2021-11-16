@@ -13,9 +13,16 @@ default:
     filters: ensembl_gene_id
     host: ensembl.org
     organism: hsa
+    exon only: FALSE
+    custom build: FALSE
+    gtfID: 
+    gtfVersion: 
+    fastaID: 
+    fastaVersion: 
   factors: ["sampleID", "batch", "sex", "diagnosis"]
   continuous: ["RIN", "pmi", "ageofdeath"]
   x_var: diagnosis
+  cores: 6
   conditions: ["diagnosis", "sex"]
   cpm threshold: 1
   percent threshold: 0.5
