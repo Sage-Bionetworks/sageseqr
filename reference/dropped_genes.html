@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Wrapper for Differential Expression Analysis — wrap_de • sageseqr</title>
+<title>Dropped Genes Finder — dropped_genes • sageseqr</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,10 @@
 
 
 
-<meta property="og:title" content="Wrapper for Differential Expression Analysis — wrap_de" />
-<meta property="og:description" content="This function will pass multiple conditions to test to &quot;sagseqr::differential_expression()&quot;." />
+<meta property="og:title" content="Dropped Genes Finder — dropped_genes" />
+<meta property="og:description" content="Finds gene IDs in the filtered counts which were removed in cqn normalization
+most likely as a function if no GC or length estimates being present in the
+user specified biomart object." />
 
 
 
@@ -126,77 +128,31 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Wrapper for Differential Expression Analysis</h1>
+    <h1>Dropped Genes Finder</h1>
     <small class="dont-index">Source: <a href='https://github.com/Sage-Bionetworks/sageseqr/blob/master/R/functions.R'><code>R/functions.R</code></a></small>
-    <div class="hidden name"><code>wrap_de.Rd</code></div>
+    <div class="hidden name"><code>dropped_genes.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This function will pass multiple conditions to test to <code>"sagseqr::differential_expression()"</code>.</p>
+    <p>Finds gene IDs in the filtered counts which were removed in cqn normalization
+most likely as a function if no GC or length estimates being present in the
+user specified biomart object.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>wrap_de</span><span class='op'>(</span>
-  <span class='va'>conditions</span>,
-  <span class='va'>filtered_counts</span>,
-  <span class='va'>cqn_counts</span>,
-  <span class='va'>md</span>,
-  <span class='va'>dropped</span>,
-  <span class='va'>biomart_results</span>,
-  <span class='va'>p_value_threshold</span>,
-  <span class='va'>fold_change_threshold</span>,
-  model_variables <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span><span class='op'>(</span><span class='va'>md</span><span class='op'>)</span>,
-  cores <span class='op'>=</span> <span class='cn'>NULL</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>dropped_genes</span><span class='op'>(</span><span class='va'>filtered_counts</span>, <span class='va'>cqn_counts</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>conditions</th>
-      <td><p>A named list of conditions to test as `primary_variable`
-in <code>"sagseqr::differential_expression()"</code>.</p></td>
-    </tr>
-    <tr>
       <th>filtered_counts</th>
-      <td><p>A counts data frame with genes removed that have low expression.</p></td>
+      <td><p>The target containing counts after low gene
+expression has been removed. Defaults to target name constrained by
+ <code>"targets::tar_make()"</code>.</p></td>
     </tr>
     <tr>
       <th>cqn_counts</th>
       <td><p>A counts data frame normalized by CQN.</p></td>
-    </tr>
-    <tr>
-      <th>md</th>
-      <td><p>A data frame with sample identifiers in a column and relevant experimental covariates.</p></td>
-    </tr>
-    <tr>
-      <th>dropped</th>
-      <td><p>a vector of gene names to drop from filtered counts, as they
-were not cqn normalized</p></td>
-    </tr>
-    <tr>
-      <th>biomart_results</th>
-      <td><p>Output of <code>"sageseqr::get_biomart()"</code>. Gene Ids are
-stored as rownames.</p></td>
-    </tr>
-    <tr>
-      <th>p_value_threshold</th>
-      <td><p>Numeric. P-values are adjusted by Benjamini and
-Hochberg (BH) false discovery rate (FDR). Significant genes are those with an
-adjusted p-value greater than this threshold.</p></td>
-    </tr>
-    <tr>
-      <th>fold_change_threshold</th>
-      <td><p>Numeric. Significant genes are those with a
-fold-change greater than this threshold.</p></td>
-    </tr>
-    <tr>
-      <th>model_variables</th>
-      <td><p>Optional. Vector of variables to include in the linear (mixed) model.
-If not supplied, the model will include all variables in <code>md</code>.</p></td>
-    </tr>
-    <tr>
-      <th>cores</th>
-      <td><p>An integer of cores to specify in the parallel backend (eg. 4).</p></td>
     </tr>
     </table>
 

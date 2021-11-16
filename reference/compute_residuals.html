@@ -142,6 +142,7 @@
     <pre class="usage"><span class='fu'>compute_residuals</span><span class='op'>(</span>
   <span class='va'>clean_metadata</span>,
   <span class='va'>filtered_counts</span>,
+  <span class='va'>dropped</span>,
   cqn_counts <span class='op'>=</span> <span class='va'>cqn_counts</span><span class='op'>$</span><span class='va'>E</span>,
   <span class='va'>primary_variable</span>,
   model_variables <span class='op'>=</span> <span class='cn'>NULL</span>,
@@ -159,6 +160,11 @@ factors or numeric as determined by <code>"sageseqr::clean_covariates()"</code>.
     <tr>
       <th>filtered_counts</th>
       <td><p>A counts data frame with genes removed that have low expression.</p></td>
+    </tr>
+    <tr>
+      <th>dropped</th>
+      <td><p>a vector of gene names to drop from filtered counts, as they
+were not cqn normalized</p></td>
     </tr>
     <tr>
       <th>cqn_counts</th>

@@ -139,7 +139,21 @@ and other metadata from Ensembl BioMart. Object returned contains gene Ids
 as rownames.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_biomart</span><span class='op'>(</span><span class='va'>count_df</span>, <span class='va'>synid</span>, <span class='va'>version</span>, <span class='va'>host</span>, <span class='va'>filters</span>, <span class='va'>organism</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>get_biomart</span><span class='op'>(</span>
+  <span class='va'>count_df</span>,
+  <span class='va'>synid</span>,
+  <span class='va'>version</span>,
+  <span class='va'>host</span>,
+  <span class='va'>filters</span>,
+  <span class='va'>organism</span>,
+  custom <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  gtfID <span class='op'>=</span> <span class='cn'>NULL</span>,
+  gtfVersion <span class='op'>=</span> <span class='cn'>NULL</span>,
+  fastaID <span class='op'>=</span> <span class='cn'>NULL</span>,
+  fastaVersion <span class='op'>=</span> <span class='cn'>NULL</span>,
+  cores <span class='op'>=</span> <span class='cn'>NULL</span>,
+  isexon <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -173,6 +187,40 @@ This specification is highly recommended for a reproducible workflow.
       <th>organism</th>
       <td><p>A character vector of the organism name. This argument
 takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".</p></td>
+    </tr>
+    <tr>
+      <th>custom</th>
+      <td><p>Defaults to FALSE If TRUE, the GC and Gene Length, and gene 
+name are calculated from user specified FASTA and GTF File.</p></td>
+    </tr>
+    <tr>
+      <th>gtfID</th>
+      <td><p>Defaults to NULL. A character vector with a Synapse ID
+corresponding to a gtf formatted gene annotation file.</p></td>
+    </tr>
+    <tr>
+      <th>gtfVersion</th>
+      <td><p>Optional. A numeric vector with the gene GTF Synapse file
+version number.</p></td>
+    </tr>
+    <tr>
+      <th>fastaID</th>
+      <td><p>Defaults to NULL. A character vector with a Synapse ID
+corresponding to a FASTA formatted genome annotation file.</p></td>
+    </tr>
+    <tr>
+      <th>fastaVersion</th>
+      <td><p>Optional. A numeric vector with the genome FASTA Synapse
+file version number.</p></td>
+    </tr>
+    <tr>
+      <th>cores</th>
+      <td><p>An integer of cores to specify in the parallel backend (eg. 4).</p></td>
+    </tr>
+    <tr>
+      <th>isexon</th>
+      <td><p>Defaults to FALSE. If TRUE, the GC and Gene Length parameters will
+only consider exotic regions and omit intronic regions.</p></td>
     </tr>
     </table>
 
