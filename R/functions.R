@@ -239,8 +239,8 @@ gtf_stats <- function( i, data, genome){
 #'(see \code{"biomaRt::listEnsemblArchives()"})
 #'@param organism A character vector of the organism name. This argument
 #'takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".
-#'@param custom Defaults to NULL. If TRUE, the GC and Gene Length parameters will
-#'only consider exotic regions.
+#'@param custom Defaults to FALSE If TRUE, the GC and Gene Length, and gene 
+#' name are calculated from user specified FASTA and GTF File.
 #'@param gtfID Defaults to NULL. A character vector with a Synapse ID
 #'corresponding to a gtf formatted gene annotation file.
 #'@param gtfVersion Optional. A numeric vector with the gene GTF Synapse file
@@ -251,11 +251,11 @@ gtf_stats <- function( i, data, genome){
 #'file version number.
 #'@param cores An integer of cores to specify in the parallel backend (eg. 4).
 #'@param isexon Defaults to FALSE. If TRUE, the GC and Gene Length parameters will
-#'only consider exotic regions.
+#'only consider exotic regions and omit intronic regions.
 #'@importFrom rlang .data
 #'@export
 get_biomart <- function(count_df, synid, version, host, filters, organism,
-                        custom, gtfID, gtfVersion = NULL, fastaID,
+                        custom = FALSE, gtfID = NULL, gtfVersion = NULL, fastaID = NULL,
                         fastaVersion = NULL, cores = NULL, isexon = FALSE) {
   if (is.null(synid)) {
     if(is.null(cores)){

@@ -18,7 +18,7 @@ default:
     gtfID: 
     gtfVersion: 
     fastaID: 
-    fataVersion: 
+    fastaVersion: 
   factors: ["sampleID", "batch", "sex", "diagnosis"]
   continuous: ["RIN", "pmi", "ageofdeath"]
   x_var: diagnosis

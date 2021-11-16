@@ -11,10 +11,10 @@ get_biomart(
   host,
   filters,
   organism,
-  custom,
-  gtfID,
+  custom = FALSE,
+  gtfID = NULL,
   gtfVersion = NULL,
-  fastaID,
+  fastaID = NULL,
   fastaVersion = NULL,
   cores = NULL,
   isexon = FALSE
@@ -39,8 +39,8 @@ This specification is highly recommended for a reproducible workflow.
 \item{organism}{A character vector of the organism name. This argument
 takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".}
 
-\item{custom}{Defaults to NULL. If TRUE, the GC and Gene Length parameters will
-only consider exotic regions.}
+\item{custom}{Defaults to FALSE If TRUE, the GC and Gene Length, and gene 
+name are calculated from user specified FASTA and GTF File.}
 
 \item{gtfID}{Defaults to NULL. A character vector with a Synapse ID
 corresponding to a gtf formatted gene annotation file.}
@@ -57,7 +57,7 @@ file version number.}
 \item{cores}{An integer of cores to specify in the parallel backend (eg. 4).}
 
 \item{isexon}{Defaults to FALSE. If TRUE, the GC and Gene Length parameters will
-only consider exotic regions.}
+only consider exotic regions and omit intronic regions.}
 }
 \description{
 Get GC content, gene Ids, gene symbols, gene biotypes, gene lengths
