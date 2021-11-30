@@ -239,7 +239,7 @@ gtf_stats <- function( i, data, genome){
 #'(see \code{"biomaRt::listEnsemblArchives()"})
 #'@param organism A character vector of the organism name. This argument
 #'takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".
-#'@param custom Defaults to FALSE If TRUE, the GC and Gene Length, and gene 
+#'@param custom Defaults to FALSE If TRUE, the GC and Gene Length, and gene
 #' name are calculated from user specified FASTA and GTF File.
 #'@param gtfID Defaults to NULL. A character vector with a Synapse ID
 #'corresponding to a gtf formatted gene annotation file.
@@ -874,6 +874,11 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
                                            L = contrasts,
                                            BPPARAM = BiocParallel::SnowParam(cores)
                                            )
+  if(is.null(lme4::findbars(
+    as.formula( metadata_input$formula_non_intercept) ))){
+    message('Applying eBayes Directly')
+    fit_contrasts <- limma::eBayes(fit_contrasts)
+  }
 
   de <- lapply(names(contrasts), function(i, fit){
     genes <- limma::topTable(fit, coef = i, number = Inf, sort.by = "logFC")
@@ -1318,7 +1323,12 @@ compute_residuals <- function(clean_metadata, filtered_counts, dropped,
   )
 
   # compute residual matrix
-  residual_gene_expression <- stats::residuals(adjusted_fit)
+  if(is.null(lme4::findbars(
+    as.formula( metadata_input$formula_non_intercept) ))){
+    residual_gene_expression <- adjusted_fit$residuals
+  }else{
+    residual_gene_expression <- stats::residuals(adjusted_fit)
+  }
 
   # calculate weighted residuals and add back signal from predictor
   variables_to_add_back <- grep(
