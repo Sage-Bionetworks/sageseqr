@@ -876,7 +876,7 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
                                            )
   if(is.null(lme4::findbars(
     as.formula( metadata_input$formula_non_intercept) ))){
-
+    message('Applying eBayes Directly')
     fit_contrasts <- limma::eBayes(fit_contrasts)
   }
 
@@ -1321,6 +1321,12 @@ compute_residuals <- function(clean_metadata, filtered_counts, dropped,
     computeResiduals = TRUE,
     BPPARAM = BiocParallel::SnowParam(cores)
   )
+
+  if(is.null(lme4::findbars(
+    as.formula( metadata_input$formula_non_intercept) ))){
+    message('Applying eBayes Directly')
+    adjusted_fit <- limma::eBayes(adjusted_fit)
+  }
 
   # compute residual matrix
   residual_gene_expression <- stats::residuals(adjusted_fit)
