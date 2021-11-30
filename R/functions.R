@@ -1322,14 +1322,13 @@ compute_residuals <- function(clean_metadata, filtered_counts, dropped,
     BPPARAM = BiocParallel::SnowParam(cores)
   )
 
+  # compute residual matrix
   if(is.null(lme4::findbars(
     as.formula( metadata_input$formula_non_intercept) ))){
-    message('Applying eBayes Directly')
-    adjusted_fit <- limma::eBayes(adjusted_fit)
+    residual_gene_expression <- adjusted_fit$residuals
+  }else{
+    residual_gene_expression <- stats::residuals(adjusted_fit)
   }
-
-  # compute residual matrix
-  residual_gene_expression <- stats::residuals(adjusted_fit)
 
   # calculate weighted residuals and add back signal from predictor
   variables_to_add_back <- grep(
