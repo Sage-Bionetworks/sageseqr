@@ -690,18 +690,23 @@ association_statistics_for_both <- function(variables = names(clean_metadata), c
 #'@export
 #'@return A boxplot with mutiple groups defined by the include_vars argument.
 boxplot_vars <- function(md, include_vars, x_var) {
-  sagethemes::import_lato()
-  df <- dplyr::select(md, !!include_vars, !!x_var) %>%
-    tidyr::pivot_longer(-!!x_var, names_to = "key", values_to = "value")
-  p <- ggplot2::ggplot(df, ggplot2::aes(x = .data[[x_var]],
-                                        y = .data$value,
-                                        group = .data[[x_var]])) +
-    ggplot2::geom_boxplot(ggplot2::aes(fill = .data[[x_var]])) +
-    ggplot2::facet_wrap(key ~ ., scales = "free") +
-    sagethemes::scale_fill_sage_d() +
-    sagethemes::theme_sage() +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1))
-  p
+  if(is.null(include_vars)){
+    p <- NULL
+    p
+  }else{
+    sagethemes::import_lato()
+    df <- dplyr::select(md, !!include_vars, !!x_var) %>%
+      tidyr::pivot_longer(-!!x_var, names_to = "key", values_to = "value")
+    p <- ggplot2::ggplot(df, ggplot2::aes(x = .data[[x_var]],
+                                          y = .data$value,
+                                          group = .data[[x_var]])) +
+      ggplot2::geom_boxplot(ggplot2::aes(fill = .data[[x_var]])) +
+      ggplot2::facet_wrap(key ~ ., scales = "free") +
+      sagethemes::scale_fill_sage_d() +
+      sagethemes::theme_sage() +
+      ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1))
+    p
+  }
 }
 #' Explore metadata by gene expression on the sex chromosomes.
 #'
