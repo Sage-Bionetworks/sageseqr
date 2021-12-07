@@ -31,7 +31,7 @@ test_that("differential_expression executes completely", {
       biomart_results,
       0.05,
       1.5
-      ),
+    ),
     6
   )
 })
