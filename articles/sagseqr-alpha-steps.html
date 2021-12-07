@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,18 +33,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sageseqr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.0.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
@@ -67,7 +63,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/Sage-Bionetworks/sageseqr/">
+  <a href="https://github.com/Sage-Bionetworks/sageseqr/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -88,14 +84,14 @@
       <h1 data-toc-skip>Run the drake plan in version 0.0.0.9-alpha</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/Sage-Bionetworks/sageseqr/blob/master/vignettes/sagseqr-alpha-steps.Rmd"><code>vignettes/sagseqr-alpha-steps.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Sage-Bionetworks/sageseqr/blob/HEAD/vignettes/sagseqr-alpha-steps.Rmd" class="external-link"><code>vignettes/sagseqr-alpha-steps.Rmd</code></a></small>
       <div class="hidden name"><code>sagseqr-alpha-steps.Rmd</code></div>
 
     </div>
 
     
     
-<p>In <code>sageseqr</code> version 0.0.0.9-alpha, <code>sageseqr</code> was built with the workflow R package called <a href="https://books.ropensci.org/drake/"><code>drake</code></a>. There are differences between the latest version of <code>sageseqr</code> and the alpha version when it comes to executing the workflow. As new features are always being released, the latest release of the package is recommended! However, if you are reproducing an analysis that depends on the alpha version of the package, follow these instructions.</p>
+<p>In <code>sageseqr</code> version 0.0.0.9-alpha, <code>sageseqr</code> was built with the workflow R package called <a href="https://books.ropensci.org/drake/" class="external-link"><code>drake</code></a>. There are differences between the latest version of <code>sageseqr</code> and the alpha version when it comes to executing the workflow. As new features are always being released, the latest release of the package is recommended! However, if you are reproducing an analysis that depends on the alpha version of the package, follow these instructions.</p>
 <ol style="list-style-type: decimal">
 <li><p>Install the package <code>remotes::install_github("Sage-Bionetworks/sageseqr@v0.0.0.9-alpha")</code>.</p></li>
 <li><p>Write your own config file.</p></li>
@@ -166,59 +162,59 @@ store output:     Required. Folder Synapse Id to store output on Synapse.</code>
 <li>Specify the active configuration by setting <code>R_CONFIG_ACTIVE</code>.</li>
 </ol>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html">Sys.setenv</a></span><span class="op">(</span>R_CONFIG_ACTIVE <span class="op">=</span> <span class="st">"default"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.setenv</a></span><span class="op">(</span>R_CONFIG_ACTIVE <span class="op">=</span> <span class="st">"default"</span><span class="op">)</span></code></pre></div>
 <ol start="4" style="list-style-type: decimal">
-<li>Load the <code>sageseqr</code> library and login to <a href="https://www.synapse.org/">Synapse</a>. <code>rnaseq_plan()</code> calls the arguments from the config file and creates the <code>drake</code> plan. Execute <code>drake::make(plan)</code> to compute. Run this code from your project root.</li>
+<li>Load the <code>sageseqr</code> library and login to <a href="https://www.synapse.org/" class="external-link">Synapse</a>. <code>rnaseq_plan()</code> calls the arguments from the config file and creates the <code>drake</code> plan. Execute <code>drake::make(plan)</code> to compute. Run this code from your project root.</li>
 </ol>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://sage-bionetworks.github.io/sageseqr">sageseqr</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://sage-bionetworks.github.io/sageseqr" class="external-link">sageseqr</a></span><span class="op">)</span>
 
 <span class="co"># Login to Synapse. Make a Synapse account and use synapser to login: https://r-docs.synapse.org/articles/manageSynapseCredentials.html</span>
-<span class="fu">synapser</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/synapser/man/synLogin.html">synLogin</a></span><span class="op">(</span><span class="op">)</span>
+<span class="fu">synapser</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/synapser/man/synLogin.html" class="external-link">synLogin</a></span><span class="op">(</span><span class="op">)</span>
 
 <span class="co"># Run the analysis</span>
 <span class="va">plan</span> <span class="op">&lt;-</span> <span class="fu">sageseqr</span><span class="fu">::</span><span class="fu">rnaseq_plan</span><span class="op">(</span>
-  metadata_id <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span><span class="st">"metadata"</span><span class="op">)</span><span class="op">$</span><span class="va">synID</span>,
-  metadata_version <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span><span class="st">"metadata"</span><span class="op">)</span><span class="op">$</span><span class="va">version</span>,
-  counts_id <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span><span class="st">"counts"</span><span class="op">)</span><span class="op">$</span><span class="va">synID</span>,
-  counts_version <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span><span class="st">"counts"</span><span class="op">)</span><span class="op">$</span><span class="va">version</span>,
-  gene_id_input <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span><span class="st">"counts"</span><span class="op">)</span><span class="op">$</span><span class="va">`gene id`</span>,
-  sample_id_input <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span><span class="st">"metadata"</span><span class="op">)</span><span class="op">$</span><span class="va">`sample id`</span>,
-  factor_input <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span><span class="st">"factors"</span><span class="op">)</span>,
-  continuous_input <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span><span class="st">"continuous"</span><span class="op">)</span>,
-  biomart_id <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span><span class="st">"biomart"</span><span class="op">)</span><span class="op">$</span><span class="va">synID</span>,
-  biomart_version <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span><span class="st">"biomart"</span><span class="op">)</span><span class="op">$</span><span class="va">version</span>,
-  filters <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span><span class="st">"biomart"</span><span class="op">)</span><span class="op">$</span><span class="va">filters</span>,
-  host <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span><span class="st">"biomart"</span><span class="op">)</span><span class="op">$</span><span class="va">host</span>,
-  organism <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span><span class="st">"biomart"</span><span class="op">)</span><span class="op">$</span><span class="va">organism</span>, 
-  conditions <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span><span class="st">"conditions"</span><span class="op">)</span>, 
-  cpm_threshold <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span><span class="st">"cpm threshold"</span><span class="op">)</span>,
-  conditions_threshold <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span><span class="st">"percent threshold"</span><span class="op">)</span>,
-  primary_variable <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span><span class="st">"x_var"</span><span class="op">)</span>, 
-  de_contrasts <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span><span class="st">"de contrasts"</span><span class="op">)</span>,
-  fold_change_threshold <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span><span class="st">"de FC"</span><span class="op">)</span>,
-  p_value_threshold <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span><span class="st">"de p-value threshold"</span><span class="op">)</span>,
-  sex_var <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span><span class="st">"sex check"</span><span class="op">)</span>, 
-  color <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span><span class="st">"dimensions"</span><span class="op">)</span><span class="op">$</span><span class="va">color</span>, 
-  shape <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span><span class="st">"dimensions"</span><span class="op">)</span><span class="op">$</span><span class="va">shape</span>,
-  size <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span><span class="st">"dimensions"</span><span class="op">)</span><span class="op">$</span><span class="va">size</span>,
-  report_name <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span><span class="st">"report"</span><span class="op">)</span>,
-  skip_model <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span><span class="st">"skip model"</span><span class="op">)</span>,
-  parent_id <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span><span class="st">"store output"</span><span class="op">)</span>,
-  rownames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
-    <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span><span class="st">"metadata"</span><span class="op">)</span><span class="op">$</span><span class="va">`sample id`</span>,
-    <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span><span class="st">"counts"</span><span class="op">)</span><span class="op">$</span><span class="va">`gene id`</span>,
-    <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span><span class="st">"biomart"</span><span class="op">)</span><span class="op">$</span><span class="va">filters</span>,
-    <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span><span class="st">"counts"</span><span class="op">)</span><span class="op">$</span><span class="va">`gene id`</span>
+  metadata_id <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html" class="external-link">get</a></span><span class="op">(</span><span class="st">"metadata"</span><span class="op">)</span><span class="op">$</span><span class="va">synID</span>,
+  metadata_version <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html" class="external-link">get</a></span><span class="op">(</span><span class="st">"metadata"</span><span class="op">)</span><span class="op">$</span><span class="va">version</span>,
+  counts_id <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html" class="external-link">get</a></span><span class="op">(</span><span class="st">"counts"</span><span class="op">)</span><span class="op">$</span><span class="va">synID</span>,
+  counts_version <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html" class="external-link">get</a></span><span class="op">(</span><span class="st">"counts"</span><span class="op">)</span><span class="op">$</span><span class="va">version</span>,
+  gene_id_input <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html" class="external-link">get</a></span><span class="op">(</span><span class="st">"counts"</span><span class="op">)</span><span class="op">$</span><span class="va">`gene id`</span>,
+  sample_id_input <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html" class="external-link">get</a></span><span class="op">(</span><span class="st">"metadata"</span><span class="op">)</span><span class="op">$</span><span class="va">`sample id`</span>,
+  factor_input <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html" class="external-link">get</a></span><span class="op">(</span><span class="st">"factors"</span><span class="op">)</span>,
+  continuous_input <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html" class="external-link">get</a></span><span class="op">(</span><span class="st">"continuous"</span><span class="op">)</span>,
+  biomart_id <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html" class="external-link">get</a></span><span class="op">(</span><span class="st">"biomart"</span><span class="op">)</span><span class="op">$</span><span class="va">synID</span>,
+  biomart_version <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html" class="external-link">get</a></span><span class="op">(</span><span class="st">"biomart"</span><span class="op">)</span><span class="op">$</span><span class="va">version</span>,
+  filters <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html" class="external-link">get</a></span><span class="op">(</span><span class="st">"biomart"</span><span class="op">)</span><span class="op">$</span><span class="va">filters</span>,
+  host <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html" class="external-link">get</a></span><span class="op">(</span><span class="st">"biomart"</span><span class="op">)</span><span class="op">$</span><span class="va">host</span>,
+  organism <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html" class="external-link">get</a></span><span class="op">(</span><span class="st">"biomart"</span><span class="op">)</span><span class="op">$</span><span class="va">organism</span>, 
+  conditions <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html" class="external-link">get</a></span><span class="op">(</span><span class="st">"conditions"</span><span class="op">)</span>, 
+  cpm_threshold <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html" class="external-link">get</a></span><span class="op">(</span><span class="st">"cpm threshold"</span><span class="op">)</span>,
+  conditions_threshold <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html" class="external-link">get</a></span><span class="op">(</span><span class="st">"percent threshold"</span><span class="op">)</span>,
+  primary_variable <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html" class="external-link">get</a></span><span class="op">(</span><span class="st">"x_var"</span><span class="op">)</span>, 
+  de_contrasts <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html" class="external-link">get</a></span><span class="op">(</span><span class="st">"de contrasts"</span><span class="op">)</span>,
+  fold_change_threshold <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html" class="external-link">get</a></span><span class="op">(</span><span class="st">"de FC"</span><span class="op">)</span>,
+  p_value_threshold <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html" class="external-link">get</a></span><span class="op">(</span><span class="st">"de p-value threshold"</span><span class="op">)</span>,
+  sex_var <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html" class="external-link">get</a></span><span class="op">(</span><span class="st">"sex check"</span><span class="op">)</span>, 
+  color <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html" class="external-link">get</a></span><span class="op">(</span><span class="st">"dimensions"</span><span class="op">)</span><span class="op">$</span><span class="va">color</span>, 
+  shape <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html" class="external-link">get</a></span><span class="op">(</span><span class="st">"dimensions"</span><span class="op">)</span><span class="op">$</span><span class="va">shape</span>,
+  size <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html" class="external-link">get</a></span><span class="op">(</span><span class="st">"dimensions"</span><span class="op">)</span><span class="op">$</span><span class="va">size</span>,
+  report_name <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html" class="external-link">get</a></span><span class="op">(</span><span class="st">"report"</span><span class="op">)</span>,
+  skip_model <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html" class="external-link">get</a></span><span class="op">(</span><span class="st">"skip model"</span><span class="op">)</span>,
+  parent_id <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html" class="external-link">get</a></span><span class="op">(</span><span class="st">"store output"</span><span class="op">)</span>,
+  rownames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>
+    <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html" class="external-link">get</a></span><span class="op">(</span><span class="st">"metadata"</span><span class="op">)</span><span class="op">$</span><span class="va">`sample id`</span>,
+    <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html" class="external-link">get</a></span><span class="op">(</span><span class="st">"counts"</span><span class="op">)</span><span class="op">$</span><span class="va">`gene id`</span>,
+    <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html" class="external-link">get</a></span><span class="op">(</span><span class="st">"biomart"</span><span class="op">)</span><span class="op">$</span><span class="va">filters</span>,
+    <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html" class="external-link">get</a></span><span class="op">(</span><span class="st">"counts"</span><span class="op">)</span><span class="op">$</span><span class="va">`gene id`</span>
     <span class="op">)</span>,
   config_file <span class="op">=</span> <span class="st">"config.yml"</span>,
-  force_model <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span><span class="st">"force model with"</span><span class="op">)</span>, 
-  gene_list <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span><span class="st">"visualization gene list"</span><span class="op">)</span>
+  force_model <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html" class="external-link">get</a></span><span class="op">(</span><span class="st">"force model with"</span><span class="op">)</span>, 
+  gene_list <span class="op">=</span> <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html" class="external-link">get</a></span><span class="op">(</span><span class="st">"visualization gene list"</span><span class="op">)</span>
 <span class="op">)</span>
 
 <span class="fu">drake</span><span class="fu">::</span><span class="fu">make</span><span class="op">(</span>
   <span class="va">plan</span>,
-  envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ns-reflect.html">getNamespace</a></span><span class="op">(</span><span class="st">"sageseqr"</span><span class="op">)</span>
+  envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ns-reflect.html" class="external-link">getNamespace</a></span><span class="op">(</span><span class="st">"sageseqr"</span><span class="op">)</span>
     <span class="op">)</span></code></pre></div>
 <ol start="4" style="list-style-type: decimal">
 <li>Visualize the results of your work.</li>
@@ -226,7 +222,7 @@ store output:     Required. Folder Synapse Id to store output on Synapse.</code>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">drake</span><span class="fu">::</span><span class="fu">vis_drake_graph</span><span class="op">(</span>
   <span class="va">plan</span>,
-  envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ns-reflect.html">getNamespace</a></span><span class="op">(</span><span class="st">"sageseqr"</span><span class="op">)</span>,
+  envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ns-reflect.html" class="external-link">getNamespace</a></span><span class="op">(</span><span class="st">"sageseqr"</span><span class="op">)</span>,
   targets_only <span class="op">=</span> <span class="cn">TRUE</span>
   <span class="op">)</span></code></pre></div>
   </div>
@@ -240,11 +236,13 @@ store output:     Required. Folder Synapse Id to store output on Synapse.</code>
 
 
       <footer><div class="copyright">
-  <p>Developed by Kelsey Montgomery, Jake Gockley, Daisy Han.</p>
+  <p></p>
+<p>Developed by Kelsey Montgomery, Jake Gockley, Daisy Han.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>
@@ -252,6 +250,8 @@ store output:     Required. Folder Synapse Id to store output on Synapse.</code>
 
   
 
+
+  
 
   </body>
 </html>

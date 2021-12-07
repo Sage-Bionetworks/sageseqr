@@ -22,6 +22,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -34,18 +36,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">sageseqr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.0.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="reference/index.html">Reference</a>
 </li>
@@ -70,7 +66,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/Sage-Bionetworks/sageseqr/">
+  <a href="https://github.com/Sage-Bionetworks/sageseqr/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -88,126 +84,86 @@
       </header><div class="row">
   <div class="contents col-md-9">
 
-
-<div id="installation" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h1></div>
-<p><code>remotes::install_github("Sage-Bionetworks/sageseqr")</code></p>
+<p><a href="https://github.com/kelshmo/sageseqr/actions" class="external-link"><img src="https://github.com/kelshmo/sageseqr/workflows/R-CMD-check/badge.svg" alt="R build status"></a> <!-- badges: end --> # Installation <code>remotes::install_github("Sage-Bionetworks/sageseqr")</code></p>
+<div class="section level1">
+<div class="page-header"><h1 id="rna-seq-normalization-workflow-in-r">RNA-seq normalization workflow in R<a class="anchor" aria-label="anchor" href="#rna-seq-normalization-workflow-in-r"></a>
+</h1></div>
+<p>The <code>sageseqr</code> package integrates the <a href="https://github.com/ropensci/targets/" class="external-link"><code>targets</code> R package</a>, the <a href="https://cran.r-project.org/web/packages/config/vignettes/introduction.html" class="external-link"><code>config</code> package for R</a>, and <a href="https://www.synapse.org/" class="external-link">Synapse</a>. <code>targets</code> tracks dependency relationships in the workflow and only updates data when it has changed. A <code>config</code> file allows inputs and parameters to be explicitly defined in one location. Synapse is a data repository that allows sensitive data to be <a href="https://docs.synapse.org/articles/article_index.html#governance" class="external-link">stored and shared responsibly</a>.</p>
+<p>The workflow takes RNA-seq gene counts and sample metadata as inputs, normalizes counts by conditional quantile normalization <a href="https://bioconductor.org/packages/release/bioc/html/cqn.html" class="external-link">(CQN)</a>, removes outliers based on a user-defined threshold, empirically selects meaningful covariates and returns differential expression analysis results. The data is also visualized in several ways to help you understand meaningful trends. The visualizations include a heatmap identifying highly correlated covariates, a sample-specific x and y marker gene check, boxplots visualizing the distribution of continuous variables and a principal component analysis (PCA) to visualize sample distribution.</p>
 </div>
-<div id="rna-seq-normalization-workflow-in-r" class="section level1">
-<h1 class="hasAnchor">
-<a href="#rna-seq-normalization-workflow-in-r" class="anchor"></a>RNA-seq normalization workflow in R</h1>
-<p>The <code>sageseqr</code> package integrates the <a href="https://github.com/ropensci/targets/"><code>targets</code> R package</a>, the <a href="https://cran.r-project.org/web/packages/config/vignettes/introduction.html"><code>config</code> package for R</a>, and <a href="https://www.synapse.org/">Synapse</a>. <code>targets</code> tracks dependency relationships in the workflow and only updates data when it has changed. A <code>config</code> file allows inputs and parameters to be explicitly defined in one location. Synapse is a data repository that allows sensitive data to be <a href="https://docs.synapse.org/articles/article_index.html#governance">stored and shared responsibly</a>.</p>
-<p>The workflow takes RNA-seq gene counts and sample metadata as inputs, normalizes counts by conditional quantile normalization <a href="https://bioconductor.org/packages/release/bioc/html/cqn.html">(CQN)</a>, removes outliers based on a user-defined threshold, empirically selects meaningful covariates and returns differential expression analysis results. The data is also visualized in several ways to help you understand meaningful trends. The visualizations include a heatmap identifying highly correlated covariates, a sample-specific x and y marker gene check, boxplots visualizing the distribution of continuous variables and a principal component analysis (PCA) to visualize sample distribution.</p>
-</div>
-<div id="the-targets" class="section level1">
-<h1 class="hasAnchor">
-<a href="#the-targets" class="anchor"></a>The Targets</h1>
+<div class="section level1">
+<h1 id="the-targets">The Targets<a class="anchor" aria-label="anchor" href="#the-targets"></a>
+</h1>
 <p>The series of steps that make up the workflow are called targets. The target objects are stored in a cache and can either be read or loaded into your environment with the <code>targets</code> functions <code>tar_read</code> or <code>tar_load</code>. Source code for each target can be visualized by setting <code>show_source = TRUE</code> with <code>loadd</code> and <code>readd</code>.</p>
-<p>Importantly, running <code>clean</code> will remove the data stored as targets (<a href="https://books.ropensci.org/targets/walkthrough.html">but, the data is never completely gone!</a>). You may specific targets by name by passing them to the <code>tar_destroy()</code> function.</p>
+<p>Importantly, running <code>clean</code> will remove the data stored as targets (<a href="https://books.ropensci.org/targets/walkthrough.html" class="external-link">but, the data is never completely gone!</a>). You may specific targets by name by passing them to the <code>tar_destroy()</code> function.</p>
 <p>The targets are called by the <code>targets</code> <code>tar_make()</code> function and are:</p>
-<p>Raw data:</p>
-<ul>
-<li>
-<code>import_metadata</code>- imports the raw metadata directly from synapse</li>
-<li>
-<code>import_counts</code> - imports the raw counts directly from synapse</li>
-<li>
-<code>biomart_results</code> - the complete list of genes with biomaRt annotations.</li>
-</ul>
-<p>Exploratory data visualizations:</p>
-<ul>
-<li>
-<code>gene_coexpression</code> - the distribution of correlated gene counts.</li>
-<li>
-<code>boxplots</code> - the distribution of continuous variables.</li>
-<li>
-<code>sex_plot</code> - the distribution of samples by x and y marker genes.</li>
-<li>
-<code>sex_plot_pca</code> - a PCA of sex-specific expression to visualize more dimensionality than <code>sex_plot</code>.</li>
-<li>
-<code>correlation_plot</code> - the correlation of covariates.</li>
-<li>
-<code>significant_covariates_plot</code> - the correlation of covariates to gene expression.</li>
-<li>
-<code>outliers</code> - the clustering of samples by PCA.</li>
-<li>
-<code>plot_de_volcano</code> - volcano plot of differentially expressed genes.</li>
-</ul>
-<p>Transformed or normalized data:</p>
-<ul>
-<li>
-<code>clean_md</code> - metadata with factor and numeric types.</li>
-<li>
-<code>filtered_counts</code> - counts matrix with low gene expression removed.</li>
-<li>
-<code>biotypes</code> - gene proportions summarized by biotype.</li>
-<li>
-<code>cqn_counts</code> - CQN normalized counts.</li>
-<li>
-<code>model</code> - model selected by multivariate forward stepwise regression (evaluated by Bayesian Information Criteria (BIC)).</li>
-<li>
-<code>de</code> - differential expression results including adjusted p-values and gene list.</li>
-<li>
-<code>report</code> - output markdown report rendered as HTML.</li>
-</ul>
+<p>Raw data: - <code>import_metadata</code>- imports the raw metadata directly from synapse - <code>import_counts</code> - imports the raw counts directly from synapse - <code>biomart_results</code> - the complete list of genes with biomaRt annotations.</p>
+<p>Exploratory data visualizations: - <code>gene_coexpression</code> - the distribution of correlated gene counts. - <code>boxplots</code> - the distribution of continuous variables. - <code>sex_plot</code> - the distribution of samples by x and y marker genes. - <code>sex_plot_pca</code> - a PCA of sex-specific expression to visualize more dimensionality than <code>sex_plot</code>. - <code>correlation_plot</code> - the correlation of covariates. - <code>significant_covariates_plot</code> - the correlation of covariates to gene expression. - <code>outliers</code> - the clustering of samples by PCA. - <code>plot_de_volcano</code> - volcano plot of differentially expressed genes.</p>
+<p>Transformed or normalized data: - <code>clean_md</code> - metadata with factor and numeric types. - <code>filtered_counts</code> - counts matrix with low gene expression removed. - <code>biotypes</code> - gene proportions summarized by biotype. - <code>cqn_counts</code> - CQN normalized counts. - <code>model</code> - model selected by multivariate forward stepwise regression (evaluated by Bayesian Information Criteria (BIC)). - <code>de</code> - differential expression results including adjusted p-values and gene list. - <code>report</code> - output markdown report rendered as HTML.</p>
 </div>
-<div id="access-to-data" class="section level1">
-<h1 class="hasAnchor">
-<a href="#access-to-data" class="anchor"></a>Access to Data</h1>
-<p>Anyone can create a <a href="https://docs.synapse.org/articles/getting_started.html">Synapse account</a> and access public data in a variety of disciplines: <a href="https://adknowledgeportal.synapse.org/">Alzheimer’s Disease Knowledge portal</a>, <a href="https://www.synapse.org/#!Synapse:syn2759792/wiki/69613">CommonMind Consoritum</a>.</p>
+<div class="section level1">
+<h1 id="access-to-data">Access to Data<a class="anchor" aria-label="anchor" href="#access-to-data"></a>
+</h1>
+<p>Anyone can create a <a href="https://docs.synapse.org/articles/getting_started.html" class="external-link">Synapse account</a> and access public data in a variety of disciplines: <a href="https://adknowledgeportal.synapse.org/" class="external-link">Alzheimer’s Disease Knowledge portal</a>, <a href="https://www.synapse.org/#!Synapse:syn2759792/wiki/69613" class="external-link">CommonMind Consoritum</a>.</p>
 </div>
 
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Browse source code at <br><a href="https://github.com/Sage-Bionetworks/sageseqr/">https://​github.com/​Sage-Bionetworks/​sageseqr/​</a>
-</li>
+<li><a href="https://github.com/Sage-Bionetworks/sageseqr/" class="external-link">Browse source code</a></li>
 </ul>
 </div>
+
 <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li><a href="LICENSE.html">Full license</a></li>
-<li><small><a href="https://opensource.org/licenses/mit-license.php">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a></small></li>
+<li><small><a href="https://opensource.org/licenses/mit-license.php" class="external-link">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a></small></li>
 </ul>
 </div>
+
 <div class="community">
-<h2>Community</h2>
+<h2 data-toc-skip>Community</h2>
 <ul class="list-unstyled">
 <li><a href="CONTRIBUTING.html">Contributing guide</a></li>
 <li><a href="CODE_OF_CONDUCT.html">Code of conduct</a></li>
 </ul>
 </div>
-<div class="developers">
-<h2>Developers</h2>
+
+<div class="citation">
+<h2 data-toc-skip>Citation</h2>
 <ul class="list-unstyled">
-<li>Kelsey Montgomery <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-0126-8944" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
-<li>Jake Gockley <br><small class="roles"> Author, maintainer </small>  </li>
-<li>Daisy Han <br><small class="roles"> Author </small>  </li>
-<li><a href="authors.html">All authors...</a></li>
+<li><a href="authors.html#citation">Citing sageseqr</a></li>
 </ul>
 </div>
 
-  <div class="dev-status">
-<h2>Dev status</h2>
+<div class="developers">
+<h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li><a href="https://github.com/kelshmo/sageseqr/actions"><img src="https://github.com/kelshmo/sageseqr/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
+<li>Kelsey Montgomery <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-0126-8944" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Jake Gockley <br><small class="roles"> Author, maintainer </small>  </li>
+<li>Daisy Han <br><small class="roles"> Author </small>  </li>
+<li><a href="authors.html">More about authors...</a></li>
 </ul>
 </div>
-</div>
+
+
+
+  </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by Kelsey Montgomery, Jake Gockley, Daisy Han.</p>
+  <p></p>
+<p>Developed by Kelsey Montgomery, Jake Gockley, Daisy Han.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>
@@ -215,6 +171,8 @@
 
   
 
+
+  
 
   </body>
 </html>
