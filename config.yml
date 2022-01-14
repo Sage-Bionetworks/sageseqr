@@ -38,7 +38,17 @@ default:
   de p-value threshold: 0.05
   visualization gene list: ["LCN2", "TRIM69"]
   de contrasts:
-    diagnosis: ["diagnosis"]
-    diagnosis-sex: ["diagnosis-sex"]
+    diagnosis: 
+      primary: ["diagnosis"]
+      is_numeric_int: FALSE
+      numeric:
+    diagnosis-sex: 
+      primary: ["diagnosis", "sex"]
+      is_numeric_int: FALSE
+      numeric:
+    age-death:
+      primary: ["diagnosis"]
+      is_numeric_int: FALSE
+      numeric: ["age_death"]
   report: "openSci"
   store output: syn23572479

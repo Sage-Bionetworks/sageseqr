@@ -807,6 +807,8 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
 #' @param fold_change_threshold Numeric. Significant genes are those with a
 #' fold-change greater than this threshold.
 #' @param cores An integer of cores to specify in the parallel backend (eg. 4).
+#' @param is_num Is there a numerical covariate to use as an interaction with the primary variable(s). default= NULL
+#' @param num_var A numerical metadata column to use in an inaction with the primary variable(s). default= NULL
 #' @inheritParams cqn
 #' @inheritParams coerce_factors
 #' @inheritParams build_formula
@@ -825,7 +827,9 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
                                     p_value_threshold, fold_change_threshold,
                                     model_variables = NULL,
                                     exclude_variables = NULL,
-                                    cores = NULL) {
+                                    cores = NULL,
+                                    is_num = NULL, 
+                                    num_var = NULL) {
   # force order of samples in metadata to match order of samples in counts.
   # Required by variancePartition
   if(is.null(cores)){
@@ -914,7 +918,7 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
 #' Wrapper for Differential Expression Analysis
 #'
 #' This function will pass multiple conditions to test to \code{"sagseqr::differential_expression()"}.
-#' @param conditions A named list of conditions to test as `primary_variable`
+#' @param conditions A named list of conditions to test as `primary`
 #' in \code{"sagseqr::differential_expression()"}.
 #' @param dropped a vector of gene names to drop from filtered counts, as they
 #' were not cqn normalized
@@ -936,7 +940,9 @@ wrap_de <- function(conditions, filtered_counts, cqn_counts, md, dropped,
       filtered_counts,
       cqn_counts,
       md,
-      primary_variable = x,
+      primary_variable = x$primary,
+      is_num = x$is_numeric_int, 
+      num_var = x$numeric,
       biomart_results,
       p_value_threshold,
       fold_change_threshold,
@@ -1285,7 +1291,8 @@ start_de <- function() {
 #' @export
 compute_residuals <- function(clean_metadata, filtered_counts, dropped,
                               cqn_counts = cqn_counts$E, primary_variable,
-                              model_variables = NULL, cores = NULL)  {
+                              model_variables = NULL, is_num = NULL, 
+                              num_var = NULL, cores = NULL)  {
 
   if (!is.null(dropped)) {
     filtered_counts <- filtered_counts[
