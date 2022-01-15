@@ -844,7 +844,7 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
   }
   md <- md[match(colnames(filtered_counts),rownames(md)),]
 
-  metadata_input <- build_formula(md, primary_variable, model_variables, is_num = NULL, num_var = NULL)
+  metadata_input <- build_formula(md, primary_variable, model_variables, is_num = is_num, num_var = num_var)
   gene_expression <- edgeR::DGEList(filtered_counts)
   gene_expression <- edgeR::calcNormFactors(gene_expression)
   voom_gene_expression <- variancePartition::voomWithDreamWeights(counts = gene_expression,
