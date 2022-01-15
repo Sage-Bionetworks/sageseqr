@@ -732,73 +732,133 @@ mclust::mclustBIC
 build_formula <- function(md, primary_variable, model_variables = NULL,
                           is_num = NULL, num_var = NULL,
                           exclude_variables = NULL) {
+  
   if (!(all(purrr::map_lgl(md, function(x) inherits(x, c("numeric", "factor")))))) {
     stop("Use sageseqr::clean_covariates() to coerce variables into factor and numeric types.")
   }
-
+  
   if (!is.null(model_variables)) {
     md <- dplyr::select(md, dplyr::all_of(c(model_variables, num_var, primary_variable)))
   }
-
+  
   if (!is.null(exclude_variables)) {
     if (exclude_variables %in% colnames(md)) {
       stop("exclude_variables and model_variables are the same.")
     }
     md <- dplyr::select(md, -dplyr::all_of(exclude_variables))
   }
-
+  
   # Update metadata to reflect variable subset
-
+  
   # Variables of factor or numeric class are required
   col_type <- dplyr::select(md, -dplyr::all_of(c(primary_variable,num_var))) %>%
     dplyr::summarise_all(class) %>%
     tidyr::pivot_longer(tidyr::everything(), names_to = "variable", values_to = "class")
-
+  
   # Categorical or factor variables are modeled as a random effect by (1|variable)
   # Numeric variables are scaled to account for when the spread of data values differs
   # by an order of magnitude
-  formula <- purrr::map(1:length(col_type$class), function(i){
+  form <- purrr::map(1:length(col_type$class), function(i){
     switch(col_type$class[i],
            "factor" = glue::glue("(1|", col_type$variable[i], ")"),
            "numeric" = glue::glue("scale(", col_type$variable[i], ")")
     )
   })
-
+  
   # List with multiple values can cause glue_collapse to fail. This step is conservative
   # as it unlists all lists at this step.
   if (class(primary_variable) == "list") {
     primary_variable <- primary_variable[[1]]
   }
-
-  # A new categorical is created to model an interaction between two variables
-  interaction_term <- glue::glue_collapse({primary_variable}, "_")
   
+  # A new categorical is created to model an interaction between two variables
+  #interaction_term <- glue::glue_collapse({primary_variable}, "_")
   if(isTRUE(is_num)){
-    interaction_term <- paste0(interaction_term,'.',num_var)
+    # A new categorical is created to model an interaction between two variables
+    interaction_term <- paste0(glue::glue_collapse({primary_variable}, "_"),'.',num_var)
+    
+    metadata = md %>%
+      tidyr::unite(!!interaction_term, dplyr::all_of(primary_variable), sep = "_")
+    
+    metadata[ , as.character(names(table(metadata[interaction_term] )))] <- 0
+    
+    for( i in names(table(metadata[interaction_term] )) ){
+      metadata[metadata[,interaction_term] == i ,i] <- 
+        metadata[metadata[,interaction_term] == i ,num_var]
+    }
+    
+    metadata[,interaction_term] <- as.factor(metadata[,interaction_term])
+    
+    de_conditions <- levels(metadata[,interaction_term])
+    
+    metadata <- dplyr::select(metadata, -dplyr::all_of(c(interaction_term,num_var)))
+    
+    #glue::glue_collapse(paste0("scale(", de_conditions, ")"), sep = "+")
+    
+    #Make Formula objects:
+    formula = formula(
+      glue::glue("~",
+                 glue::glue_collapse(paste0(
+                   "scale(",
+                   de_conditions, 
+                   ")"), 
+                   sep = "+"),
+                 "+", 
+                 glue::glue_collapse(form, sep = "+")
+      ))
+    
+    formula_non_intercept = formula(
+      glue::glue("~ 0+",
+                 glue::glue_collapse(paste0(
+                   "scale(",
+                   de_conditions, 
+                   ")"), 
+                   sep = "+"),
+                 "+", 
+                 glue::glue_collapse(form, sep = "+")
+      ))
+    
+    formula_base_model = formula(glue::glue("~",
+                                            glue::glue_collapse(paste0(
+                                              "scale(",
+                                              de_conditions, 
+                                              ")"), sep = "+")
+    ))
+    
+  }else{
+    # A new categorical is created to model an interaction between two variables
+    interaction_term <- glue::glue_collapse({primary_variable}, "_")
+    
+    metadata = md %>%
+      tidyr::unite(!!interaction_term, dplyr::all_of(primary_variable), sep = "_")
+    
+    de_conditions <- levels(metadata_input$metadata[[interaction_term]])
+    
+    #Make Formula objects:
+    formula = formula(
+      glue::glue("~ {interaction_term}+", glue::glue_collapse(form, sep = "+")
+      ))
+    
+    formula_non_intercept = formula(
+      glue::glue("~ 0+{interaction_term}+", glue::glue_collapse(form, sep = "+")
+      ))
+    
+    formula_base_model = formula(glue::glue("~ {interaction_term}"))
   }
   
-  object <- list(metadata = md %>%
-                   tidyr::unite(!!interaction_term, dplyr::all_of(primary_variable), sep = "_"),
-                formula = formula(
-                  glue::glue("~ {interaction_term}+",
-                             glue::glue_collapse(formula, sep = "+")
-                             )
-                  ),
-                formula_non_intercept = formula(
-                  glue::glue("~ 0+{interaction_term}+",
-                             glue::glue_collapse(formula, sep = "+")
-                             )
-                  ),
-                formula_base_model = formula(
-                  glue::glue("~ {interaction_term}")
-                  ),
-                primary_variable = interaction_term,
-                variables = unlist(formula)
+  object <- list(metadata = metadata,
+                 formula = formula,
+                 formula_non_intercept = formula_non_intercept,
+                 formula_base_model = formula_base_model,
+                 primary_variable = interaction_term,
+                 variables = unlist(form),
+                 de_conditions = de_conditions
   )
-
+  
   # Resolve dropped class type of factor without losing samples as rownames
-  object$metadata[[interaction_term]] <- as.factor(object$metadata[[interaction_term]])
-
+  if(interaction_term %in% colnames(object$metadata)) {
+    object$metadata[[interaction_term]] <- as.factor(object$metadata[[interaction_term]])
+  }
   object
 }
 #' Differential Expression with Dream
