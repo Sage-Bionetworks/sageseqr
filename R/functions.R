@@ -724,17 +724,20 @@ mclust::mclustBIC
 #' If not supplied, the model will include all variables in \code{md}.
 #' @param primary_variable Vector of variables that will be collapsed into a single
 #' fixed effect interaction term.
+#' @param is_num Is there a numerical covariate to use as an interaction with the primary variable(s). default= NULL
+#' @param num_var A numerical metadata column to use in an inaction with the primary variable(s). default= NULL
 #' @param exclude_variables Vector of variables to exclude from testing.
 #' @inheritParams coerce_factors
 #' @export
 build_formula <- function(md, primary_variable, model_variables = NULL,
+                          is_num = NULL, num_var = NULL,
                           exclude_variables = NULL) {
   if (!(all(purrr::map_lgl(md, function(x) inherits(x, c("numeric", "factor")))))) {
     stop("Use sageseqr::clean_covariates() to coerce variables into factor and numeric types.")
   }
 
   if (!is.null(model_variables)) {
-    md <- dplyr::select(md, dplyr::all_of(c(model_variables, primary_variable)))
+    md <- dplyr::select(md, dplyr::all_of(c(model_variables, num_var, primary_variable)))
   }
 
   if (!is.null(exclude_variables)) {
@@ -747,7 +750,7 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
   # Update metadata to reflect variable subset
 
   # Variables of factor or numeric class are required
-  col_type <- dplyr::select(md, -dplyr::all_of(primary_variable)) %>%
+  col_type <- dplyr::select(md, -dplyr::all_of(c(primary_variable,num_var))) %>%
     dplyr::summarise_all(class) %>%
     tidyr::pivot_longer(tidyr::everything(), names_to = "variable", values_to = "class")
 
@@ -769,8 +772,12 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
 
   # A new categorical is created to model an interaction between two variables
   interaction_term <- glue::glue_collapse({primary_variable}, "_")
-
-  object <- list(metadata = md %>%
+  
+  if(isTRUE(is_num)){
+    interaction_term <- paste0(interaction_term,'.',num_var)
+  }
+  
+  c <- list(metadata = md %>%
                    tidyr::unite(!!interaction_term, dplyr::all_of(primary_variable), sep = "_"),
                 formula = formula(
                   glue::glue("~ {interaction_term}+",
