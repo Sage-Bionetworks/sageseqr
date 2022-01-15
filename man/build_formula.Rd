@@ -8,6 +8,8 @@ build_formula(
   md,
   primary_variable,
   model_variables = NULL,
+  is_num = NULL,
+  num_var = NULL,
   exclude_variables = NULL
 )
 }
@@ -19,6 +21,10 @@ fixed effect interaction term.}
 
 \item{model_variables}{Optional. Vector of variables to include in the linear (mixed) model.
 If not supplied, the model will include all variables in \code{md}.}
+
+\item{is_num}{Is there a numerical covariate to use as an interaction with the primary variable(s). default= NULL}
+
+\item{num_var}{A numerical metadata column to use in an inaction with the primary variable(s). default= NULL}
 
 \item{exclude_variables}{Vector of variables to exclude from testing.}
 }

@@ -35,3 +35,4 @@ test_that("differential_expression executes completely", {
     6
   )
 })
+

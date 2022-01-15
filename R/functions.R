@@ -777,7 +777,7 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
     interaction_term <- paste0(interaction_term,'.',num_var)
   }
   
-  c <- list(metadata = md %>%
+  object <- list(metadata = md %>%
                    tidyr::unite(!!interaction_term, dplyr::all_of(primary_variable), sep = "_"),
                 formula = formula(
                   glue::glue("~ {interaction_term}+",
@@ -844,7 +844,7 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
   }
   md <- md[match(colnames(filtered_counts),rownames(md)),]
 
-  metadata_input <- build_formula(md, primary_variable, model_variables)
+  metadata_input <- build_formula(md, primary_variable, model_variables, is_num = NULL, num_var = NULL)
   gene_expression <- edgeR::DGEList(filtered_counts)
   gene_expression <- edgeR::calcNormFactors(gene_expression)
   voom_gene_expression <- variancePartition::voomWithDreamWeights(counts = gene_expression,
