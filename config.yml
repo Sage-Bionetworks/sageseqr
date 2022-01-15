@@ -27,7 +27,6 @@ default:
   cpm threshold: 1
   percent threshold: 0.5
   sex check: sex
-  cores: 
   dimensions:
     color: "diagnosis"
     shape: "batch"
