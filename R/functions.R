@@ -788,7 +788,6 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
     }
     
     metadata[,interaction_term] <- as.factor(metadata[,interaction_term])
-    
     de_conditions <- levels(metadata[,interaction_term])
     
     metadata <- dplyr::select(metadata, -dplyr::all_of(c(interaction_term,num_var)))
@@ -832,6 +831,7 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
     metadata = md %>%
       tidyr::unite(!!interaction_term, dplyr::all_of(primary_variable), sep = "_")
     
+    metadata[,interaction_term] <- as.factor(metadata[,interaction_term])
     de_conditions <- levels(metadata[,interaction_term])
     
     #Make Formula objects:
