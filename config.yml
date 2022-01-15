@@ -48,6 +48,6 @@ default:
     age-death:
       primary: ["diagnosis"]
       is_numeric_int: FALSE
-      numeric: ["age_death"]
+      numeric: ["ageofdeath"]
   report: "openSci"
   store output: syn23572479
