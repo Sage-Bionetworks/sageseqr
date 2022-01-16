@@ -733,6 +733,7 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
                           is_num = NULL, num_var = NULL,
                           exclude_variables = NULL) {
   
+  
   if (!(all(purrr::map_lgl(md, function(x) inherits(x, c("numeric", "factor")))))) {
     stop("Use sageseqr::clean_covariates() to coerce variables into factor and numeric types.")
   }
@@ -780,15 +781,15 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
     metadata = md %>%
       tidyr::unite(!!interaction_term, dplyr::all_of(primary_variable), sep = "_")
     
-    metadata[ , as.character(names(table(metadata[interaction_term] )))] <- 0
+    metadata[ , paste0(num_var,'.',as.character(names(table(metadata[interaction_term] ))))] <- 0
     
-    for( i in names(table(metadata[interaction_term] )) ){
-      metadata[metadata[,interaction_term] == i ,i] <- 
-        metadata[metadata[,interaction_term] == i ,num_var]
+    for( i in paste0(num_var,'.',as.character(names(table(metadata[interaction_term] )))) ){
+      metadata[metadata[,interaction_term] == gsub(paste0( num_var, '.'),'',i) ,i] <- 
+        metadata[metadata[,interaction_term] == gsub(paste0( num_var, '.'),'',i) ,num_var]
     }
     
     metadata[,interaction_term] <- as.factor(metadata[,interaction_term])
-    de_conditions <- levels(metadata[,interaction_term])
+    de_conditions <- paste0( 'scale(', num_var, '.', levels(metadata[,interaction_term]), ')')
     
     metadata <- dplyr::select(metadata, -dplyr::all_of(c(interaction_term,num_var)))
     
@@ -797,10 +798,8 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
     #Make Formula objects:
     formula = formula(
       glue::glue("~",
-                 glue::glue_collapse(paste0(
-                   "scale(",
+                 glue::glue_collapse(
                    de_conditions, 
-                   ")"), 
                    sep = "+"),
                  "+", 
                  glue::glue_collapse(form, sep = "+")
@@ -808,20 +807,18 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
     
     formula_non_intercept = formula(
       glue::glue("~ 0+",
-                 glue::glue_collapse(paste0(
-                   "scale(",
+                 glue::glue_collapse(
                    de_conditions, 
-                   ")"), 
                    sep = "+"),
                  "+", 
                  glue::glue_collapse(form, sep = "+")
       ))
     
     formula_base_model = formula(glue::glue("~",
-                                            glue::glue_collapse(paste0(
-                                              "scale(",
+                                            glue::glue_collapse(
                                               de_conditions, 
-                                              ")"), sep = "+")
+                                              sep = "+"
+                                            )
     ))
     
   }else{
@@ -855,10 +852,6 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
                  de_conditions = de_conditions
   )
   
-  # Resolve dropped class type of factor without losing samples as rownames
-  if(interaction_term %in% colnames(object$metadata)) {
-    object$metadata[[interaction_term]] <- as.factor(object$metadata[[interaction_term]])
-  }
   object
 }
 #' Differential Expression with Dream
