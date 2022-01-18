@@ -896,61 +896,89 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
     cores = parallel::detectCores()-1
   }
   md <- md[match(colnames(filtered_counts),rownames(md)),]
-
+  
   metadata_input <- build_formula(md, primary_variable, model_variables, is_num = is_num, num_var = num_var)
+  
   gene_expression <- edgeR::DGEList(filtered_counts)
   gene_expression <- edgeR::calcNormFactors(gene_expression)
   voom_gene_expression <- variancePartition::voomWithDreamWeights(counts = gene_expression,
                                                                   formula = metadata_input$formula,
                                                                   data = metadata_input$metadata,
                                                                   BPPARAM = BiocParallel::SnowParam(cores)
-                                                                 )
+  )
+  
   voom_gene_expression$E <- cqn_counts
-
-  de_conditions <- levels(metadata_input$metadata[[metadata_input$primary_variable]])
-
-  conditions_for_contrast <- purrr::map_chr(de_conditions,
-                                        function(x) glue::glue({metadata_input$primary_variable}, x)
-                                        )
-
-  setup_coefficients <- gtools::combinations(n = length(conditions_for_contrast),
-                                             r = 2,
-                                             v = conditions_for_contrast
-                                             )
-
+  
+  de_conditions <- metadata_input$de_conditions
+  if(isTRUE(is_num)){
+    de_conditions <- gsub("scale\\(",'',de_conditions)
+    if(all( ')' == stringr::str_sub(de_conditions, - 1, - 1))) {   
+      de_conditions <- gsub("\\)",'',de_conditions)
+    }
+    conditions_for_contrast <- purrr::map_chr(metadata_input$de_conditions,
+                                              function(x) glue::glue(x)
+    )
+    setup_coefficients <- gtools::combinations(n = length(conditions_for_contrast),
+                                               r = 2,
+                                               v = conditions_for_contrast
+    )
+  }else{
+    conditions_for_contrast <- purrr::map_chr(de_conditions,
+                                              function(x) glue::glue({metadata_input$primary_variable}, x)
+    )
+    setup_coefficients <- gtools::combinations(n = length(conditions_for_contrast),
+                                               r = 2,
+                                               v = conditions_for_contrast
+    )
+  }
+  
   contrasts <- lapply(seq_len(nrow(setup_coefficients)),
                       function(i) variancePartition::getContrast(exprObj = voom_gene_expression,
                                                                  formula = metadata_input$formula_non_intercept,
                                                                  data = metadata_input$metadata,
                                                                  coefficient = as.vector(setup_coefficients[i,])
-                                                                 )
                       )
-
+  )
+  
   contrasts <- as.data.frame(contrasts)
-
+  
   df <- as.data.frame(setup_coefficients)
-
+  
   names(contrasts) <- stringr::str_glue_data(df, "{V1} - {V2}")
-
+  
   fit_contrasts = variancePartition::dream(exprObj = voom_gene_expression,
                                            formula = metadata_input$formula_non_intercept,
                                            data = metadata_input$metadata,
                                            L = contrasts,
                                            BPPARAM = BiocParallel::SnowParam(cores)
-                                           )
+  )
+  
   if(is.null(lme4::findbars(
     stats::as.formula( metadata_input$formula_non_intercept) ))){
     message('Applying eBayes Directly')
     fit_contrasts <- limma::eBayes(fit_contrasts)
   }
-
+  
   de <- lapply(names(contrasts), function(i, fit){
     genes <- limma::topTable(fit, coef = i, number = Inf, sort.by = "logFC")
     genes <- tibble::rownames_to_column(genes, var = "ensembl_gene_id")
   }, fit_contrasts)
-
-  names(de) <- names(contrasts)
-
+  
+  if(isTRUE(is_num)){
+    c_names <- names(contrasts)
+    c_names <- gsub("scale\\(",'',c_names)
+    if(all( ')' == stringr::str_sub(c_names, - 1, - 1))) {   
+      c_names <- gsub("\\)",'',c_names)
+    }
+    
+    replace_val <- strsplit(metadata_input$primary_variable,'[.]')[[1]][2]
+    c_names <- gsub(replace_val,metadata_input$primary_variable,c_names)
+    
+    names(de) <- c_names
+  }else{
+    names(de) <- names(contrasts)
+  }
+  
   de <- data.table::rbindlist(de, idcol = "Comparison") %>%
     dplyr::mutate(Comparison = gsub(metadata_input$primary_variable, "", .data$Comparison),
                   Direction = .data$logFC/abs(.data$logFC),
@@ -960,19 +988,19 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
                                      "none",
                                      .data$Direction)
     )
-
+  
   # Join metadata from biomart to differential expression results
   biomart_results <- tibble::rownames_to_column(biomart_results, var = "ensembl_gene_id")
-
+  
   de <- dplyr::left_join(de, biomart_results, by = c("ensembl_gene_id"))
-
+  
   object <- list(voom_object = voom_gene_expression,
                  contrasts_to_plot = contrasts,
                  fits = fit_contrasts,
                  differential_expression = de,
                  primary_variable = metadata_input$primary_variable,
                  formula = metadata_input$formula_non_intercept)
-
+  
   object
 }
 #' Wrapper for Differential Expression Analysis
@@ -987,7 +1015,8 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
 #' @export
 wrap_de <- function(conditions, filtered_counts, cqn_counts, md, dropped,
                     biomart_results, p_value_threshold, fold_change_threshold,
-                    model_variables = names(md), cores = NULL) {
+                    model_variables = names(md), cores = NULL, is_num = NULL, 
+                    num_var = NULL) {
 
   if (!is.null(dropped)) {
     filtered_counts <- filtered_counts[
