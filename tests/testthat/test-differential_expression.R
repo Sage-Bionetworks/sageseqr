@@ -32,7 +32,7 @@ test_that("differential_expression executes completely", {
       0.05,
       1.5
     ),
-    6
+    7
   )
 })
 

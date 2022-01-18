@@ -972,22 +972,35 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
     }
     
     replace_val <- strsplit(metadata_input$primary_variable,'[.]')[[1]][2]
-    c_names <- gsub(replace_val,metadata_input$primary_variable,c_names)
+    rep_val <-  gsub('[.]','*',metadata_input$primary_variable)
+    c_names <- gsub(replace_val,rep_val,c_names)
+    
     
     names(de) <- c_names
+    
+    de <- data.table::rbindlist(de, idcol = "Comparison") %>%
+      dplyr::mutate(Comparison = .data$Comparison,
+                    Direction = .data$logFC/abs(.data$logFC),
+                    Direction = ifelse(.data$Direction == -1,"down", .data$Direction),
+                    Direction = ifelse(.data$Direction == 1, "up", .data$Direction),
+                    Direction = ifelse(.data$`adj.P.Val` > p_value_threshold | abs(.data$logFC) < log2(fold_change_threshold),
+                                       "none",
+                                       .data$Direction)
+      )
+    
   }else{
     names(de) <- names(contrasts)
+    
+    de <- data.table::rbindlist(de, idcol = "Comparison") %>%
+      dplyr::mutate(Comparison = gsub(metadata_input$primary_variable, "", .data$Comparison),
+                    Direction = .data$logFC/abs(.data$logFC),
+                    Direction = ifelse(.data$Direction == -1,"down", .data$Direction),
+                    Direction = ifelse(.data$Direction == 1, "up", .data$Direction),
+                    Direction = ifelse(.data$`adj.P.Val` > p_value_threshold | abs(.data$logFC) < log2(fold_change_threshold),
+                                       "none",
+                                       .data$Direction)
+      )
   }
-  
-  de <- data.table::rbindlist(de, idcol = "Comparison") %>%
-    dplyr::mutate(Comparison = gsub(metadata_input$primary_variable, "", .data$Comparison),
-                  Direction = .data$logFC/abs(.data$logFC),
-                  Direction = ifelse(.data$Direction == -1,"down", .data$Direction),
-                  Direction = ifelse(.data$Direction == 1, "up", .data$Direction),
-                  Direction = ifelse(.data$`adj.P.Val` > p_value_threshold | abs(.data$logFC) < log2(fold_change_threshold),
-                                     "none",
-                                     .data$Direction)
-    )
   
   # Join metadata from biomart to differential expression results
   biomart_results <- tibble::rownames_to_column(biomart_results, var = "ensembl_gene_id")
