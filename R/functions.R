@@ -1411,7 +1411,7 @@ compute_residuals <- function(clean_metadata, filtered_counts, dropped,
   clean_metadata <- clean_metadata[match(colnames(filtered_counts),rownames(clean_metadata)),]
   
   primary_variable <- primary_variable$primary
-  metadata_input <- build_formula(clean_metadata, primary_variable, model_variables, is_num = is_num, num_var = num_var)
+  metadata_input <- build_formula(clean_metadata, primary_variable, model_variables, is_num = x$is_numeric_int, num_var = numeric)
   
   # Estimate voom weights with DREAM
   gene_expression <- edgeR::DGEList(filtered_counts)
@@ -1442,7 +1442,7 @@ compute_residuals <- function(clean_metadata, filtered_counts, dropped,
   }
 
   # calculate weighted residuals and add back signal from predictor
-  if(isTRUE(is_num)) {
+  if(isTRUE(x$is_numeric_int)) {
     variables_to_add_back <- metadata_input$de_conditions
   }else{
     variables_to_add_back <- grep(

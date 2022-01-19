@@ -170,8 +170,6 @@ list(
         dropped,
         cqn_counts = cqn_counts$E,
         primary_variable = x,
-        is_num = x$is_numeric_int,
-        num_var = x$numeric,
         model_variables = selected_model,
         cores = get("cores")
         )
