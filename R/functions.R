@@ -1410,7 +1410,8 @@ compute_residuals <- function(clean_metadata, filtered_counts, dropped,
   # Required by variancePartition
   clean_metadata <- clean_metadata[match(colnames(filtered_counts),rownames(clean_metadata)),]
 
-  metadata_input <- build_formula(clean_metadata, primary_variable, model_variables)
+  metadata_input <- build_formula(clean_metadata, primary_variable, model_variables, is_num = is_num, num_var = num_var)
+  
   # Estimate voom weights with DREAM
   gene_expression <- edgeR::DGEList(filtered_counts)
   gene_expression <- edgeR::calcNormFactors(gene_expression)
@@ -1440,11 +1441,15 @@ compute_residuals <- function(clean_metadata, filtered_counts, dropped,
   }
 
   # calculate weighted residuals and add back signal from predictor
-  variables_to_add_back <- grep(
-    metadata_input$primary_variable,
-    colnames(adjusted_fit$design),
-    value = TRUE
+  if(isTRUE(is_num)) {
+    variables_to_add_back <- metadata_input$de_conditions
+  }else{
+    variables_to_add_back <- grep(
+      metadata_input$primary_variable,
+      colnames(adjusted_fit$design),
+      value = TRUE
     )
+  }
   output <- residual_gene_expression +
     adjusted_fit$coefficients[
       ,variables_to_add_back
