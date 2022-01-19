@@ -1409,7 +1409,8 @@ compute_residuals <- function(clean_metadata, filtered_counts, dropped,
   # force order of samples in metadata to match order of samples in counts.
   # Required by variancePartition
   clean_metadata <- clean_metadata[match(colnames(filtered_counts),rownames(clean_metadata)),]
-
+  
+  primary_variable <- primary_variable$primary
   metadata_input <- build_formula(clean_metadata, primary_variable, model_variables, is_num = is_num, num_var = num_var)
   
   # Estimate voom weights with DREAM
