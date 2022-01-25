@@ -1,9 +1,9 @@
 pandoc: 2.7.3
-pkgdown: 2.0.1
+pkgdown: 2.0.2
 pkgdown_sha: ~
 articles:
   customize-config: customize-config.html
   run-the-plan: run-the-plan.html
   sagseqr-alpha-steps: sagseqr-alpha-steps.html
-last_built: 2021-12-07T22:01Z
+last_built: 2022-01-25T23:15Z
 

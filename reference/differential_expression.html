@@ -80,7 +80,9 @@ effect. If you wish to test an interaction term, `primary_variable` can take mul
   <span class="va">fold_change_threshold</span>,
   model_variables <span class="op">=</span> <span class="cn">NULL</span>,
   exclude_variables <span class="op">=</span> <span class="cn">NULL</span>,
-  cores <span class="op">=</span> <span class="cn">NULL</span>
+  cores <span class="op">=</span> <span class="cn">NULL</span>,
+  is_num <span class="op">=</span> <span class="cn">NULL</span>,
+  num_var <span class="op">=</span> <span class="cn">NULL</span>
 <span class="op">)</span></code></pre></div>
     </div>
 
@@ -112,6 +114,10 @@ If not supplied, the model will include all variables in <code>md</code>.</p></d
 <dd><p>Vector of variables to exclude from testing.</p></dd>
 <dt>cores</dt>
 <dd><p>An integer of cores to specify in the parallel backend (eg. 4).</p></dd>
+<dt>is_num</dt>
+<dd><p>Is there a numerical covariate to use as an interaction with the primary variable(s). default= NULL</p></dd>
+<dt>num_var</dt>
+<dd><p>A numerical metadata column to use in an inaction with the primary variable(s). default= NULL</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
@@ -136,7 +142,7 @@ If not supplied, the model will include all variables in <code>md</code>.</p></d
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
       </footer></div>

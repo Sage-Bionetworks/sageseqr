@@ -77,6 +77,8 @@
   cqn_counts <span class="op">=</span> <span class="va">cqn_counts</span><span class="op">$</span><span class="va">E</span>,
   <span class="va">primary_variable</span>,
   model_variables <span class="op">=</span> <span class="cn">NULL</span>,
+  is_num <span class="op">=</span> <span class="cn">NULL</span>,
+  num_var <span class="op">=</span> <span class="cn">NULL</span>,
   cores <span class="op">=</span> <span class="cn">NULL</span>
 <span class="op">)</span></code></pre></div>
     </div>
@@ -99,6 +101,10 @@ fixed effect interaction term.</p></dd>
 <dt>model_variables</dt>
 <dd><p>Optional. Vector of variables to include in the linear (mixed) model.
 If not supplied, the model will include all variables in <code>md</code>.</p></dd>
+<dt>is_num</dt>
+<dd><p>Is there a numerical covariate to use as an interaction with the primary variable(s). default= NULL</p></dd>
+<dt>num_var</dt>
+<dd><p>A numerical metadata column to use in an inaction with the primary variable(s). default= NULL</p></dd>
 <dt>cores</dt>
 <dd><p>An integer of cores to specify in the parallel backend (eg. 4).</p></dd>
 </dl></div>
@@ -122,7 +128,7 @@ mean-variance relationship. Counts normalized by conditional quantile
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
       </footer></div>

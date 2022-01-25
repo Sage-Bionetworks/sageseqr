@@ -169,8 +169,14 @@ de FC:            The fold-change (FC) of significant differentially expressed
                   into log2 FC.
 de p-value threshold: The adjusted p-value of significant differentially expressed 
                   (de) genes must exceed this value.
-de contrasts:     Required. Variable in the metadata to define comparisons between 
-                  groups.
+de contrasts:     Required. 
+  primary:        Required. Variable(s) in the metadata to define comparisons between 
+                  groups. Currently must be either one numeric variable, or one or
+                  more catagorical variables.
+  is_numeric_int: Optional. Specifies if there is a numeric interaction variable specified.
+                  default (FALSE)
+  numeric:        Optional. The numeric in variable which interacts with the 
+                  primary variable(s). default (NULL)
   &lt;any named list:&gt; If there are multiple comparisons, set them up as nested lists.
 visualization gene list: Label this list of genes in the volcano plot.
 report:           Required. The name of your project. This will become the name of your 
@@ -193,7 +199,7 @@ store output:     Required. Folder Synapse Id to store output on Synapse.</code>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
       </footer>
