@@ -14,7 +14,9 @@ differential_expression(
   fold_change_threshold,
   model_variables = NULL,
   exclude_variables = NULL,
-  cores = NULL
+  cores = NULL,
+  is_num = NULL,
+  num_var = NULL
 )
 }
 \arguments{
@@ -43,6 +45,10 @@ If not supplied, the model will include all variables in \code{md}.}
 \item{exclude_variables}{Vector of variables to exclude from testing.}
 
 \item{cores}{An integer of cores to specify in the parallel backend (eg. 4).}
+
+\item{is_num}{Is there a numerical covariate to use as an interaction with the primary variable(s). default= NULL}
+
+\item{num_var}{A numerical metadata column to use in an inaction with the primary variable(s). default= NULL}
 }
 \value{
 A named list with \code{"variancePartition::voomWithDreamWeights()"}
