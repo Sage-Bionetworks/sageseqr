@@ -27,7 +27,6 @@ default:
   cpm threshold: 1
   percent threshold: 0.5
   sex check: sex
-  cores: 
   dimensions:
     color: "diagnosis"
     shape: "batch"
@@ -38,7 +37,17 @@ default:
   de p-value threshold: 0.05
   visualization gene list: ["LCN2", "TRIM69"]
   de contrasts:
-    diagnosis: ["diagnosis"]
-    diagnosis-sex: ["diagnosis-sex"]
+    diagnosis: 
+      primary: ["diagnosis"]
+      is_numeric_int: FALSE
+      numeric:
+    diagnosis-sex: 
+      primary: ["diagnosis", "sex"]
+      is_numeric_int: FALSE
+      numeric:
+    age-death:
+      primary: ["diagnosis"]
+      is_numeric_int: TRUE
+      numeric: ["ageofdeath"]
   report: "openSci"
   store output: syn23572479

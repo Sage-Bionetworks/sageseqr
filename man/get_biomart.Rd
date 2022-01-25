@@ -39,7 +39,7 @@ This specification is highly recommended for a reproducible workflow.
 \item{organism}{A character vector of the organism name. This argument
 takes partial strings. For example,"hsa" will match "hsapiens_gene_ensembl".}
 
-\item{custom}{Defaults to FALSE If TRUE, the GC and Gene Length, and gene 
+\item{custom}{Defaults to FALSE If TRUE, the GC and Gene Length, and gene
 name are calculated from user specified FASTA and GTF File.}
 
 \item{gtfID}{Defaults to NULL. A character vector with a Synapse ID

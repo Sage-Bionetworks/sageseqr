@@ -16,12 +16,18 @@ counts <- data.frame(matrix(
                   c("S1", "S2", "S3", "S4",  "S5", "S6", "S7", "S8"))
 ))
 
+pv <-  list( 
+  primary = c("diagnosis", "sex"),
+  is_num = FALSE,
+  num_var = NULL
+)
+
 matrix <- compute_residuals(
   metadata,
   filtered_counts = counts,
   dropped = NULL,
   cqn_counts = counts,
-  primary_variable = c("diagnosis", "sex"),
+  primary_variable = pv,
 )
 
 test_that("gene features stored in column", {

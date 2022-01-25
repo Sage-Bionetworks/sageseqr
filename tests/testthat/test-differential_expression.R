@@ -24,17 +24,18 @@ biomart_results <- data.frame(
 test_that("differential_expression executes completely", {
   expect_length(
     differential_expression(
-      filtered_counts=counts,
-      cqn_counts=counts,
-      md=metadata,
-      primary_variable="diagnosis",
-      biomart_results=biomart_results,
-      p_value_threshold=0.05,
-      fold_change_threshold=1.5,
-      cores=1,
+      filtered_counts = counts,
+      cqn_counts = counts,
+      md = metadata,
+      primary_variable = "diagnosis",
+      biomart_results = biomart_results,
+      p_value_threshold = 0.05,
+      fold_change_threshold = 1.5,
+      cores = 1,
       is_num = FALSE,
       num_var = NULL
-      ),
+    ),
     6
   )
 })
+
