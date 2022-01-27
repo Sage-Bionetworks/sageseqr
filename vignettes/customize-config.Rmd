@@ -59,6 +59,9 @@ biomart:
   fastaVersion:   Optional. Include Synapse file version number (e.g. 3).
 factors:          Required. List of factor variables in brackets. Variables must be 
                   present in the metadata as column names (e.g. [ "donorid", "source"]).
+random_effect:    Optional. List of factor variables (must also be included in `factors`)
+                  that are to be treated as random effects in the linear regression model.
+                  (eg. ["donorid"])
 continuous:       Required. List of continuous variables in brackets. Variables must 
                   be present in the metadata as column names (e.g. [ "rin", "rin2"]).
 x_var:            Required. This is your predictor or primary variable of interest. 

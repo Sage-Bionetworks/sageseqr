@@ -10,6 +10,7 @@ build_formula(
   model_variables = NULL,
   is_num = NULL,
   num_var = NULL,
+  random_effect = NULL,
   exclude_variables = NULL
 )
 }
@@ -25,6 +26,9 @@ If not supplied, the model will include all variables in \code{md}.}
 \item{is_num}{Is there a numerical covariate to use as an interaction with the primary variable(s). default= NULL}
 
 \item{num_var}{A numerical metadata column to use in an inaction with the primary variable(s). default= NULL}
+
+\item{random_effect}{A vector of variables to consider as random effects instead
+of fixed effects.}
 
 \item{exclude_variables}{Vector of variables to exclude from testing.}
 }

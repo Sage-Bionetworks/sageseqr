@@ -10,6 +10,7 @@ compute_residuals(
   dropped,
   cqn_counts = cqn_counts$E,
   primary_variable,
+  random_effect = NULL,
   model_variables = NULL,
   is_num = NULL,
   num_var = NULL,
@@ -29,6 +30,9 @@ were not cqn normalized}
 
 \item{primary_variable}{Vector of variables that will be collapsed into a single
 fixed effect interaction term.}
+
+\item{random_effect}{A vector of variables to consider as random effects instead
+of fixed effects.}
 
 \item{model_variables}{Optional. Vector of variables to include in the linear (mixed) model.
 If not supplied, the model will include all variables in \code{md}.}
