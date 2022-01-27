@@ -1116,9 +1116,8 @@ wrap_de <- function(conditions, filtered_counts, cqn_counts, md, dropped,
 #' the model, linear (mixed) model formula and vector of variables to include.
 #' @export
 stepwise_regression <- function(md, primary_variable, cqn_counts,
-                                model_variables = names(md),
-                                random_effect = random_effect,
-                                skip = NULL, random_effect = NULL) {
+                                model_variables = names(md), skip = NULL,
+                                random_effect = NULL) {
   # skip stepwise generation if skip = TRUE
   if(isTRUE(skip)) {
     return("Skipping stepwise regression model generation...")
