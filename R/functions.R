@@ -732,7 +732,7 @@ mclust::mclustBIC
 #' @inheritParams coerce_factors
 #' @export
 build_formula <- function(md, primary_variable, model_variables = NULL,
-                          is_num = NULL, num_var = NULL, random_effect=NULL,
+                          is_num = NULL, num_var = NULL, random_effect = NULL,
                           exclude_variables = NULL) {
 
 
@@ -1116,7 +1116,7 @@ wrap_de <- function(conditions, filtered_counts, cqn_counts, md, dropped,
 #' @export
 stepwise_regression <- function(md, primary_variable, cqn_counts,
                                 model_variables = names(md),
-                                skip = NULL) {
+                                skip = NULL, random_effect = NULL) {
   # skip stepwise generation if skip = TRUE
   if(isTRUE(skip)) {
     return("Skipping stepwise regression model generation...")

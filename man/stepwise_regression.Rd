@@ -9,7 +9,8 @@ stepwise_regression(
   primary_variable,
   cqn_counts,
   model_variables = names(md),
-  skip = NULL
+  skip = NULL,
+  random_effect = NULL
 )
 }
 \arguments{
@@ -25,6 +26,9 @@ If not supplied, the model will include all variables in \code{md}.}
 
 \item{skip}{Defaults to NULL. If TRUE, this step will be skipped in the
 targets plan.}
+
+\item{random_effect}{A vector of variables to consider as random effects instead
+of fixed effects.}
 }
 \value{
 Table with BIC criteria for exclusion or inclusion of variables in
