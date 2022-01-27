@@ -59,15 +59,15 @@ If not supplied, the model will include all variables in \code{md}.}
 to consider for differential sequencing results if using factor(s) as your
 primary variable. If not specified all combinations will be tested. If specified
 this will speed up the pipeline. Specify the contrast with the factor values
-involved in the contrast separated by a hyphen. (eg for diagnosis, \code{"primary_variable = c("AD-CT")}
+involved in the contrast separated by a hyphen. (eg for diagnosis, \code{"primary_variable = c(\"AD-CT\")"}
 where AD is the value in diagnosis column for cases and CT is the value for controls.
-For multi-level contrasts, eg. \code{primary_variable = c("diagnosis", "Sex")} would have contrasts
-specified as; \code{cont= c("ZZ_F-CT_F", "ZZ_M-CT_M")} to look at cases vs controls in
+For multi-level contrasts, eg. \code{"primary_variable = c(\"diagnosis\", \"Sex\")"} would have contrasts
+specified as; \code{cont= c(\"ZZ_F-CT_F\", \"ZZ_M-CT_M\")} to look at cases vs controls in
 females and cases vs controls in males independently. While the order before or
 after the hyphen doesn't matter, the order of values  before/after the underscore does matter.
 The value order must be the same as the \code{"primary:} specification.
-eg. \code{"primary_variable = c("diagnosis","sex")} must be \code{"CT_M-ZZ_M"} while
-\code{primary_variable = c("sex","diagnosis")} must be \code{"M_CT-M_ZZ"} (default= NULL)}
+eg. \code{"primary_variable = c(\"diagnosis\",\"sex\")} must be \code{\"CT_M-ZZ_M\"} while
+\code{"primary_variable = c(\"sex\",\"diagnosis\")"} must be \code{\"M_CT-M_ZZ\"} (default= NULL)}
 }
 \value{
 A named list with \code{"variancePartition::voomWithDreamWeights()"}
