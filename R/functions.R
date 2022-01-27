@@ -1117,6 +1117,7 @@ wrap_de <- function(conditions, filtered_counts, cqn_counts, md, dropped,
 #' @export
 stepwise_regression <- function(md, primary_variable, cqn_counts,
                                 model_variables = names(md),
+                                random_effect = random_effect,
                                 skip = NULL, random_effect = NULL) {
   # skip stepwise generation if skip = TRUE
   if(isTRUE(skip)) {
