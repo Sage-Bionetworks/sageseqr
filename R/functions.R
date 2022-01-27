@@ -800,7 +800,7 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
 
     #Make Formula objects:
     formula = formula(
-      glue::glue("~",
+      glue::glue("~ ",
                  glue::glue_collapse(
                    de_conditions,
                    sep = "+"),
@@ -817,7 +817,7 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
                  glue::glue_collapse(form, sep = "+")
       ))
 
-    formula_base_model = formula(glue::glue("~",
+    formula_base_model = formula(glue::glue("~ ",
                                             glue::glue_collapse(
                                               de_conditions,
                                               sep = "+"
@@ -960,10 +960,12 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
     stats::as.formula( metadata_input$formula_non_intercept) ))){
     message('Applying eBayes Directly')
     fit_contrasts <- limma::eBayes(fit_contrasts)
+  }else{
+    fit_contrasts <- limma::eBayes(fit_contrasts)
   }
 
   de <- lapply(names(contrasts), function(i, fit){
-    genes <- limma::topTable(fit, coef = i, number = Inf, sort.by = "logFC")
+    genes <- limma::topTable(fit, coef = i, number = Inf, sort.by = "logFC", confint=TRUE)
     genes <- tibble::rownames_to_column(genes, var = "ensembl_gene_id")
   }, fit_contrasts)
 
