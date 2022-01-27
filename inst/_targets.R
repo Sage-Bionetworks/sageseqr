@@ -149,7 +149,8 @@ list(
       clean_md,
       primary_variable = get("x_var"),
       cqn_counts = cqn_counts,
-      skip = get("skip model")
+      skip = get("skip model"),
+      random_effect = get("random_effect")
     )
   ),
   tar_target(
@@ -168,8 +169,11 @@ list(
         clean_md,
         filtered_counts,
         dropped,
+        random_effect = get("random_effect"),
         cqn_counts = cqn_counts$E,
-        primary_variable = x,
+        primary_variable = x$primary,
+        is_num = x$is_numeric_int,
+        num_var = x$numeric,
         model_variables = selected_model,
         cores = get("cores")
         )
@@ -181,6 +185,7 @@ list(
       conditions = get("de contrasts"),
       filtered_counts,
       cqn_counts$E,
+      random_effect = get("random_effect"),
       clean_md,
       dropped,
       biomart_results,
