@@ -872,6 +872,19 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
 #' @param cores An integer of cores to specify in the parallel backend (eg. 4).
 #' @param is_num Is there a numerical covariate to use as an interaction with the primary variable(s). default= NULL
 #' @param num_var A numerical metadata column to use in an inaction with the primary variable(s). default= NULL
+#' @param cont Optional. A list specifying contrasts of the primary variable(s)
+#' to consider for differential sequencing results if using factor(s) as your
+#' primary variable. If not specified all combinations will be tested. If specified
+#' this will speed up the pipeline. Specify the contrast with the factor values
+#' involved in the contrast separated by a hyphen. (eg for diagnosis, `primary_variable = c("AD-CT")`
+#' where AD is the value in diagnosis column for cases and CT is the value for controls.
+#' For multi-level contrasts, eg. `primary_variable = c("diagnosis", "Sex")` would have contrasts
+#' specified as; `cont= c("ZZ_F-CT_F", "ZZ_M-CT_M")` to look at cases vs controls in
+#' females and cases vs controls in males independently. While the order before or
+#' after the hyphen doesn't matter, the order of values  before/after the underscore does matter.
+#' The value order must be the same as the `primary:` specification.
+#' eg. `primary_variable = c("diagnosis","sex")` must be `"CT_M-ZZ_M"` while
+#' `primary_variable = c("sex","diagnosis")` must be `"M_CT-M_ZZ"` (default= NULL)
 #' @inheritParams cqn
 #' @inheritParams coerce_factors
 #' @inheritParams build_formula
@@ -890,7 +903,8 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
                                     p_value_threshold, fold_change_threshold,
                                     random_effect = NULL, model_variables = NULL,
                                     exclude_variables = NULL, cores = NULL,
-                                    is_num = NULL, num_var = NULL) {
+                                    is_num = NULL, num_var = NULL,
+                                    cont = NULL) {
   # force order of samples in metadata to match order of samples in counts.
   # Required by variancePartition
   if(is.null(cores)){
@@ -925,6 +939,21 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
                                                r = 2,
                                                v = conditions_for_contrast
     )
+
+    if(!is.null(cont)){
+      conts <- sapply(cont, function(i) { strsplit(i,'-')} )
+      new_setup_coefficients <- NULL
+      for( i in conts){
+        new_setup_coefficients <- rbind(
+          new_setup_coefficients,
+          setup_coefficients[
+            ( grepl(i[1],setup_coefficients[,1]) | grepl(i[1],setup_coefficients[,2])) &
+              ( grepl(i[2],setup_coefficients[,1]) | grepl(i[2],setup_coefficients[,2])),
+          ])
+      }
+      setup_coefficients <- new_setup_coefficients
+    }
+
   }else{
     conditions_for_contrast <- purrr::map_chr(de_conditions,
                                               function(x) glue::glue({metadata_input$primary_variable}, x)
@@ -933,6 +962,20 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
                                                r = 2,
                                                v = conditions_for_contrast
     )
+
+    if(!is.null(cont)){
+      conts <- sapply(cont, function(i) { strsplit(i,'-')} )
+      new_setup_coefficients <- NULL
+      for( i in conts){
+        new_setup_coefficients <- rbind(
+          new_setup_coefficients,
+          setup_coefficients[
+            ( grepl(i[1],setup_coefficients[,1]) | grepl(i[1],setup_coefficients[,2])) &
+              ( grepl(i[2],setup_coefficients[,1]) | grepl(i[2],setup_coefficients[,2])),
+          ])
+      }
+      setup_coefficients <- new_setup_coefficients
+    }
   }
 
   contrasts <- lapply(seq_len(nrow(setup_coefficients)),
@@ -1034,7 +1077,7 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
 wrap_de <- function(conditions, filtered_counts, cqn_counts, md, dropped,
                     biomart_results, p_value_threshold, fold_change_threshold,
                     random_effect = NULL, model_variables = names(md),
-                    cores = NULL, is_num = NULL, num_var = NULL) {
+                    cores = NULL, cont = NULL, is_num = NULL, num_var = NULL) {
 
   if (!is.null(dropped)) {
     filtered_counts <- filtered_counts[
@@ -1054,7 +1097,8 @@ wrap_de <- function(conditions, filtered_counts, cqn_counts, md, dropped,
       p_value_threshold,
       fold_change_threshold,
       model_variables,
-      cores = cores
+      cores = cores,
+      cont = x$contrasts
       )
     )
 }

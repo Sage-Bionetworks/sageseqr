@@ -42,13 +42,16 @@ default:
       primary: ["diagnosis"]
       is_numeric_int: FALSE
       numeric:
+      contrasts: ["CT-ZZ"]
     diagnosis-sex:
       primary: ["diagnosis", "sex"]
       is_numeric_int: FALSE
       numeric:
+      contrasts: ["ZZ_F-CT_F","ZZ_M-CT_M" ]
     age-death:
       primary: ["diagnosis"]
       is_numeric_int: TRUE
       numeric: ["ageofdeath"]
+      contrasts: ["CT-ZZ"]
   report: "openSci"
   store output: syn23572479
