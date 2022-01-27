@@ -1076,7 +1076,7 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
 #' @export
 wrap_de <- function(conditions, filtered_counts, cqn_counts, md, dropped,
                     biomart_results, p_value_threshold, fold_change_threshold,
-                    random_effect = NULL, model_variables = names(md),
+                    model_variables = names(md), random_effect = NULL, exclude_variables = NULL,
                     cores = NULL, cont = NULL, is_num = NULL, num_var = NULL) {
 
   if (!is.null(dropped)) {
@@ -1097,6 +1097,7 @@ wrap_de <- function(conditions, filtered_counts, cqn_counts, md, dropped,
       p_value_threshold,
       fold_change_threshold,
       model_variables,
+      random_effect = random_effect,
       cores = cores,
       cont = x$contrasts
       )

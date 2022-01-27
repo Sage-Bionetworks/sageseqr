@@ -13,8 +13,9 @@ wrap_de(
   biomart_results,
   p_value_threshold,
   fold_change_threshold,
-  random_effect = NULL,
   model_variables = names(md),
+  random_effect = NULL,
+  exclude_variables = NULL,
   cores = NULL,
   cont = NULL,
   is_num = NULL,
@@ -44,11 +45,13 @@ adjusted p-value greater than this threshold.}
 \item{fold_change_threshold}{Numeric. Significant genes are those with a
 fold-change greater than this threshold.}
 
+\item{model_variables}{Optional. Vector of variables to include in the linear (mixed) model.
+If not supplied, the model will include all variables in \code{md}.}
+
 \item{random_effect}{A vector of variables to consider as random effects instead
 of fixed effects.}
 
-\item{model_variables}{Optional. Vector of variables to include in the linear (mixed) model.
-If not supplied, the model will include all variables in \code{md}.}
+\item{exclude_variables}{Vector of variables to exclude from testing.}
 
 \item{cores}{An integer of cores to specify in the parallel backend (eg. 4).}
 
