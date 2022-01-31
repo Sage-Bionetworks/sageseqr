@@ -1460,9 +1460,9 @@ compute_residuals <- function(clean_metadata, filtered_counts, dropped,
   # Required by variancePartition
   clean_metadata <- clean_metadata[match(colnames(filtered_counts),rownames(clean_metadata)),]
 
-  is_num <- primary_variable$is_numeric_int
-  num_var <- primary_variable$numeric
-  primary_variable <- primary_variable$primary
+  #is_num <- primary_variable$is_numeric_int
+  #num_var <- primary_variable$numeric
+  #primary_variable <- primary_variable$primary
 
   metadata_input <- build_formula(clean_metadata, primary_variable, model_variables,
                                   random_effect = random_effect, is_num = is_num, num_var = num_var)
