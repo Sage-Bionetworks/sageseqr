@@ -741,7 +741,14 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
   }
 
   if (!is.null(model_variables)) {
-    md <- dplyr::select(md, dplyr::all_of(c(model_variables, num_var, primary_variable)))
+    if(!is.null(num_var) | !isFALSE(num_var)){
+      vars <- c(model_variables, primary_variable)
+      vars <- vars[!duplicated(vars)]
+      md <- dplyr::select(md, dplyr::all_of(vars))
+    }else{
+      md <- dplyr::select(md, dplyr::all_of(c(model_variables,
+                                              num_var, primary_variable)))
+    }
   }
 
   if (!is.null(exclude_variables)) {
