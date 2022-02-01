@@ -761,9 +761,15 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
   # Update metadata to reflect variable subset
 
   # Variables of factor or numeric class are required
-  col_type <- dplyr::select(md, -dplyr::all_of(c(primary_variable,num_var))) %>%
-    dplyr::summarise_all(class) %>%
-    tidyr::pivot_longer(tidyr::everything(), names_to = "variable", values_to = "class")
+  if(!is.null(num_var) | !isFALSE(num_var)){
+    col_type <- dplyr::select(md, -dplyr::all_of(c(primary_variable))) %>%
+      dplyr::summarise_all(class) %>%
+      tidyr::pivot_longer(tidyr::everything(), names_to = "variable", values_to = "class")
+  }else{
+    col_type <- dplyr::select(md, -dplyr::all_of(c(vars))) %>%
+      dplyr::summarise_all(class) %>%
+      tidyr::pivot_longer(tidyr::everything(), names_to = "variable", values_to = "class")
+  }
 
   col_type[ col_type$variable %in% random_effect, ]$class <- 'random'
   # Categorical or factor variables are modeled as a random effect by (1|variable)
