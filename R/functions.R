@@ -1024,12 +1024,35 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
                                            BPPARAM = BiocParallel::SnowParam(cores)
   )
 
-  if(is.null(lme4::findbars(
-    stats::as.formula( metadata_input$formula_non_intercept) ))){
-    message('Applying eBayes Directly')
+  if (is.null(lme4::findbars(stats::as.formula(metadata_input$formula_non_intercept)))) {
+    message("Applying eBayes Directly")
     fit_contrasts <- limma::eBayes(fit_contrasts)
-  }else{
-    fit_contrasts <- limma::eBayes(fit_contrasts)
+
+    de <- lapply(names(contrasts), function(i, fit) {
+      genes <- limma::topTable(fit, coef = i, number = Inf,
+                               sort.by = "logFC", confint = TRUE)
+      genes <- tibble::rownames_to_column(genes, var = "ensembl_gene_id")
+    }, fit_contrasts)
+
+  }else {
+    CIs <- limma::eBayes(fit_contrasts)
+
+    de <- lapply(names(contrasts), function(i, fit, ci) {
+      genes <- limma::topTable(fit, coef = i, number = Inf,
+                               sort.by = "logFC")
+      genes <- tibble::rownames_to_column(genes, var = "ensembl_gene_id") #%>%
+      #dplyr::select(-CI.L, CI.R)
+
+      cis <- limma::topTable(ci, coef = i, number = Inf,
+                             sort.by = "logFC", confint = TRUE)
+      cis <- tibble::rownames_to_column(cis, var = "ensembl_gene_id")
+
+      genes <- cis %>%
+        dplyr::select(ensembl_gene_id,CI.L, CI.R) %>%
+        dplyr::left_join(.,genes, by='ensembl_gene_id') %>%
+        dplyr::select(., ensembl_gene_id, logFC, CI.L, CI.R, AveExpr, t, P.Value, adj.P.Val)
+
+    }, fit_contrasts, CIs)
   }
 
   de <- lapply(names(contrasts), function(i, fit){
