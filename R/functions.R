@@ -811,7 +811,17 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
 
     metadata <- dplyr::select(metadata, -dplyr::all_of(c(interaction_term,num_var)))
 
-    #glue::glue_collapse(paste0("scale(", de_conditions, ")"), sep = "+")
+    #Remove numeric from form
+    remo_var <- NULL
+    for( i in 1:length(form)){
+      if(grepl(num_var, as.character(form[[i]]))) {
+        #message(form[[i]])
+        remo_var <- i
+      }
+    }
+    if(!is.null(remo_var)){
+      form <- form[-remo_var]
+    }
 
     #Make Formula objects:
     formula = formula(
