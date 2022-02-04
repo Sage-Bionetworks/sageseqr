@@ -1055,11 +1055,6 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
     }, fit_contrasts, CIs)
   }
 
-  de <- lapply(names(contrasts), function(i, fit){
-    genes <- limma::topTable(fit, coef = i, number = Inf, sort.by = "logFC", confint=TRUE)
-    genes <- tibble::rownames_to_column(genes, var = "ensembl_gene_id")
-  }, fit_contrasts)
-
   if(isTRUE(is_num)){
     c_names <- names(contrasts)
     c_names <- gsub("scale\\(",'',c_names)
