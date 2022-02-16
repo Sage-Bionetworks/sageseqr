@@ -487,7 +487,11 @@ get_association_statistics <- function(clean_metadata, p_value_cutoff = 0.05) {
   # Identify factors and continuous variables
   md <- clean_metadata
   factors <- names(md)[sapply(md, is.factor)]
-  continuous <- setdiff(names(md), factors)
+  if(length(factors) < dim(md)[2]){
+    continuous <- setdiff(names(md), factors)
+  }else{
+    continuous <- NULL
+  }
 
   # Convert factor variables to numeric vector
   md[, factors] <- lapply(
