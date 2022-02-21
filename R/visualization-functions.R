@@ -378,10 +378,16 @@ correlate_and_plot <- function(principal_components, clean_metadata,
   }
   # plot if to_plot = TRUE
   if (!plyr::empty(plot)) {
-    plot <- plot_pcs_with_covariates(
-      plot,
-      glue::glue("*FDR <= {maximum_fdr}")
-      )
+    if (length(table(plot$compare)) == 1) {
+      plot <- NULL
+      message(glue::glue("Warning: only one PC > 1% variance explained. Will not plot
+                         covariate significant covariate clustering"))
+    } else {
+      plot <- plot_pcs_with_covariates(
+        plot,
+        glue::glue("*FDR <= {maximum_fdr}")
+        )
+    }
   } else {
     plot <- NULL
   }
