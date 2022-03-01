@@ -27,7 +27,12 @@ matrix <- compute_residuals(
   filtered_counts = counts,
   dropped = NULL,
   cqn_counts = counts,
-  primary_variable = pv,
+  primary_variable = pv$primary,
+  random_effect = NULL,
+  model_variables = NULL,
+  is_num = NULL,
+  num_var = NULL,
+  cores = 1
 )
 
 test_that("gene features stored in column", {
