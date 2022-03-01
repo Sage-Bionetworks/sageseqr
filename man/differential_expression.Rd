@@ -12,11 +12,13 @@ differential_expression(
   biomart_results,
   p_value_threshold,
   fold_change_threshold,
+  random_effect = NULL,
   model_variables = NULL,
   exclude_variables = NULL,
   cores = NULL,
   is_num = NULL,
-  num_var = NULL
+  num_var = NULL,
+  cont = NULL
 )
 }
 \arguments{
@@ -39,6 +41,9 @@ adjusted p-value greater than this threshold.}
 \item{fold_change_threshold}{Numeric. Significant genes are those with a
 fold-change greater than this threshold.}
 
+\item{random_effect}{A vector of variables to consider as random effects instead
+of fixed effects.}
+
 \item{model_variables}{Optional. Vector of variables to include in the linear (mixed) model.
 If not supplied, the model will include all variables in \code{md}.}
 
@@ -49,6 +54,20 @@ If not supplied, the model will include all variables in \code{md}.}
 \item{is_num}{Is there a numerical covariate to use as an interaction with the primary variable(s). default= NULL}
 
 \item{num_var}{A numerical metadata column to use in an inaction with the primary variable(s). default= NULL}
+
+\item{cont}{Optional. A list specifying contrasts of the primary variable(s)
+to consider for differential sequencing results if using factor(s) as your
+primary variable. If not specified all combinations will be tested. If specified
+this will speed up the pipeline. Specify the contrast with the factor values
+involved in the contrast separated by a hyphen. (eg for diagnosis, \code{"primary_variable = c(\"AD-CT\")"}
+where AD is the value in diagnosis column for cases and CT is the value for controls.
+For multi-level contrasts, eg. \code{"primary_variable = c(\"diagnosis\", \"Sex\")"} would have contrasts
+specified as; \code{cont= c(\"ZZ_F-CT_F\", \"ZZ_M-CT_M\")} to look at cases vs controls in
+females and cases vs controls in males independently. While the order before or
+after the hyphen doesn't matter, the order of values  before/after the underscore does matter.
+The value order must be the same as the \code{"primary:} specification.
+eg. \code{"primary_variable = c(\"diagnosis\",\"sex\")} must be \code{\"CT_M-ZZ_M\"} while
+\code{"primary_variable = c(\"sex\",\"diagnosis\")"} must be \code{\"M_CT-M_ZZ\"} (default= NULL)}
 }
 \value{
 A named list with \code{"variancePartition::voomWithDreamWeights()"}

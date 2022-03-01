@@ -14,7 +14,10 @@ wrap_de(
   p_value_threshold,
   fold_change_threshold,
   model_variables = names(md),
+  random_effect = NULL,
+  exclude_variables = NULL,
   cores = NULL,
+  cont = NULL,
   is_num = NULL,
   num_var = NULL
 )
@@ -45,7 +48,26 @@ fold-change greater than this threshold.}
 \item{model_variables}{Optional. Vector of variables to include in the linear (mixed) model.
 If not supplied, the model will include all variables in \code{md}.}
 
+\item{random_effect}{A vector of variables to consider as random effects instead
+of fixed effects.}
+
+\item{exclude_variables}{Vector of variables to exclude from testing.}
+
 \item{cores}{An integer of cores to specify in the parallel backend (eg. 4).}
+
+\item{cont}{Optional. A list specifying contrasts of the primary variable(s)
+to consider for differential sequencing results if using factor(s) as your
+primary variable. If not specified all combinations will be tested. If specified
+this will speed up the pipeline. Specify the contrast with the factor values
+involved in the contrast separated by a hyphen. (eg for diagnosis, \code{"primary_variable = c(\"AD-CT\")"}
+where AD is the value in diagnosis column for cases and CT is the value for controls.
+For multi-level contrasts, eg. \code{"primary_variable = c(\"diagnosis\", \"Sex\")"} would have contrasts
+specified as; \code{cont= c(\"ZZ_F-CT_F\", \"ZZ_M-CT_M\")} to look at cases vs controls in
+females and cases vs controls in males independently. While the order before or
+after the hyphen doesn't matter, the order of values  before/after the underscore does matter.
+The value order must be the same as the \code{"primary:} specification.
+eg. \code{"primary_variable = c(\"diagnosis\",\"sex\")} must be \code{\"CT_M-ZZ_M\"} while
+\code{"primary_variable = c(\"sex\",\"diagnosis\")"} must be \code{\"M_CT-M_ZZ\"} (default= NULL)}
 
 \item{is_num}{Is there a numerical covariate to use as an interaction with the primary variable(s). default= NULL}
 

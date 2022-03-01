@@ -378,10 +378,16 @@ correlate_and_plot <- function(principal_components, clean_metadata,
   }
   # plot if to_plot = TRUE
   if (!plyr::empty(plot)) {
-    plot <- plot_pcs_with_covariates(
-      plot,
-      glue::glue("*FDR <= {maximum_fdr}")
-      )
+    if (length(table(plot$compare)) == 1) {
+      plot <- NULL
+      message(glue::glue("Warning: only one PC > 1% variance explained. Will not plot
+                         covariate significant covariate clustering"))
+    } else {
+      plot <- plot_pcs_with_covariates(
+        plot,
+        glue::glue("*FDR <= {maximum_fdr}")
+        )
+    }
   } else {
     plot <- NULL
   }
@@ -487,7 +493,11 @@ get_association_statistics <- function(clean_metadata, p_value_cutoff = 0.05) {
   # Identify factors and continuous variables
   md <- clean_metadata
   factors <- names(md)[sapply(md, is.factor)]
-  continuous <- setdiff(names(md), factors)
+  if(length(factors) < dim(md)[2]){
+    continuous <- setdiff(names(md), factors)
+  }else{
+    continuous <- NULL
+  }
 
   # Convert factor variables to numeric vector
   md[, factors] <- lapply(
@@ -690,18 +700,20 @@ association_statistics_for_both <- function(variables = names(clean_metadata), c
 #'@export
 #'@return A boxplot with mutiple groups defined by the include_vars argument.
 boxplot_vars <- function(md, include_vars, x_var) {
-  sagethemes::import_lato()
-  df <- dplyr::select(md, !!include_vars, !!x_var) %>%
-    tidyr::pivot_longer(-!!x_var, names_to = "key", values_to = "value")
-  p <- ggplot2::ggplot(df, ggplot2::aes(x = .data[[x_var]],
-                                        y = .data$value,
-                                        group = .data[[x_var]])) +
-    ggplot2::geom_boxplot(ggplot2::aes(fill = .data[[x_var]])) +
-    ggplot2::facet_wrap(key ~ ., scales = "free") +
-    sagethemes::scale_fill_sage_d() +
-    sagethemes::theme_sage() +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1))
-  p
+  if(!is.null(include_vars)){
+    sagethemes::import_lato()
+    df <- dplyr::select(md, !!include_vars, !!x_var) %>%
+      tidyr::pivot_longer(-!!x_var, names_to = "key", values_to = "value")
+    p <- ggplot2::ggplot(df, ggplot2::aes(x = .data[[x_var]],
+                                          y = .data$value,
+                                          group = .data[[x_var]])) +
+      ggplot2::geom_boxplot(ggplot2::aes(fill = .data[[x_var]])) +
+      ggplot2::facet_wrap(key ~ ., scales = "free") +
+      sagethemes::scale_fill_sage_d() +
+      sagethemes::theme_sage() +
+      ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1))
+    p
+  }
 }
 #' Explore metadata by gene expression on the sex chromosomes.
 #'

@@ -15,11 +15,12 @@ default:
     organism: hsa
     exon only: FALSE
     custom build: FALSE
-    gtfID: 
-    gtfVersion: 
-    fastaID: 
-    fastaVersion: 
+    gtfID:
+    gtfVersion:
+    fastaID:
+    fastaVersion:
   factors: ["sampleID", "batch", "sex", "diagnosis"]
+  random_effect:
   continuous: ["RIN", "pmi", "ageofdeath"]
   x_var: diagnosis
   cores: 6
@@ -37,17 +38,20 @@ default:
   de p-value threshold: 0.05
   visualization gene list: ["LCN2", "TRIM69"]
   de contrasts:
-    diagnosis: 
+    diagnosis:
       primary: ["diagnosis"]
       is_numeric_int: FALSE
       numeric:
-    diagnosis-sex: 
+      contrasts: ["CT-ZZ"]
+    diagnosis-sex:
       primary: ["diagnosis", "sex"]
       is_numeric_int: FALSE
       numeric:
+      contrasts: ["ZZ_F-CT_F","ZZ_M-CT_M" ]
     age-death:
       primary: ["diagnosis"]
       is_numeric_int: TRUE
       numeric: ["ageofdeath"]
+      contrasts: ["CT-ZZ"]
   report: "openSci"
   store output: syn23572479

@@ -724,125 +724,153 @@ mclust::mclustBIC
 #' If not supplied, the model will include all variables in \code{md}.
 #' @param primary_variable Vector of variables that will be collapsed into a single
 #' fixed effect interaction term.
+#' @param random_effect A vector of variables to consider as random effects instead
+#' of fixed effects.
 #' @param is_num Is there a numerical covariate to use as an interaction with the primary variable(s). default= NULL
 #' @param num_var A numerical metadata column to use in an inaction with the primary variable(s). default= NULL
 #' @param exclude_variables Vector of variables to exclude from testing.
 #' @inheritParams coerce_factors
 #' @export
 build_formula <- function(md, primary_variable, model_variables = NULL,
-                          is_num = NULL, num_var = NULL,
+                          is_num = NULL, num_var = NULL, random_effect = NULL,
                           exclude_variables = NULL) {
-  
-  
+
+
   if (!(all(purrr::map_lgl(md, function(x) inherits(x, c("numeric", "factor")))))) {
     stop("Use sageseqr::clean_covariates() to coerce variables into factor and numeric types.")
   }
-  
+
   if (!is.null(model_variables)) {
-    md <- dplyr::select(md, dplyr::all_of(c(model_variables, num_var, primary_variable)))
+    if(!is.null(num_var) | !isFALSE(num_var)){
+      vars <- c(model_variables, primary_variable,num_var)
+      vars <- vars[!duplicated(vars)]
+      md <- dplyr::select(md, dplyr::all_of(vars))
+    }else{
+      #md <- dplyr::select(md, dplyr::all_of(c(model_variables,
+      #                                        num_var, primary_variable)))
+      md <- dplyr::select(md, dplyr::all_of(c(model_variables,
+                                             primary_variable)))
+    }
   }
-  
+
   if (!is.null(exclude_variables)) {
     if (exclude_variables %in% colnames(md)) {
       stop("exclude_variables and model_variables are the same.")
     }
     md <- dplyr::select(md, -dplyr::all_of(exclude_variables))
   }
-  
+
   # Update metadata to reflect variable subset
-  
+
   # Variables of factor or numeric class are required
-  col_type <- dplyr::select(md, -dplyr::all_of(c(primary_variable,num_var))) %>%
-    dplyr::summarise_all(class) %>%
-    tidyr::pivot_longer(tidyr::everything(), names_to = "variable", values_to = "class")
-  
+  if(!is.null(num_var) | !isFALSE(num_var)){
+    col_type <- dplyr::select(md, -dplyr::all_of(c(primary_variable))) %>%
+      dplyr::summarise_all(class) %>%
+      tidyr::pivot_longer(tidyr::everything(), names_to = "variable", values_to = "class")
+  }else{
+    col_type <- dplyr::select(md, -dplyr::all_of(c(vars))) %>%
+      dplyr::summarise_all(class) %>%
+      tidyr::pivot_longer(tidyr::everything(), names_to = "variable", values_to = "class")
+  }
+
+  col_type[ col_type$variable %in% random_effect, ]$class <- 'random'
   # Categorical or factor variables are modeled as a random effect by (1|variable)
   # Numeric variables are scaled to account for when the spread of data values differs
   # by an order of magnitude
   form <- purrr::map(1:length(col_type$class), function(i){
     switch(col_type$class[i],
-           "factor" = glue::glue("(1|", col_type$variable[i], ")"),
+           "factor" = glue::glue( col_type$variable[i] ),
+           "random" = glue::glue("(1|", col_type$variable[i], ")"),
            "numeric" = glue::glue("scale(", col_type$variable[i], ")")
     )
   })
-  
   # List with multiple values can cause glue_collapse to fail. This step is conservative
   # as it unlists all lists at this step.
   if (class(primary_variable) == "list") {
     primary_variable <- primary_variable[[1]]
   }
-  
+
   # A new categorical is created to model an interaction between two variables
   #interaction_term <- glue::glue_collapse({primary_variable}, "_")
   if(isTRUE(is_num)){
     # A new categorical is created to model an interaction between two variables
     interaction_term <- paste0(glue::glue_collapse({primary_variable}, "_"),'.',num_var)
-    
+
     metadata = md %>%
       tidyr::unite(!!interaction_term, dplyr::all_of(primary_variable), sep = "_")
-    
+
     metadata[ , paste0(num_var,'.',as.character(names(table(metadata[interaction_term] ))))] <- 0
-    
+
     for( i in paste0(num_var,'.',as.character(names(table(metadata[interaction_term] )))) ){
-      metadata[metadata[,interaction_term] == gsub(paste0( num_var, '.'),'',i) ,i] <- 
+      metadata[metadata[,interaction_term] == gsub(paste0( num_var, '.'),'',i) ,i] <-
         metadata[metadata[,interaction_term] == gsub(paste0( num_var, '.'),'',i) ,num_var]
     }
-    
+
     metadata[,interaction_term] <- as.factor(metadata[,interaction_term])
     de_conditions <- paste0( 'scale(', num_var, '.', levels(metadata[,interaction_term]), ')')
-    
+
     metadata <- dplyr::select(metadata, -dplyr::all_of(c(interaction_term,num_var)))
-    
-    #glue::glue_collapse(paste0("scale(", de_conditions, ")"), sep = "+")
-    
+
+    #Remove numeric from form
+    remo_var <- NULL
+    for( i in 1:length(form)){
+      if(grepl(num_var, as.character(form[[i]]))) {
+        #message(form[[i]])
+        remo_var <- i
+      }
+    }
+    if(!is.null(remo_var)){
+      form <- form[-remo_var]
+    }
+
     #Make Formula objects:
     formula = formula(
-      glue::glue("~",
+      glue::glue("~ ",
                  glue::glue_collapse(
-                   de_conditions, 
+                   de_conditions,
                    sep = "+"),
-                 "+", 
+                 "+",
                  glue::glue_collapse(form, sep = "+")
       ))
-    
+
     formula_non_intercept = formula(
       glue::glue("~ 0+",
                  glue::glue_collapse(
-                   de_conditions, 
+                   de_conditions,
                    sep = "+"),
-                 "+", 
+                 "+",
                  glue::glue_collapse(form, sep = "+")
       ))
-    
-    formula_base_model = formula(glue::glue("~",
+
+    formula_base_model = formula(glue::glue("~ ",
                                             glue::glue_collapse(
-                                              de_conditions, 
+                                              de_conditions,
                                               sep = "+"
                                             )
     ))
-    
+
   }else{
     # A new categorical is created to model an interaction between two variables
     interaction_term <- glue::glue_collapse({primary_variable}, "_")
-    
+
     metadata = md %>%
       tidyr::unite(!!interaction_term, dplyr::all_of(primary_variable), sep = "_")
-    
+
     metadata[,interaction_term] <- as.factor(metadata[,interaction_term])
     de_conditions <- levels(metadata[,interaction_term])
-    
+
     #Make Formula objects:
     formula = formula(
       glue::glue("~ {interaction_term}+", glue::glue_collapse(form, sep = "+")
       ))
-    
+
     formula_non_intercept = formula(
       glue::glue("~ 0+{interaction_term}+", glue::glue_collapse(form, sep = "+")
       ))
-    
+
     formula_base_model = formula(glue::glue("~ {interaction_term}"))
   }
-  
+
   object <- list(metadata = metadata,
                  formula = formula,
                  formula_non_intercept = formula_non_intercept,
@@ -851,7 +879,7 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
                  variables = unlist(form),
                  de_conditions = de_conditions
   )
-  
+
   object
 }
 #' Differential Expression with Dream
@@ -869,6 +897,19 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
 #' @param cores An integer of cores to specify in the parallel backend (eg. 4).
 #' @param is_num Is there a numerical covariate to use as an interaction with the primary variable(s). default= NULL
 #' @param num_var A numerical metadata column to use in an inaction with the primary variable(s). default= NULL
+#' @param cont Optional. A list specifying contrasts of the primary variable(s)
+#' to consider for differential sequencing results if using factor(s) as your
+#' primary variable. If not specified all combinations will be tested. If specified
+#' this will speed up the pipeline. Specify the contrast with the factor values
+#' involved in the contrast separated by a hyphen. (eg for diagnosis, \code{"primary_variable = c(\"AD-CT\")"}
+#' where AD is the value in diagnosis column for cases and CT is the value for controls.
+#' For multi-level contrasts, eg. \code{"primary_variable = c(\"diagnosis\", \"Sex\")"} would have contrasts
+#' specified as; \code{cont= c(\"ZZ_F-CT_F\", \"ZZ_M-CT_M\")} to look at cases vs controls in
+#' females and cases vs controls in males independently. While the order before or
+#' after the hyphen doesn't matter, the order of values  before/after the underscore does matter.
+#' The value order must be the same as the \code{"primary:} specification.
+#' eg. \code{"primary_variable = c(\"diagnosis\",\"sex\")} must be \code{\"CT_M-ZZ_M\"} while
+#' \code{"primary_variable = c(\"sex\",\"diagnosis\")"} must be \code{\"M_CT-M_ZZ\"} (default= NULL)
 #' @inheritParams cqn
 #' @inheritParams coerce_factors
 #' @inheritParams build_formula
@@ -885,20 +926,21 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
 differential_expression <- function(filtered_counts, cqn_counts, md,
                                     primary_variable, biomart_results,
                                     p_value_threshold, fold_change_threshold,
-                                    model_variables = NULL,
-                                    exclude_variables = NULL,
-                                    cores = NULL,
-                                    is_num = NULL, 
-                                    num_var = NULL) {
+                                    random_effect = NULL, model_variables = NULL,
+                                    exclude_variables = NULL, cores = NULL,
+                                    is_num = NULL, num_var = NULL,
+                                    cont = NULL) {
   # force order of samples in metadata to match order of samples in counts.
   # Required by variancePartition
   if(is.null(cores)){
     cores = parallel::detectCores()-1
   }
   md <- md[match(colnames(filtered_counts),rownames(md)),]
-  
-  metadata_input <- build_formula(md, primary_variable, model_variables, is_num = is_num, num_var = num_var)
-  
+
+  metadata_input <- build_formula(md, primary_variable, model_variables,
+                                  random_effect = random_effect, is_num = is_num,
+                                  num_var = num_var)
+
   gene_expression <- edgeR::DGEList(filtered_counts)
   gene_expression <- edgeR::calcNormFactors(gene_expression)
   voom_gene_expression <- variancePartition::voomWithDreamWeights(counts = gene_expression,
@@ -906,13 +948,13 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
                                                                   data = metadata_input$metadata,
                                                                   BPPARAM = BiocParallel::SnowParam(cores)
   )
-  
+
   voom_gene_expression$E <- cqn_counts
-  
+
   de_conditions <- metadata_input$de_conditions
   if(isTRUE(is_num)){
     de_conditions <- gsub("scale\\(",'',de_conditions)
-    if(all( ')' == stringr::str_sub(de_conditions, - 1, - 1))) {   
+    if(all( ')' == stringr::str_sub(de_conditions, - 1, - 1))) {
       de_conditions <- gsub("\\)",'',de_conditions)
     }
     conditions_for_contrast <- purrr::map_chr(metadata_input$de_conditions,
@@ -922,6 +964,21 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
                                                r = 2,
                                                v = conditions_for_contrast
     )
+
+    if(!is.null(cont)){
+      conts <- sapply(cont, function(i) { strsplit(i,'-')} )
+      new_setup_coefficients <- NULL
+      for( i in conts){
+        new_setup_coefficients <- rbind(
+          new_setup_coefficients,
+          setup_coefficients[
+            ( grepl(i[1],setup_coefficients[,1]) | grepl(i[1],setup_coefficients[,2])) &
+              ( grepl(i[2],setup_coefficients[,1]) | grepl(i[2],setup_coefficients[,2])),
+          ])
+      }
+      setup_coefficients <- new_setup_coefficients
+    }
+
   }else{
     conditions_for_contrast <- purrr::map_chr(de_conditions,
                                               function(x) glue::glue({metadata_input$primary_variable}, x)
@@ -930,8 +987,22 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
                                                r = 2,
                                                v = conditions_for_contrast
     )
+
+    if(!is.null(cont)){
+      conts <- sapply(cont, function(i) { strsplit(i,'-')} )
+      new_setup_coefficients <- NULL
+      for( i in conts){
+        new_setup_coefficients <- rbind(
+          new_setup_coefficients,
+          setup_coefficients[
+            ( grepl(i[1],setup_coefficients[,1]) | grepl(i[1],setup_coefficients[,2])) &
+              ( grepl(i[2],setup_coefficients[,1]) | grepl(i[2],setup_coefficients[,2])),
+          ])
+      }
+      setup_coefficients <- new_setup_coefficients
+    }
   }
-  
+
   contrasts <- lapply(seq_len(nrow(setup_coefficients)),
                       function(i) variancePartition::getContrast(exprObj = voom_gene_expression,
                                                                  formula = metadata_input$formula_non_intercept,
@@ -939,45 +1010,65 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
                                                                  coefficient = as.vector(setup_coefficients[i,])
                       )
   )
-  
+
   contrasts <- as.data.frame(contrasts)
-  
+
   df <- as.data.frame(setup_coefficients)
-  
+
   names(contrasts) <- stringr::str_glue_data(df, "{V1} - {V2}")
-  
+
   fit_contrasts = variancePartition::dream(exprObj = voom_gene_expression,
                                            formula = metadata_input$formula_non_intercept,
                                            data = metadata_input$metadata,
                                            L = contrasts,
                                            BPPARAM = BiocParallel::SnowParam(cores)
   )
-  
-  if(is.null(lme4::findbars(
-    stats::as.formula( metadata_input$formula_non_intercept) ))){
-    message('Applying eBayes Directly')
+
+  if (is.null(lme4::findbars(stats::as.formula(metadata_input$formula_non_intercept)))) {
+    message("Applying eBayes Directly")
     fit_contrasts <- limma::eBayes(fit_contrasts)
+
+    de <- lapply(names(contrasts), function(i, fit) {
+      genes <- limma::topTable(fit, coef = i, number = Inf,
+                               sort.by = "logFC", confint = TRUE)
+      genes <- tibble::rownames_to_column(genes, var = "ensembl_gene_id")
+    }, fit_contrasts)
+
+  }else {
+    CIs <- limma::eBayes(fit_contrasts)
+
+    de <- lapply(names(contrasts), function(i, fit, ci) {
+      genes <- limma::topTable(fit, coef = i, number = Inf,
+                               sort.by = "logFC")
+      genes <- tibble::rownames_to_column(genes, var = "ensembl_gene_id") #%>%
+      #dplyr::select(-CI.L, CI.R)
+
+      cis <- limma::topTable(ci, coef = i, number = Inf,
+                             sort.by = "logFC", confint = TRUE)
+      cis <- tibble::rownames_to_column(cis, var = "ensembl_gene_id")
+
+      genes <- cis %>%
+        dplyr::select(ensembl_gene_id,CI.L, CI.R) %>%
+        dplyr::left_join(.,genes, by='ensembl_gene_id') %>%
+        dplyr::select(., ensembl_gene_id, logFC, CI.L, CI.R, AveExpr, t, P.Value, adj.P.Val)
+
+    }, fit_contrasts, CIs)
   }
-  
-  de <- lapply(names(contrasts), function(i, fit){
-    genes <- limma::topTable(fit, coef = i, number = Inf, sort.by = "logFC")
-    genes <- tibble::rownames_to_column(genes, var = "ensembl_gene_id")
-  }, fit_contrasts)
-  
+
   if(isTRUE(is_num)){
     c_names <- names(contrasts)
     c_names <- gsub("scale\\(",'',c_names)
-    if(all( ')' == stringr::str_sub(c_names, - 1, - 1))) {   
+    if(all( ')' == stringr::str_sub(c_names, - 1, - 1))) {
       c_names <- gsub("\\)",'',c_names)
     }
-    
+
     replace_val <- strsplit(metadata_input$primary_variable,'[.]')[[1]][2]
     rep_val <-  gsub('[.]','*',metadata_input$primary_variable)
     c_names <- gsub(replace_val,rep_val,c_names)
-    
-    
+
+
     names(de) <- c_names
-    
+
     de <- data.table::rbindlist(de, idcol = "Comparison") %>%
       dplyr::mutate(Comparison = .data$Comparison,
                     Direction = .data$logFC/abs(.data$logFC),
@@ -987,10 +1078,10 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
                                        "none",
                                        .data$Direction)
       )
-    
+
   }else{
     names(de) <- names(contrasts)
-    
+
     de <- data.table::rbindlist(de, idcol = "Comparison") %>%
       dplyr::mutate(Comparison = gsub(metadata_input$primary_variable, "", .data$Comparison),
                     Direction = .data$logFC/abs(.data$logFC),
@@ -1001,19 +1092,19 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
                                        .data$Direction)
       )
   }
-  
+
   # Join metadata from biomart to differential expression results
   biomart_results <- tibble::rownames_to_column(biomart_results, var = "ensembl_gene_id")
-  
+
   de <- dplyr::left_join(de, biomart_results, by = c("ensembl_gene_id"))
-  
+
   object <- list(voom_object = voom_gene_expression,
                  contrasts_to_plot = contrasts,
                  fits = fit_contrasts,
                  differential_expression = de,
                  primary_variable = metadata_input$primary_variable,
                  formula = metadata_input$formula_non_intercept)
-  
+
   object
 }
 #' Wrapper for Differential Expression Analysis
@@ -1028,8 +1119,8 @@ differential_expression <- function(filtered_counts, cqn_counts, md,
 #' @export
 wrap_de <- function(conditions, filtered_counts, cqn_counts, md, dropped,
                     biomart_results, p_value_threshold, fold_change_threshold,
-                    model_variables = names(md), cores = NULL, is_num = NULL, 
-                    num_var = NULL) {
+                    model_variables = names(md), random_effect = NULL, exclude_variables = NULL,
+                    cores = NULL, cont = NULL, is_num = NULL, num_var = NULL) {
 
   if (!is.null(dropped)) {
     filtered_counts <- filtered_counts[
@@ -1043,13 +1134,15 @@ wrap_de <- function(conditions, filtered_counts, cqn_counts, md, dropped,
       cqn_counts,
       md,
       primary_variable = x$primary,
-      is_num = x$is_numeric_int, 
+      is_num = x$is_numeric_int,
       num_var = x$numeric,
       biomart_results,
       p_value_threshold,
       fold_change_threshold,
       model_variables,
-      cores = cores
+      random_effect = random_effect,
+      cores = cores,
+      cont = x$contrasts
       )
     )
 }
@@ -1066,13 +1159,13 @@ wrap_de <- function(conditions, filtered_counts, cqn_counts, md, dropped,
 #' the model, linear (mixed) model formula and vector of variables to include.
 #' @export
 stepwise_regression <- function(md, primary_variable, cqn_counts,
-                                model_variables = names(md),
-                                skip = NULL) {
+                                model_variables = names(md), skip = NULL,
+                                random_effect = NULL) {
   # skip stepwise generation if skip = TRUE
   if(isTRUE(skip)) {
     return("Skipping stepwise regression model generation...")
   } else {
-  metadata_input <- build_formula(md, primary_variable, model_variables)
+  metadata_input <- build_formula(md, primary_variable, model_variables, random_effect = random_effect)
   model <- mvIC::mvForwardStepwise(exprObj = cqn_counts$E,
                                    baseFormula = metadata_input$formula_base_model,
                                    data = metadata_input$metadata,
@@ -1393,8 +1486,8 @@ start_de <- function() {
 #' @export
 compute_residuals <- function(clean_metadata, filtered_counts, dropped,
                               cqn_counts = cqn_counts$E, primary_variable,
-                              model_variables = NULL, is_num = NULL, 
-                              num_var = NULL, cores = NULL)  {
+                              random_effect = NULL, model_variables = NULL,
+                              is_num = NULL, num_var = NULL, cores = NULL)  {
 
   if (!is.null(dropped)) {
     filtered_counts <- filtered_counts[
@@ -1409,13 +1502,14 @@ compute_residuals <- function(clean_metadata, filtered_counts, dropped,
   # force order of samples in metadata to match order of samples in counts.
   # Required by variancePartition
   clean_metadata <- clean_metadata[match(colnames(filtered_counts),rownames(clean_metadata)),]
-  
-  is_num <- primary_variable$is_numeric_int
-  num_var <- primary_variable$numeric
-  primary_variable <- primary_variable$primary
-  
-  metadata_input <- build_formula(clean_metadata, primary_variable, model_variables, is_num = is_num, num_var = num_var)
-  
+
+  #is_num <- primary_variable$is_numeric_int
+  #num_var <- primary_variable$numeric
+  #primary_variable <- primary_variable$primary
+
+  metadata_input <- build_formula(clean_metadata, primary_variable, model_variables,
+                                  random_effect = random_effect, is_num = is_num, num_var = num_var)
+
   # Estimate voom weights with DREAM
   gene_expression <- edgeR::DGEList(filtered_counts)
   gene_expression <- edgeR::calcNormFactors(gene_expression)

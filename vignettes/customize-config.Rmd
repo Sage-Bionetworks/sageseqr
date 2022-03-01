@@ -59,6 +59,9 @@ biomart:
   fastaVersion:   Optional. Include Synapse file version number (e.g. 3).
 factors:          Required. List of factor variables in brackets. Variables must be 
                   present in the metadata as column names (e.g. [ "donorid", "source"]).
+random_effect:    Optional. List of factor variables (must also be included in `factors`)
+                  that are to be treated as random effects in the linear regression model.
+                  (eg. ["donorid"])
 continuous:       Required. List of continuous variables in brackets. Variables must 
                   be present in the metadata as column names (e.g. [ "rin", "rin2"]).
 x_var:            Required. This is your predictor or primary variable of interest. 
@@ -102,6 +105,22 @@ de contrasts:     Required.
                   default (FALSE)
   numeric:        Optional. The numeric in variable which interacts with the 
                   primary variable(s). default (NULL)
+  contrasts:      Optional. A list specifying contrasts of the primary variable(s) 
+                  to consider for differential sequencing results if using factor(s)
+                  as your primary variable. If not specified all combinations will
+                  be tested. If specified this will speed up the pipeline. Specify 
+                  the contrast with the factor values involved in the contrast 
+                  seperated by a hyphen. (eg for diagnosis, `contrasts: ["AD-CT"]`
+                  where AD is the value in diagnosis column for cases and CT is 
+                  the value for controls. For multi-level contrasts, eg. `primary:
+                  ["diagnosis", "Sex"] would have contrasts specified as; `contrasts:
+                   ["ZZ_F-CT_F", "ZZ_M-CT_M"]` to look at cases vs controls in 
+                  females and cases vs controls in males independently. While the
+                  order before or after the hyphen doesn't matter, the order of values
+                  before/after the underscore does matter. The value order must be
+                  the same as the `primary:` specification. 
+                  eg. `primary: ["diagnosis","sex"]` must be CT_M 
+                  while `primary: ["sex","diagnosis"]` must be M_CT. 
   <any named list:> If there are multiple comparisons, set them up as nested lists.
 visualization gene list: Label this list of genes in the volcano plot.
 report:           Required. The name of your project. This will become the name of your 
