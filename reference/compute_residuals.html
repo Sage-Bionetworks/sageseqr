@@ -76,6 +76,7 @@
   <span class="va">dropped</span>,
   cqn_counts <span class="op">=</span> <span class="va">cqn_counts</span><span class="op">$</span><span class="va">E</span>,
   <span class="va">primary_variable</span>,
+  random_effect <span class="op">=</span> <span class="cn">NULL</span>,
   model_variables <span class="op">=</span> <span class="cn">NULL</span>,
   is_num <span class="op">=</span> <span class="cn">NULL</span>,
   num_var <span class="op">=</span> <span class="cn">NULL</span>,
@@ -98,6 +99,9 @@ were not cqn normalized</p></dd>
 <dt>primary_variable</dt>
 <dd><p>Vector of variables that will be collapsed into a single
 fixed effect interaction term.</p></dd>
+<dt>random_effect</dt>
+<dd><p>A vector of variables to consider as random effects instead
+of fixed effects.</p></dd>
 <dt>model_variables</dt>
 <dd><p>Optional. Vector of variables to include in the linear (mixed) model.
 If not supplied, the model will include all variables in <code>md</code>.</p></dd>

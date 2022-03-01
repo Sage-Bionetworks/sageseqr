@@ -80,6 +80,7 @@ multiple variables that might have an order of magnitude difference.</p>
   model_variables <span class="op">=</span> <span class="cn">NULL</span>,
   is_num <span class="op">=</span> <span class="cn">NULL</span>,
   num_var <span class="op">=</span> <span class="cn">NULL</span>,
+  random_effect <span class="op">=</span> <span class="cn">NULL</span>,
   exclude_variables <span class="op">=</span> <span class="cn">NULL</span>
 <span class="op">)</span></code></pre></div>
     </div>
@@ -98,6 +99,9 @@ If not supplied, the model will include all variables in <code>md</code>.</p></d
 <dd><p>Is there a numerical covariate to use as an interaction with the primary variable(s). default= NULL</p></dd>
 <dt>num_var</dt>
 <dd><p>A numerical metadata column to use in an inaction with the primary variable(s). default= NULL</p></dd>
+<dt>random_effect</dt>
+<dd><p>A vector of variables to consider as random effects instead
+of fixed effects.</p></dd>
 <dt>exclude_variables</dt>
 <dd><p>Vector of variables to exclude from testing.</p></dd>
 </dl></div>

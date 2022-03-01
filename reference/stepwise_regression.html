@@ -73,7 +73,8 @@ Critera (BIC) by wrapping <code>"mvIC::mvForwardStepwise()"</code>.</p>
   <span class="va">primary_variable</span>,
   <span class="va">cqn_counts</span>,
   model_variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">md</span><span class="op">)</span>,
-  skip <span class="op">=</span> <span class="cn">NULL</span>
+  skip <span class="op">=</span> <span class="cn">NULL</span>,
+  random_effect <span class="op">=</span> <span class="cn">NULL</span>
 <span class="op">)</span></code></pre></div>
     </div>
 
@@ -92,6 +93,9 @@ If not supplied, the model will include all variables in <code>md</code>.</p></d
 <dt>skip</dt>
 <dd><p>Defaults to NULL. If TRUE, this step will be skipped in the
 targets plan.</p></dd>
+<dt>random_effect</dt>
+<dd><p>A vector of variables to consider as random effects instead
+of fixed effects.</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
