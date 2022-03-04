@@ -726,7 +726,7 @@ mclust::mclustBIC
 #' fixed effect interaction term.
 #' @param random_effect A vector of variables to consider as random effects instead
 #' of fixed effects.
-#' @param add_model Optional. User Speciffied variables to add to the null model 
+#' @param add_model Optional. User Speciffied variables to add to the null model
 #' apriori to model generation. (Default = NULL)
 #' @param is_num Is there a numerical covariate to use as an interaction with the primary variable(s). default= NULL
 #' @param num_var A numerical metadata column to use in an inaction with the primary variable(s). default= NULL
@@ -787,6 +787,8 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
            "numeric" = glue::glue("scale(", col_type$variable[i], ")")
     )
   })
+  names(form) <- col_type$variable
+
   # List with multiple values can cause glue_collapse to fail. This step is conservative
   # as it unlists all lists at this step.
   if (class(primary_variable) == "list") {
@@ -844,13 +846,20 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
                  "+",
                  glue::glue_collapse(form, sep = "+")
       ))
-
-    formula_base_model = formula(glue::glue("~ ",
-                                            glue::glue_collapse(
-                                              de_conditions,
-                                              sep = "+"
-                                            )
-    ))
+    if(!is.null(add_model)){
+      formula_base_model = formula(glue::glue("~ {interaction_term}+",
+                                              glue::glue_collapse(
+                                                form[add_model],
+                                                sep = "+"
+                                              )
+                                            ))
+    }else{
+      formula_base_model = formula(glue::glue("~ ",
+                                              glue::glue_collapse(
+                                                c(de_conditions,form[add_model]),
+                                                sep = "+")
+                                            ))
+    }
 
   }else{
     # A new categorical is created to model an interaction between two variables
@@ -871,7 +880,12 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
       glue::glue("~ 0+{interaction_term}+", glue::glue_collapse(form, sep = "+")
       ))
 
-    formula_base_model = formula(glue::glue("~ {interaction_term}"))
+    if(!is.null(add_model)){
+      formula_base_model = formula(glue::glue("~ {interaction_term}+",
+                                              glue::glue_collapse(form[add_model], sep = "+")))
+    }else{
+      formula_base_model = formula(glue::glue("~ {interaction_term}"))
+    }
   }
 
   object <- list(metadata = metadata,
