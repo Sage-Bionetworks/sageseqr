@@ -85,6 +85,8 @@ dimensions:       Required. Specify the PCA dimensions by variable name.
   size:
 skip model:       Optional. If TRUE, the exploratory data report is run. Model selection
                   is not computed.
+force null model: Optional. Variables to add to the model aprori eg. sex that users want
+                  to account for.
 force model with: Optional. Force differential expression with this user defined model
                   instead of the output of stepwise regression.
 cores:            Optional. Specify an integer of cores to use with a BiocParallel 

@@ -726,6 +726,8 @@ mclust::mclustBIC
 #' fixed effect interaction term.
 #' @param random_effect A vector of variables to consider as random effects instead
 #' of fixed effects.
+#' @param add_model Optional. User Speciffied variables to add to the null model 
+#' apriori to model generation. (Default = NULL)
 #' @param is_num Is there a numerical covariate to use as an interaction with the primary variable(s). default= NULL
 #' @param num_var A numerical metadata column to use in an inaction with the primary variable(s). default= NULL
 #' @param exclude_variables Vector of variables to exclude from testing.
@@ -733,7 +735,7 @@ mclust::mclustBIC
 #' @export
 build_formula <- function(md, primary_variable, model_variables = NULL,
                           is_num = NULL, num_var = NULL, random_effect = NULL,
-                          exclude_variables = NULL) {
+                          exclude_variables = NULL, add_model = NULL) {
 
 
   if (!(all(purrr::map_lgl(md, function(x) inherits(x, c("numeric", "factor")))))) {
@@ -742,14 +744,15 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
 
   if (!is.null(model_variables)) {
     if(!is.null(num_var) | !isFALSE(num_var)){
-      vars <- c(model_variables, primary_variable,num_var)
+      vars <- c(model_variables, add_model, primary_variable,num_var)
       vars <- vars[!duplicated(vars)]
       md <- dplyr::select(md, dplyr::all_of(vars))
     }else{
       #md <- dplyr::select(md, dplyr::all_of(c(model_variables,
       #                                        num_var, primary_variable)))
       md <- dplyr::select(md, dplyr::all_of(c(model_variables,
-                                             primary_variable)))
+                                              add_model,
+                                              primary_variable)))
     }
   }
 
@@ -1160,12 +1163,12 @@ wrap_de <- function(conditions, filtered_counts, cqn_counts, md, dropped,
 #' @export
 stepwise_regression <- function(md, primary_variable, cqn_counts,
                                 model_variables = names(md), skip = NULL,
-                                random_effect = NULL) {
+                                random_effect = NULL, add_model = NULL) {
   # skip stepwise generation if skip = TRUE
   if(isTRUE(skip)) {
     return("Skipping stepwise regression model generation...")
   } else {
-  metadata_input <- build_formula(md, primary_variable, model_variables, random_effect = random_effect)
+  metadata_input <- build_formula(md, primary_variable, model_variables, add_model = add_model random_effect = random_effect)
   model <- mvIC::mvForwardStepwise(exprObj = cqn_counts$E,
                                    baseFormula = metadata_input$formula_base_model,
                                    data = metadata_input$metadata,
