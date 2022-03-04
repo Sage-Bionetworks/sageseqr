@@ -10,7 +10,8 @@ stepwise_regression(
   cqn_counts,
   model_variables = names(md),
   skip = NULL,
-  random_effect = NULL
+  random_effect = NULL,
+  add_model = NULL
 )
 }
 \arguments{
@@ -29,6 +30,9 @@ targets plan.}
 
 \item{random_effect}{A vector of variables to consider as random effects instead
 of fixed effects.}
+
+\item{add_model}{Optional. User Speciffied variables to add to the null model 
+apriori to model generation. (Default = NULL)}
 }
 \value{
 Table with BIC criteria for exclusion or inclusion of variables in
