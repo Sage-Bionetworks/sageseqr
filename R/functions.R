@@ -893,7 +893,7 @@ build_formula <- function(md, primary_variable, model_variables = NULL,
                  formula_non_intercept = formula_non_intercept,
                  formula_base_model = formula_base_model,
                  primary_variable = interaction_term,
-                 variables = unlist(form),
+                 variables = unlist(form[!(names(form) %in% add_model)]),
                  de_conditions = de_conditions
   )
 
