@@ -11,7 +11,8 @@ build_formula(
   is_num = NULL,
   num_var = NULL,
   random_effect = NULL,
-  exclude_variables = NULL
+  exclude_variables = NULL,
+  add_model = NULL
 )
 }
 \arguments{
@@ -31,6 +32,9 @@ If not supplied, the model will include all variables in \code{md}.}
 of fixed effects.}
 
 \item{exclude_variables}{Vector of variables to exclude from testing.}
+
+\item{add_model}{Optional. User Speciffied variables to add to the null model 
+apriori to model generation. (Default = NULL)}
 }
 \description{
 If a linear mixed model is used, all categorical variables must be

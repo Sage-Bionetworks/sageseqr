@@ -147,6 +147,7 @@ list(
     model,
     stepwise_regression(
       clean_md,
+      add_model = get("force null model"),
       primary_variable = get("x_var"),
       cqn_counts = cqn_counts,
       skip = get("skip model"),
