@@ -30,7 +30,7 @@ multiple variables that might have an order of magnitude difference."><!-- mathj
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -81,7 +81,8 @@ multiple variables that might have an order of magnitude difference.</p>
   is_num <span class="op">=</span> <span class="cn">NULL</span>,
   num_var <span class="op">=</span> <span class="cn">NULL</span>,
   random_effect <span class="op">=</span> <span class="cn">NULL</span>,
-  exclude_variables <span class="op">=</span> <span class="cn">NULL</span>
+  exclude_variables <span class="op">=</span> <span class="cn">NULL</span>,
+  add_model <span class="op">=</span> <span class="cn">NULL</span>
 <span class="op">)</span></code></pre></div>
     </div>
 
@@ -104,6 +105,9 @@ If not supplied, the model will include all variables in <code>md</code>.</p></d
 of fixed effects.</p></dd>
 <dt>exclude_variables</dt>
 <dd><p>Vector of variables to exclude from testing.</p></dd>
+<dt>add_model</dt>
+<dd><p>Optional. User Speciffied variables to add to the null model 
+apriori to model generation. (Default = NULL)</p></dd>
 </dl></div>
 
   </div>

@@ -27,7 +27,7 @@ Critera (BIC) by wrapping "mvIC::mvForwardStepwise()".'><!-- mathjax --><script 
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -74,7 +74,8 @@ Critera (BIC) by wrapping <code>"mvIC::mvForwardStepwise()"</code>.</p>
   <span class="va">cqn_counts</span>,
   model_variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">md</span><span class="op">)</span>,
   skip <span class="op">=</span> <span class="cn">NULL</span>,
-  random_effect <span class="op">=</span> <span class="cn">NULL</span>
+  random_effect <span class="op">=</span> <span class="cn">NULL</span>,
+  add_model <span class="op">=</span> <span class="cn">NULL</span>
 <span class="op">)</span></code></pre></div>
     </div>
 
@@ -96,6 +97,9 @@ targets plan.</p></dd>
 <dt>random_effect</dt>
 <dd><p>A vector of variables to consider as random effects instead
 of fixed effects.</p></dd>
+<dt>add_model</dt>
+<dd><p>Optional. User Speciffied variables to add to the null model 
+apriori to model generation. (Default = NULL)</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
