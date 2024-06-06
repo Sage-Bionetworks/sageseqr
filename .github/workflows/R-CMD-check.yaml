@@ -22,5 +22,6 @@ jobs:
       - name: Check
         run: |
           install.packages(c("remotes", "rcmdcheck"))
+          remotes::install_github("https://github.com/fischuu/GenomicTools")
           rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "warning")
         shell: Rscript {0}
