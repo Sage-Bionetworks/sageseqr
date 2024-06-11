@@ -980,7 +980,7 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
     matrix(
       NA,
       nrow = filt_pcs,
-      ncol = 0)
+      ncol = 1)
     ) %>%
     dplyr::mutate(
       .,
@@ -1022,7 +1022,7 @@ plot_sexcheck_pca <- function(clean_metadata, count_df, biomart_results,
           method='kendall')$statistic
       )))
     )
-
+  test_vals <- test_vals[, c('xist_pval','xist_coeff','uty_pval','uty_coeff') ]
   # adjust P-values for multiple comparisons
   test_vals$xist_pval <- stats::p.adjust(
     p = test_vals$xist_pval,
